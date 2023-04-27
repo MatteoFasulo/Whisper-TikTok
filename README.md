@@ -2,9 +2,10 @@
 From AI tools to TikTok video creation using Adobe Premiere Pro and Edge read aloud feature
 
 # Requirements
-Tested in python 3.8 on Windows 10. For full install run
+Tested in python 3.8 and 3.9 on Windows 10. Install first pipenv
 ```python
-pip install -r requirements.txt
+pip install -U pipenv # after this run
+pipenv install
 ```
 If you only want to test the Edge-TTS feature then run
 ```python

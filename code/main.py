@@ -11,7 +11,7 @@ path = f"F:\\Vari Progetti\\AI_YouTube\\source\\{outfile}"
 with open('script.txt', 'r') as file:
     text = file.read().rstrip().replace('"',"'")
 
-final_text = f"{series}. Part {part}.\n{text}\n{outro}"
+final_text = f"{series} Part {part}.\n{text}\n{outro}"
 
 with subprocess.Popen(f'edge-tts --voice en-US-ChristopherNeural --text "{final_text}" --write-media "{path}"', stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as process:
     pass

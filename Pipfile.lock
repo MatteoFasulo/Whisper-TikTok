@@ -1,12 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d8b7cf3b82f2a3770de9eee4079d41316fa3d2daa1e190dc05fcfc3458fb7999"
+            "sha256": "70c10ff4ab8bc189ec52f5b342a756866ed9e4ffc71daa35cb3501682a52e849"
         },
         "pipfile-spec": 6,
-        "requires": {
-            "python_version": "3.9"
-        },
+        "requires": {},
         "sources": [
             {
                 "name": "pypi",
@@ -230,6 +228,14 @@
             "markers": "platform_system == 'Windows'",
             "version": "==0.4.6"
         },
+        "easygui": {
+            "hashes": [
+                "sha256:33498710c68b5376b459cd3fc48d1d1f33822139eb3ed01defbc0528326da3ba",
+                "sha256:d653ff79ee1f42f63b5a090f2f98ce02335d86ad8963b3ce2661805cafe99a04"
+            ],
+            "index": "pypi",
+            "version": "==0.98.3"
+        },
         "edge-tts": {
             "hashes": [
                 "sha256:2f1f4c12516576971264243186a278159dae69bd98bbf14763a057e3b3871ef7",
@@ -408,11 +414,19 @@
         },
         "openai": {
             "hashes": [
-                "sha256:3b82c867d531e1fd2003d9de2131e1c4bfd4c70b1a3149e0543a555b30807b70",
-                "sha256:9f9d27d26e62c6068f516c0729449954b5ef6994be1a6cbfe7dbefbc84423a04"
+                "sha256:5b2121d8c0a4350626096fa482306d12e246a83b992530d54fd474f309f2882c",
+                "sha256:75778ca05759c77dde704985ee16976ba58804212f10e61f44356e68ffb8390e"
             ],
             "index": "pypi",
-            "version": "==0.27.4"
+            "version": "==0.27.5"
+        },
+        "python-dotenv": {
+            "hashes": [
+                "sha256:a8df96034aae6d2d50a4ebe8216326c61c3eb64836776504fcca410e5937a3ba",
+                "sha256:f5971a9226b701070a4bf2c38c89e5a3f0d64de8debda981d1db98583009122a"
+            ],
+            "index": "pypi",
+            "version": "==1.0.0"
         },
         "requests": {
             "hashes": [

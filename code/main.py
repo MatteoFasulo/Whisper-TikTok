@@ -1,9 +1,18 @@
-from typing import Tuple
-import os
 import platform
-import asyncio
+import os
 import random
+import re
+import asyncio
+from datetime import timedelta
+from typing import Tuple
 
+# ENV
+from dotenv import load_dotenv, find_dotenv
+
+# OpenAI Whisper Model PyTorch
+import whisper
+
+# MicrosoftEdge TTS 
 import edge_tts
 from edge_tts import VoicesManager
 
@@ -15,47 +24,66 @@ jsonData = {"series": "Crazy facts that you did not know",
             "outro": "Follow us for more",
             "random": False,
             "path": "F:\\Vari Progetti\\AI_YouTube\\source",
-            "texts": ["Example 1", "Example 2", "Example 3"]}
+            "texts": ["Did you know that there are more possible iterations of a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120, while the estimated number of atoms in the observable universe is 10^80. This means that if every atom in the universe were a chess game being played out simultaneously, there still wouldn't be enough atoms to represent every possible iteration of the game!","Example2","Example 3"]}
 
 #######################
 #         CODE        #
 #######################
 async def main() -> bool:
-    """
-    Asynchronous function that generates and synthesizes speech from a list of text strings.
+    load_dotenv(find_dotenv())
 
-    Args:
-        None. Assumes that the necessary data is stored in a global variable called `jsonData`.
-        `jsonData` is expected to be a dictionary with the following keys:
-            - 'series': an integer indicating the index of the series.
-            - 'part': an integer indicating the index of the part.
-            - 'outro': a string with the outro text.
-            - 'path': a string with the path to store the synthesized audio files.
-            - 'random': a boolean indicating whether to use a random voice or not.
-            - 'texts': a list of strings with the text to synthesize.
-
-    Returns:
-        A boolean value indicating whether the function executed successfully (always True).
-
-    Raises:
-        This function does not raise any exceptions.
-
-    Side effects:
-        This function generates speech and saves it to disk. It also updates the `part` counter in `jsonData`.
-
-    """
     series = jsonData['series']
     part = jsonData['part']
     outro = jsonData['outro']
     path = jsonData['path']
-    random_voice = jsonData['random']
 
+    model = whisper.load_model("base")
+
+    # Text 2 Speech (TikTok API) Batched
     for text in jsonData['texts']:
-        final_text, outfile = create_full_text(path, series, part, text, outro)
-        await tts(final_text, outfile=outfile, random_voice=random_voice)
+        req_text, filename = create_full_text(path, series, part, text, outro)
+        #textlist = textwrap.wrap(req_text, width=150, break_long_words=True, break_on_hyphens=False)
+        #os.makedirs('./batch/')
+        #for i, item in enumerate(textlist):
+        #    tts(session_id, req_text=item, filename=f'./batch/{i}.mp3')
+#
+        #batch_create(filename)
+#
+        #for item in os.listdir('./batch/'):
+        #    pass
+        #    os.remove('./batch/' + item)
+        #os.removedirs('./batch/')
+        await tts(req_text, outfile=filename)
+
+        # Whisper Model to create SRT file from Speech recording
+        transcribe = model.transcribe(filename)
+        segments = transcribe['segments']
+        for segment in segments:
+            startTime = str(0)+str(timedelta(seconds=int(segment['start'])))+',000'
+            endTime = str(0)+str(timedelta(seconds=int(segment['end'])))+',000'
+            text = segment['text'].upper()
+            segmentId = segment['id']+1
+            segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:] if text[0] == ' ' else text}\n\n"
+
+            srtFilename = os.path.join(f"{path}\\{series}\\", f"{series.replace(' ', '')}_{part}.srt")
+            with open(srtFilename, 'a', encoding='utf-8') as srtFile:
+                srtFile.write(segment)
+        
+        # Increment part so it can fetch the next text in JSON
         part += 1
 
     return True
+
+def batch_create(filename: str) -> None:
+    with open(filename, 'wb') as out:
+        def sorted_alphanumeric(data):
+            convert = lambda text: int(text) if text.isdigit() else text.lower()
+            alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+            return sorted(data, key=alphanum_key)
+            
+        for item in sorted_alphanumeric(os.listdir('./batch/')):
+            filestuff = open('./batch/' + item, 'rb').read()
+            out.write(filestuff)
 
 
 def create_directory(path: str, directory: str) -> bool:
@@ -107,11 +135,54 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
         ("My Series Part 2.\nThis is some text\nThanks for listening!", 'audio\\MySeries\\MySeries_2.mp3')
 
     """
-    final_text = f"{series} Part {part}.\n{text}\n{outro}"
-    outfile = f"{path}\\{series}\\{series.replace(' ', '')}_{part}.mp3"
+    req_text = f"{series} Part {part}.\n{text}\n{outro}"
+    filename = f"{path}\\{series}\\{series.replace(' ', '')}_{part}.mp3"
     create_directory(path, directory=series)
-    return final_text, outfile
+    return req_text, filename
 
+
+#def tts(session_id: str, text_speaker: str = 'en_us_010', req_text: str = 'TikTok Text to Speech', filename: str = 'voice.mp3'):
+#    req_text = req_text.replace("+", "plus").replace("&", "and").replace("r/", "")
+#
+#    headers = {
+#        'User-Agent': 'com.zhiliaoapp.musically/2022600030 (Linux; U; Android 7.1.2; es_ES; SM-G988N; Build/NRD90M;tt-ok/3.12.13.1)',
+#        'Cookie': f'sessionid={session_id}'
+#    }
+#    url = f"https://api16-normal-c-useast1a.tiktokv.com/media/api/text/speech/invoke/"
+#
+#    params = {"req_text": req_text, "speaker_map_type": 0, "aid": 1233, "text_speaker": text_speaker}
+#
+#    r = requests.post(url, headers=headers, params=params)
+#
+#    if r.json()["message"] == "Couldn't load speech. Try again.":
+#        output_data = {"status": "Session ID is invalid", "status_code": 5}
+#        print(output_data)
+#        return output_data
+#
+#    vstr = [r.json()["data"]["v_str"]][0]
+#    msg = [r.json()["message"]][0]
+#    scode = [r.json()["status_code"]][0]
+#    log = [r.json()["extra"]["log_id"]][0]
+#    
+#    dur = [r.json()["data"]["duration"]][0]
+#    spkr = [r.json()["data"]["speaker"]][0]
+#
+#    b64d = base64.b64decode(vstr)
+#    
+#    with open(filename, "wb") as out:
+#        out.write(b64d)
+#
+#    output_data = {
+#        "status": msg.capitalize(),
+#        "status_code": scode,
+#        "duration": dur,
+#        "speaker": spkr,
+#        "log": log
+#    }
+#
+#    print(output_data)
+#
+#    return output_data
 
 async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", random_voice: bool = False, stdout: bool = False, outfile: str = "tts.mp3") -> bool:
     """
@@ -141,6 +212,8 @@ async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", random_vo
         await communicate.save(outfile)
     return True
 
+#if __name__ == "__main__":
+#    main()
 
 if __name__ == "__main__":
     if platform.system()=='Windows':

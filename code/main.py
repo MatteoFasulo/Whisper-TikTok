@@ -2,9 +2,13 @@ import platform
 import os
 import random
 import re
+import sys
 import asyncio
+import multiprocessing
 from datetime import timedelta
 from typing import Tuple
+
+from tqdm import tqdm
 
 # ENV
 from dotenv import load_dotenv, find_dotenv
@@ -15,6 +19,9 @@ import whisper
 # MicrosoftEdge TTS
 import edge_tts
 from edge_tts import VoicesManager
+
+# FFMPEG (Python)
+import ffmpeg
 
 #######################
 #        STATIC       #
@@ -39,6 +46,7 @@ async def main() -> bool:
     outro = jsonData['outro']
     path = jsonData['path']
 
+    current_cwd = os.getcwd()
     model = whisper.load_model("base")
 
     # Text 2 Speech (TikTok API) Batched
@@ -47,12 +55,74 @@ async def main() -> bool:
         await tts(req_text, outfile=filename)
 
         # Whisper Model to create SRT file from Speech recording
-        srt_create(model, path, series, part, text, filename)
+        srt_filename = srt_create(model, path, series, part, text, filename)
+
+        os.chdir(current_cwd)
+        background_mp4 = random_background()
+        file_info = get_info(background_mp4)
+        prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, W=file_info.get('width'), H=file_info.get('height'), duration=int(file_info.get('duration')))
 
         # Increment part so it can fetch the next text in JSON
         part += 1
 
     return True
+
+def random_background(folder_path: str = "background"):
+    os.chdir(folder_path)
+    files = os.listdir(f"{os.getcwd()}")
+    random_file = random.choice(files)
+    return os.path.abspath(random_file)
+
+def get_info(file_path: str):
+    try:
+        probe = ffmpeg.probe(file_path)
+        video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+        if video_stream is None:
+            print('No video stream found', file=sys.stderr)
+            audio_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
+            bit_rate = int(audio_stream['bit_rate'])
+            duration = float(audio_stream['duration'])
+            return {'bit_rate': bit_rate, 'duration': duration}
+        
+        width = int(video_stream['width'])
+        height = int(video_stream['height'])
+        duration = float(video_stream['duration'])
+        print(f"File: {file_path}\nResolution: {width} x {height}\nDuration: {duration} seconds")
+        return {'width': width,'height': height, 'duration': duration}
+    except ffmpeg.Error as e:
+        print(e.stderr, file=sys.stderr)
+        sys.exit(1)
+
+def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: int, duration:int): 
+    # Crop if too large
+    if (W > 1080) and (H > 1920):
+        W, H = 1080, 1920
+    # Get length of MP3 file to be merged with
+    audio_info = get_info(filename_mp3)
+
+    output_path = f"{os.getcwd()}{os.sep}background.mp4"
+
+    input_video = ffmpeg.input(background_mp4)
+    input_audio = ffmpeg.input(filename_mp3)
+    subtitles_stream = ffmpeg.input(filename_srt)
+
+    cropped_video = input_video.filter('crop', f'ih*({W}/{H})', 'ih')
+
+    merged = ffmpeg.filter([cropped_video, input_audio], 'amix', inputs=2)
+
+    output = merged.output(output_path, acodec="aac", strict="experimental", **{
+        'c:v': 'h264',
+        'b:v': '10M',
+        'f': 'mp4',
+        'b:a': '192k',
+        "to": audio_info.get('duration'),
+        'threads': multiprocessing.cpu_count(),
+    })
+
+    output.run_async(quiet=False)
+    
+    return output_path
+
 
 
 def srt_create(model, path: str, series: str, part: int, text: str, filename: str) -> bool:
@@ -84,6 +154,8 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
             f"{path}\\{series}\\", f"{series.replace(' ', '')}_{part}.srt")
         with open(srtFilename, 'a', encoding='utf-8') as srtFile:
             srtFile.write(segment)
+    
+    return srtFilename
 
 
 def batch_create(filename: str) -> None:

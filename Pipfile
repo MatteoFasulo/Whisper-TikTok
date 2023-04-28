@@ -8,5 +8,9 @@ edge-tts = "*"
 openai = "*"
 easygui = "*"
 python-dotenv = "*"
+torchvision = "*"
+torchaudio = "*"
+openai-whisper = "*"
+ffmpeg-python = "*"
 
 [dev-packages]

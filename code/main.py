@@ -100,27 +100,27 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: in
     # Get length of MP3 file to be merged with
     audio_info = get_info(filename_mp3)
 
-    output_path = f"{os.getcwd()}{os.sep}background.mp4"
-
-    input_video = ffmpeg.input(background_mp4)
-    input_audio = ffmpeg.input(filename_mp3)
-    subtitles_stream = ffmpeg.input(filename_srt)
-
-    cropped_video = input_video.filter('crop', f'ih*({W}/{H})', 'ih')
-
-    merged = ffmpeg.filter([cropped_video, input_audio], 'amix', inputs=2)
-
-    output = merged.output(output_path, acodec="aac", strict="experimental", **{
-        'c:v': 'h264',
-        'b:v': '10M',
-        'f': 'mp4',
-        'b:a': '192k',
-        "to": audio_info.get('duration'),
-        'threads': multiprocessing.cpu_count(),
-    })
-
-    output.run_async(quiet=False)
-    
+    output = (
+        ffmpeg.input(f"{background_mp4}")
+        .filter("crop", f"ih*({W}/{H})", "ih")
+        .concat(f"{background_mp4}", )
+        .output(
+            output_path:=f"{os.getcwd()}{os.sep}background.mp4",
+            **{
+                "c:v": "h264",
+                "b:v": "10M",
+                "b:a": "192k",
+                "to": audio_info.get('duration'),
+                "threads": multiprocessing.cpu_count(),
+            },
+        )
+        .overwrite_output()
+    )
+    try:
+        output.run_async(quiet=False)
+    except Exception as e:
+        print(e)
+        exit()
     return output_path
 
 

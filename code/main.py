@@ -3,6 +3,7 @@ import os
 import random
 import re
 import sys
+import subprocess
 import asyncio
 import multiprocessing
 from datetime import timedelta
@@ -23,6 +24,8 @@ from edge_tts import VoicesManager
 # FFMPEG (Python)
 import ffmpeg
 
+HOME = os.getcwd()
+
 #######################
 #        STATIC       #
 #######################
@@ -30,7 +33,7 @@ jsonData = {"series": "Crazy facts that you did not know",
             "part": 4,
             "outro": "Follow us for more",
             "random": False,
-            "path": "F:\\Vari Progetti\\AI_YouTube\\source",
+            "path": "F:\\PremiereTrash",
             "texts": ["Did you know that there are more possible iterations of a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120, while the estimated number of atoms in the observable universe is 10^80. This means that if every atom in the universe were a chess game being played out simultaneously, there still wouldn't be enough atoms to represent every possible iteration of the game!", "Example2", "Example 3"]}
 
 #######################
@@ -46,10 +49,9 @@ async def main() -> bool:
     outro = jsonData['outro']
     path = jsonData['path']
 
-    current_cwd = os.getcwd()
     model = whisper.load_model("base")
 
-    # Text 2 Speech (TikTok API) Batched
+    # Text 2 Speech (Edge TTS API)
     for text in jsonData['texts']:
         req_text, filename = create_full_text(path, series, part, text, outro)
         await tts(req_text, outfile=filename)
@@ -57,72 +59,75 @@ async def main() -> bool:
         # Whisper Model to create SRT file from Speech recording
         srt_filename = srt_create(model, path, series, part, text, filename)
 
-        os.chdir(current_cwd)
         background_mp4 = random_background()
         file_info = get_info(background_mp4)
-        prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, W=file_info.get('width'), H=file_info.get('height'), duration=int(file_info.get('duration')))
+        prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, W=file_info.get(
+            'width'), H=file_info.get('height'), duration=int(file_info.get('duration')))
 
         # Increment part so it can fetch the next text in JSON
+        break
         part += 1
 
     return True
 
+
 def random_background(folder_path: str = "background"):
-    os.chdir(folder_path)
-    files = os.listdir(f"{os.getcwd()}")
+    os.chdir(f"{HOME}{os.sep}{folder_path}")
+    files = os.listdir(".")
     random_file = random.choice(files)
     return os.path.abspath(random_file)
+
 
 def get_info(file_path: str):
     try:
         probe = ffmpeg.probe(file_path)
-        video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+        video_stream = next(
+            (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
         if video_stream is None:
             print('No video stream found', file=sys.stderr)
-            audio_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
+            audio_stream = next(
+                (stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
             bit_rate = int(audio_stream['bit_rate'])
             duration = float(audio_stream['duration'])
             return {'bit_rate': bit_rate, 'duration': duration}
-        
+
         width = int(video_stream['width'])
         height = int(video_stream['height'])
         duration = float(video_stream['duration'])
-        print(f"File: {file_path}\nResolution: {width} x {height}\nDuration: {duration} seconds")
-        return {'width': width,'height': height, 'duration': duration}
+        return {'width': width, 'height': height, 'duration': duration}
     except ffmpeg.Error as e:
         print(e.stderr, file=sys.stderr)
         sys.exit(1)
 
-def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: int, duration:int): 
+
+def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: int, duration: int):
     # Crop if too large
     if (W > 1080) and (H > 1920):
         W, H = 1080, 1920
+
     # Get length of MP3 file to be merged with
     audio_info = get_info(filename_mp3)
 
-    output = (
-        ffmpeg.input(f"{background_mp4}")
-        .filter("crop", f"ih*({W}/{H})", "ih")
-        .concat(f"{background_mp4}", )
-        .output(
-            output_path:=f"{os.getcwd()}{os.sep}background.mp4",
-            **{
-                "c:v": "h264",
-                "b:v": "10M",
-                "b:a": "192k",
-                "to": audio_info.get('duration'),
-                "threads": multiprocessing.cpu_count(),
-            },
-        )
-        .overwrite_output()
-    )
-    try:
-        output.run_async(quiet=False)
-    except Exception as e:
-        print(e)
-        exit()
-    return output_path
+    # Get starting time:
+    audio_duration = int(round(audio_info.get('duration'),0))
+    # print(duration-audio_duration)
+    ss = random.randint(0, (duration-audio_duration))
+    if ss < 0:
+        ss = 0
 
+    current_cwd = os.getcwd()
+    srt_filename = filename_srt.split('\\')[-1]
+    srt_path = "\\".join(filename_srt.split('\\')[:-1])
+    print(f"{filename_srt = }\n{background_mp4 = }\n{filename_mp3 = }\n")   #
+                                                                            #'Alignment=9,BorderStyle=3,Outline=5,Shadow=71,Fontsize=12,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(5), "-i", background_mp4, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, boxblur=luma_radius=3:chroma_radius=3, subtitles={srt_filename}:force_style='Alignment=8,OutlineColour=&HFFFFFFFF,Shadow=90,Fontsize=15,MarginL=45,MarginR=85,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "ultrafast", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{os.getcwd()}{os.sep}output_{ss}.mp4", "-y"]
+    os.chdir(srt_path)
+    print('\n\n\n\n\n\n'+' '.join(args)+'\n\n')
+    with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
+        pass
+    os.chdir(current_cwd)
+    
+    return True
 
 
 def srt_create(model, path: str, series: str, part: int, text: str, filename: str) -> bool:
@@ -144,18 +149,29 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
     transcribe = model.transcribe(filename)
     segments = transcribe['segments']
     for segment in segments:
-        startTime = str(0)+str(timedelta(seconds=int(segment['start'])))+',000'
-        endTime = str(0)+str(timedelta(seconds=int(segment['end'])))+',000'
-        text = segment['text'].upper()
+        startTime = convert_time(segment['start'])
+        endTime = convert_time(segment['end'])
+        text = segment['text']
         segmentId = segment['id']+1
-        segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:] if text[0] == ' ' else text}\n\n"
+        segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:].upper() if text[0] == ' ' else text.upper()}\n\n"
 
+        series = series.replace(' ', '_')
         srtFilename = os.path.join(
             f"{path}\\{series}\\", f"{series.replace(' ', '')}_{part}.srt")
         with open(srtFilename, 'a', encoding='utf-8') as srtFile:
             srtFile.write(segment)
-    
+
+    os.chdir(HOME)
     return srtFilename
+
+
+def convert_time(time_in_seconds):
+    hours = int(time_in_seconds // 3600)
+    minutes = int((time_in_seconds % 3600) // 60)
+    seconds = int(time_in_seconds % 60)
+    milliseconds = int((time_in_seconds - int(time_in_seconds)) * 1000)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
+
 
 
 def batch_create(filename: str) -> None:
@@ -219,7 +235,8 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
 
     """
     req_text = f"{series} Part {part}.\n{text}\n{outro}"
-    filename = f"{path}\\{series}\\{series.replace(' ', '')}_{part}.mp3"
+    series = series.replace(' ', '_')
+    filename = f"{path}\\{series}\\{series}_{part}.mp3"
     create_directory(path, directory=series)
     return req_text, filename
 
@@ -254,5 +271,9 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(main())
+    except Exception as e:
+        print(e)
+        loop.close()
+        exit()
     finally:
         loop.close()

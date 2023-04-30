@@ -184,30 +184,29 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
         bool: A boolean indicating whether the creation of the .srt file was successful or not.
 
     """
-    with KeepDir() as keep_dir:
-        series = series.replace(' ', '_')
-        keep_dir.chdir(f"{path}{os.sep}{series}{os.sep}")
-        transcribe = model.transcribe(filename)
-        srtFilename = os.path.abspath(f"{series}_{part}.srt")
-        if os.path.exists(srtFilename):
-            os.remove(srtFilename)
+    transcribe = model.transcribe(filename)
+    series = series.replace(' ', '_')
+    srtFilename = os.path.join(f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}.srt")
+    if os.path.exists(srtFilename):
+        os.remove(srtFilename)
 
-        segments = transcribe['segments']
+    segments = transcribe['segments']
 
-        for index,segment in enumerate(segments, start=1):
-            startTime = convert_time(segment['start'])
-            endTime = convert_time(segment['end'])
-            text = segment['text']
-            segmentId = segment['id']+1
+    for index,segment in enumerate(segments, start=1):
+        startTime = convert_time(segment['start'])
+        endTime = convert_time(segment['end'])
+        text = segment['text']
+        segmentId = segment['id']+1
 
-            if index == 1 or index == len(segments):
-                segment = f"{segmentId}\n{startTime} --> {endTime}\n<font color=#FFFF00>{text[1:].upper() if text[0] == ' ' else text.upper()}</font>\n\n"
-            else:
-                segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:].upper() if text[0] == ' ' else text.upper()}\n\n"
+        if index == 1 or index == len(segments):
+            segment = f"{segmentId}\n{startTime} --> {endTime}\n<font color=#FFFF00>{text[1:].upper() if text[0] == ' ' else text.upper()}</font>\n\n"
+        else:
+            segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:].upper() if text[0] == ' ' else text.upper()}\n\n"
 
-            with open(srtFilename, 'a', encoding='utf-8') as srtFile:
-                srtFile.write(segment)
+        with open(srtFilename, 'a', encoding='utf-8') as srtFile:
+            srtFile.write(segment)
 
+    os.chdir(HOME)
     return srtFilename
 
 
@@ -256,7 +255,6 @@ def create_directory(path: str, directory: str) -> bool:
     bool: Returns True if a new directory was created, False otherwise.
 
     """
-
     with KeepDir() as keep_dir:
         keep_dir.chdir(path)
         if not os.path.isdir(directory):

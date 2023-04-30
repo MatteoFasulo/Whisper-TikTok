@@ -49,7 +49,7 @@ async def main() -> bool:
     load_dotenv(find_dotenv())
 
     assert(torch.cuda.is_available())
-    rich_print('[PyTorch] GPU version found!', style='bold green')
+    rich_print('[PyTorch] GPU version found', style='bold green')
 
     series = jsonData['series']
     part = jsonData['part']
@@ -255,11 +255,12 @@ def create_directory(path: str, directory: str) -> bool:
     bool: Returns True if a new directory was created, False otherwise.
 
     """
-    with KeepDir() as keep_dir:
-        keep_dir.chdir(path)
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
-            return True
+    current_dir = os.getcwd()
+    os.chdir(path)
+    if not os.path.isdir(directory):
+        os.mkdir(directory)
+        os.chdir(current_dir)
+        return True
     return False
 
 

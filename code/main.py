@@ -6,10 +6,13 @@ import sys
 import subprocess
 import asyncio
 import multiprocessing
-from datetime import timedelta
 from typing import Tuple
+import datetime
 
-from tqdm import tqdm
+import torch
+
+# Rich
+from rich.console import Console
 
 # ENV
 from dotenv import load_dotenv, find_dotenv
@@ -25,6 +28,7 @@ from edge_tts import VoicesManager
 import ffmpeg
 
 HOME = os.getcwd()
+console = Console()
 
 #######################
 #        STATIC       #
@@ -44,11 +48,15 @@ jsonData = {"series": "Crazy facts that you did not know",
 async def main() -> bool:
     load_dotenv(find_dotenv())
 
+    assert(torch.cuda.is_available())
+    rich_print('[PyTorch] GPU version found!', style='bold green')
+
     series = jsonData['series']
     part = jsonData['part']
     outro = jsonData['outro']
     path = jsonData['path']
 
+    download_video(url='https://www.youtube.com/watch?v=intRX7BRA90')
     model = whisper.load_model("small.en")
 
     # Text 2 Speech (Edge TTS API)
@@ -70,33 +78,60 @@ async def main() -> bool:
 
     return True
 
+class KeepDir:
+    def __init__(self):
+        self.original_dir = os.getcwd()
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        os.chdir(self.original_dir)
+    def chdir(self, path):
+        os.chdir(path)
+
+
+def rich_print(text, style: str = ""):
+    console.print(text, style=style)
+
+
+def download_video(url: str, resolution: str = "1080p"):
+    with KeepDir() as keep_dir:
+        keep_dir.chdir('background')
+        rich_print("Downloading the backgrounds videos... please be patient 🙏 ")
+        with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
+            pass
+        rich_print("Background video downloaded successfully! 🎉", style="bold green")
+    return
+
 
 def random_background(folder_path: str = "background"):
-    os.chdir(f"{HOME}{os.sep}{folder_path}")
-    files = os.listdir(".")
-    random_file = random.choice(files)
-    return os.path.abspath(random_file)
+    with KeepDir() as keep_dir:
+        keep_dir.chdir(f"{HOME}{os.sep}{folder_path}")
+        files = os.listdir(".")
+        random_file = random.choice(files)
+    return random_file
 
 
-def get_info(file_path: str):
+def get_info(filename: str):
     try:
-        probe = ffmpeg.probe(file_path)
-        video_stream = next(
-            (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-        if video_stream is None:
-            print('No video stream found', file=sys.stderr)
-            audio_stream = next(
-                (stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
-            bit_rate = int(audio_stream['bit_rate'])
-            duration = float(audio_stream['duration'])
-            return {'bit_rate': bit_rate, 'duration': duration}
+        with KeepDir() as keep_dir:
+            keep_dir.chdir("background")
+            probe = ffmpeg.probe(filename)
+            video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+            audio_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
+            try:
+                duration = float(audio_stream['duration'])
+            except Exception:
+                duration = (datetime.datetime.strptime(audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
+            if video_stream is None:
+                rich_print('No video stream found', style="bold red")
+                bit_rate = int(audio_stream['bit_rate'])
+                return {'bit_rate': bit_rate, 'duration': duration}
 
-        width = int(video_stream['width'])
-        height = int(video_stream['height'])
-        duration = float(video_stream['duration'])
-        return {'width': width, 'height': height, 'duration': duration}
+            width = int(video_stream['width'])
+            height = int(video_stream['height'])
+            return {'width': width, 'height': height, 'duration': duration}
     except ffmpeg.Error as e:
-        print(e.stderr, file=sys.stderr)
+        rich_print(e.stderr, style="bold red")
         sys.exit(1)
 
 
@@ -115,17 +150,20 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: in
     if ss < 0:
         ss = 0
 
-    current_cwd = os.getcwd()
     srt_filename = filename_srt.split('\\')[-1]
+    with KeepDir() as keep_dir:
+        keep_dir.chdir("background")
+        mp4_absolute_path = os.path.abspath(background_mp4)
+        output_path = f"{os.getcwd()}{os.sep}"
     srt_path = "\\".join(filename_srt.split('\\')[:-1])
-    print(f"{filename_srt = }\n{background_mp4 = }\n{filename_mp3 = }\n")   #
+    rich_print(f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
                                                                             #'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", background_mp4, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, boxblur=luma_radius=3:chroma_radius=3, subtitles={srt_filename}:force_style='Alignment=8,BorderStyle=2,Outline=1,Shadow=1,Fontsize=15,MarginL=45,MarginR=85,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "ultrafast", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{os.getcwd()}{os.sep}output_{ss}.mp4", "-y"]
-    os.chdir(srt_path)
-    print('\n\n\n\n\n\n'+' '.join(args)+'\n\n')
-    with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
-        pass
-    os.chdir(current_cwd)
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, boxblur=luma_radius=5:chroma_radius=5, subtitles={srt_filename}:force_style='Alignment=8,BorderStyle=2,Outline=1,Shadow=1,Fontsize=15,MarginL=45,MarginR=65,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "ultrafast", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{output_path}output_{ss}.mp4", "-y", "-threads", f"{multiprocessing.cpu_count()}"]
+    rich_print('FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
+    with KeepDir() as keep_dir:
+        keep_dir.chdir(srt_path)
+        with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
+            pass
     
     return True
 

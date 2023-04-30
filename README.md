@@ -1,22 +1,26 @@
 # ChatGPT-TikTok 🤖🎥
-From AI tools to TikTok video creation using Adobe Premiere Pro and Edge read aloud feature 🎬🎙️
+ChatGPT-TikTok is an AI-powered tool for creating TikTok videos using OpenAI-ChatGPT,Edge TTS, OpenAI-Whisper and FFMPEG. It utilizes OpenAI's powerful natural language processing capabilities to provide responses to prompts in various formats, including text and audio.
+
+## How It Works
+To use ChatGPT-TikTok, simply enter a prompt and wait for the AI model to generate a response. The response can then be used to create a TikTok video using the Microsoft Edge Cloud Text-to-Speech (TTS) API.
 
 ## Requirements 🛠️
-Tested in Python 3.8 and 3.9 on Windows 10 💻 Install first Pipenv 🌟
+ChatGPT-TikTok has been tested on Windows 10 with Python 3.8 and 3.9. To install the required dependencies, run the following command in your terminal:
+
 ```python
-pip install -U pipenv # After this, run:
-pipenv install
-```
-If you only want to test the Edge-TTS feature, then run:
-```python
-pip install -U edge-tts
+pip install -r requirements.txt
 ```
 
-## OpenAI 🔮
-_Upcoming feature to implement prompting and answering from OpenAI API_ 🚀
+## Code of Conduct
+Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to ChatGPT-TikTok.
 
-## Edge TTS 🎧
-Huge thanks to [@rany2](https://www.github.com/rany2) with [rany2/edge-tts](https://github.com/rany2/edge-tts) 💯 that helped us to bring ChatGPT response into an MP3 file with the TTS voice of Microsoft Edge Cloud models 🌤️
+## Contributing
+We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
 
-## TikTok API 📱
-_Upcoming feature to implement uploading to TikTok with TikTok Dev API (only .mp4 video and caption with tags)_ 📈
+## Upcoming Features 🔮
+- Integration with the OpenAI API to generate more advanced responses.
+- Integration with the TikTok Developer API to upload videos directly to the platform.
+- Improved user interface for a more seamless experience.
+
+## Acknowledgments
+We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with ChatGPT-TikTok.

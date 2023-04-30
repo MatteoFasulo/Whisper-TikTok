@@ -2,6 +2,7 @@ aiohttp==3.8.4
 aiosignal==1.3.1
 async-timeout==4.0.2
 attrs==23.1.0
+Brotli==1.0.9
 certifi==2022.12.7
 charset-normalizer==3.1.0
 colorama==0.4.6
@@ -20,11 +21,13 @@ mdurl==0.1.2
 more-itertools==9.1.0
 mpmath==1.3.0
 multidict==6.0.4
+mutagen==1.46.0
 networkx==3.1
 numba==0.56.4
 numpy==1.23.5
 openai-whisper==20230314
 Pillow==9.3.0
+pycryptodomex==3.17
 Pygments==2.15.1
 python-dotenv==1.0.0
 regex==2023.3.23
@@ -38,5 +41,7 @@ torchvision==0.15.1+cu117
 tqdm==4.65.0
 typing_extensions==4.5.0
 urllib3==1.26.15
+websockets==11.0.2
 yarl==1.9.2
+yt-dlp==2023.3.4
 zipp==3.15.0

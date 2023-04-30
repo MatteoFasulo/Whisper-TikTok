@@ -185,9 +185,9 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
 
     """
     with KeepDir() as keep_dir:
+        series = series.replace(' ', '_')
         keep_dir.chdir(f"{path}{os.sep}{series}{os.sep}")
         transcribe = model.transcribe(filename)
-        series = series.replace(' ', '_')
         srtFilename = os.path.abspath(f"{series}_{part}.srt")
         if os.path.exists(srtFilename):
             os.remove(srtFilename)

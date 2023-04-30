@@ -49,7 +49,7 @@ async def main() -> bool:
     outro = jsonData['outro']
     path = jsonData['path']
 
-    model = whisper.load_model("base")
+    model = whisper.load_model("small.en")
 
     # Text 2 Speech (Edge TTS API)
     for text in jsonData['texts']:
@@ -119,8 +119,8 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: in
     srt_filename = filename_srt.split('\\')[-1]
     srt_path = "\\".join(filename_srt.split('\\')[:-1])
     print(f"{filename_srt = }\n{background_mp4 = }\n{filename_mp3 = }\n")   #
-                                                                            #'Alignment=9,BorderStyle=3,Outline=5,Shadow=71,Fontsize=12,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(5), "-i", background_mp4, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, boxblur=luma_radius=3:chroma_radius=3, subtitles={srt_filename}:force_style='Alignment=8,OutlineColour=&HFFFFFFFF,Shadow=90,Fontsize=15,MarginL=45,MarginR=85,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "ultrafast", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{os.getcwd()}{os.sep}output_{ss}.mp4", "-y"]
+                                                                            #'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", background_mp4, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, boxblur=luma_radius=3:chroma_radius=3, subtitles={srt_filename}:force_style='Alignment=8,BorderStyle=2,Outline=1,Shadow=1,Fontsize=15,MarginL=45,MarginR=85,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "ultrafast", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{os.getcwd()}{os.sep}output_{ss}.mp4", "-y"]
     os.chdir(srt_path)
     print('\n\n\n\n\n\n'+' '.join(args)+'\n\n')
     with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
@@ -147,17 +147,24 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
 
     """
     transcribe = model.transcribe(filename)
+    series = series.replace(' ', '_')
+    srtFilename = os.path.join(f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}.srt")
+    if os.path.exists(srtFilename):
+        os.remove(srtFilename)
+
     segments = transcribe['segments']
-    for segment in segments:
+
+    for index,segment in enumerate(segments, start=1):
         startTime = convert_time(segment['start'])
         endTime = convert_time(segment['end'])
         text = segment['text']
         segmentId = segment['id']+1
-        segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:].upper() if text[0] == ' ' else text.upper()}\n\n"
 
-        series = series.replace(' ', '_')
-        srtFilename = os.path.join(
-            f"{path}\\{series}\\", f"{series.replace(' ', '')}_{part}.srt")
+        if index == 1 or index == len(segments):
+            segment = f"{segmentId}\n{startTime} --> {endTime}\n<font color=#FFFF00>{text[1:].upper() if text[0] == ' ' else text.upper()}</font>\n\n"
+        else:
+            segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:].upper() if text[0] == ' ' else text.upper()}\n\n"
+
         with open(srtFilename, 'a', encoding='utf-8') as srtFile:
             srtFile.write(segment)
 
@@ -236,7 +243,7 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
     """
     req_text = f"{series} Part {part}.\n{text}\n{outro}"
     series = series.replace(' ', '_')
-    filename = f"{path}\\{series}\\{series}_{part}.mp3"
+    filename = f"{path}{os.sep}{series}{os.sep}{series}_{part}.mp3"
     create_directory(path, directory=series)
     return req_text, filename
 

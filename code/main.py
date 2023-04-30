@@ -18,7 +18,8 @@ from rich.console import Console
 from dotenv import load_dotenv, find_dotenv
 
 # OpenAI Whisper Model PyTorch
-import whisper
+#import whisper
+import stable_whisper as whisper
 
 # MicrosoftEdge TTS
 import edge_tts
@@ -37,8 +38,8 @@ jsonData = {"series": "Crazy facts that you did not know",
             "part": 4,
             "outro": "Follow us for more",
             "random": False,
-            "path": "F:\\PremiereTrash",
-            "texts": ["Did you know that there are more possible iterations of a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120, while the estimated number of atoms in the observable universe is 10^80. This means that if every atom in the universe were a chess game being played out simultaneously, there still wouldn't be enough atoms to represent every possible iteration of the game!", "Example2", "Example 3"]}
+            "path": "C:\\Users\\smoxy\\Documents\\temp",
+            "texts": ["Did you know that there are more possible iterations of ", "a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120, while the estimated number of atoms in the observable universe is 10^80. This means that if every atom in the universe were a chess game being played out simultaneously, there still wouldn't be enough atoms to represent every possible iteration of the game!", "Example2", "Example 3"]}
 
 #######################
 #         CODE        #
@@ -73,7 +74,7 @@ async def main() -> bool:
             'width'), H=file_info.get('height'), duration=int(file_info.get('duration')))
 
         # Increment part so it can fetch the next text in JSON
-        break
+        break   #TODO: Remove this break
         part += 1
 
     return True
@@ -136,10 +137,6 @@ def get_info(filename: str):
 
 
 def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: int, duration: int):
-    # Crop if too large
-    if (W > 1080) and (H > 1920):
-        W, H = 1080, 1920
-
     # Get length of MP3 file to be merged with
     audio_info = get_info(filename_mp3)
 
@@ -147,18 +144,20 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: in
     audio_duration = int(round(audio_info.get('duration'),0))
     # print(duration-audio_duration)
     ss = random.randint(0, (duration-audio_duration))
+    audio_duration = convert_time(audio_info.get('duration'))
     if ss < 0:
         ss = 0
 
     srt_filename = filename_srt.split('\\')[-1]
+    create_directory(os.getcwd(), "output")
+    output_path = f"{os.getcwd()}{os.sep}output{os.sep}"
     with KeepDir() as keep_dir:
         keep_dir.chdir("background")
         mp4_absolute_path = os.path.abspath(background_mp4)
-        output_path = f"{os.getcwd()}{os.sep}"
     srt_path = "\\".join(filename_srt.split('\\')[:-1])
     rich_print(f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
                                                                             #'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, boxblur=luma_radius=5:chroma_radius=5, subtitles={srt_filename}:force_style='Alignment=8,BorderStyle=2,Outline=1,Shadow=1,Fontsize=15,MarginL=45,MarginR=65,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "ultrafast", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{output_path}output_{ss}.mp4", "-y", "-threads", f"{multiprocessing.cpu_count()}"]
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{output_path}output_{ss}.mp4", "-y", "-threads", f"{multiprocessing.cpu_count()-6}"]
     rich_print('FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
     with KeepDir() as keep_dir:
         keep_dir.chdir(srt_path)
@@ -184,7 +183,14 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
         bool: A boolean indicating whether the creation of the .srt file was successful or not.
 
     """
-    transcribe = model.transcribe(filename)
+    transcribe = model.transcribe(filename, regroup=True)
+    transcribe.split_by_gap(0.5).split_by_length(38).merge_by_gap(0.15, max_words=2)
+    series = series.replace(' ', '_')
+    srtFilename = os.path.join(f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}")
+    transcribe.to_srt_vtt(srtFilename+'.srt', word_level=True)
+    transcribe.to_ass(srtFilename+'.ass', word_level=True)
+    os.chdir(HOME)
+    return srtFilename+".srt"
     series = series.replace(' ', '_')
     srtFilename = os.path.join(f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}.srt")
     if os.path.exists(srtFilename):

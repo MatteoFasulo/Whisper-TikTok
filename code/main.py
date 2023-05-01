@@ -38,8 +38,8 @@ jsonData = {"series": "Crazy facts that you did not know",
             "part": 4,
             "outro": "Follow us for more",
             "random": False,
-            "path": "C:\\Users\\smoxy\\Documents\\temp",
-            "texts": ["Did you know that there are more possible iterations of ", "a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120, while the estimated number of atoms in the observable universe is 10^80. This means that if every atom in the universe were a chess game being played out simultaneously, there still wouldn't be enough atoms to represent every possible iteration of the game!", "Example2", "Example 3"]}
+            "path": "F:\\PremiereTrash",
+            "texts": ["Did you know that there are more possible iterations of a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120, while the estimated number of atoms in the observable universe is 10^80. This means that if every atom in the universe were a chess game being played out simultaneously, there still wouldn't be enough atoms to represent every possible iteration of the game!", "Example2", "Example 3"]}
 
 #######################
 #         CODE        #

@@ -47,35 +47,48 @@ jsonData = {"series": "Crazy facts that you did not know",
 
 
 async def main() -> bool:
-    load_dotenv(find_dotenv())
+    with console.status("[bold green]Creating video...") as status:
+        load_dotenv(find_dotenv())
+        console.log(f"[green]Finish loading environment variables[/green]")
 
-    assert(torch.cuda.is_available())
-    rich_print('[PyTorch] GPU version found', style='bold green')
+        assert(torch.cuda.is_available())
+        console.log(f"[green]PyTorch GPU version found[/green]")
+        rich_print('[OK] PyTorch GPU version found', style='bold green')
 
-    series = jsonData['series']
-    part = jsonData['part']
-    outro = jsonData['outro']
-    path = jsonData['path']
+        series = jsonData['series']
+        part = jsonData['part']
+        outro = jsonData['outro']
+        path = jsonData['path']
 
-    download_video(url='https://www.youtube.com/watch?v=intRX7BRA90')
-    model = whisper.load_model("small.en")
+        download_video(url='https://www.youtube.com/watch?v=intRX7BRA90')
 
-    # Text 2 Speech (Edge TTS API)
-    for text in jsonData['texts']:
-        req_text, filename = create_full_text(path, series, part, text, outro)
-        await tts(req_text, outfile=filename)
+        rich_print('[INFO] Loading OpenAI-Whisper model...', style='yellow')
+        model = whisper.load_model("small.en")
 
-        # Whisper Model to create SRT file from Speech recording
-        srt_filename = srt_create(model, path, series, part, text, filename)
+        # Text 2 Speech (Edge TTS API)
+        for text in jsonData['texts']:
+            rich_print('[INFO] Converting JSON text...', style='yellow')
+            req_text, filename = create_full_text(path, series, part, text, outro)
+            rich_print('[OK] Text converted successfully.', style='bold green')
+            rich_print('[INFO] Starting Text2Speech instance...', style='yellow')
+            await tts(req_text, outfile=filename)
+            rich_print('[OK] Text2Speech mp3 file generated successfully!', style='bold green')
 
-        background_mp4 = random_background()
-        file_info = get_info(background_mp4)
-        prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, W=file_info.get(
-            'width'), H=file_info.get('height'), duration=int(file_info.get('duration')))
+            # Whisper Model to create SRT file from Speech recording
+            rich_print('[INFO] Starting model transcription...', style='yellow')
+            srt_filename = srt_create(model, path, series, part, text, filename)
+            rich_print('[OK] Transcription srt and ass file saved successfully!', style='bold green')
 
-        # Increment part so it can fetch the next text in JSON
-        break   #TODO: Remove this break
-        part += 1
+            rich_print('[INFO] Getting background video...', style='yellow')
+            background_mp4 = random_background()
+            file_info = get_info(background_mp4)
+            rich_print('[INFO] Merging video, audio and subtitles...', style='yellow')
+            final_video = prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')))
+            rich_print(f'[OK] MP4 video saved successfully!\nPath: {final_video}', style='bold green')
+
+            # Increment part so it can fetch the next text in JSON
+            break   #TODO: Remove this break
+            part += 1
 
     return True
 
@@ -94,13 +107,13 @@ def rich_print(text, style: str = ""):
     console.print(text, style=style)
 
 
-def download_video(url: str, resolution: str = "1080p"):
+def download_video(url: str):
     with KeepDir() as keep_dir:
         keep_dir.chdir('background')
-        rich_print("Downloading the backgrounds videos... please be patient 🙏 ")
+        rich_print("[INFO] Downloading the backgrounds videos... please be patient 🙏", style='yellow')
         with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
             pass
-        rich_print("Background video downloaded successfully! 🎉", style="bold green")
+        rich_print("[OK] Background video downloaded successfully! 🎉", style="bold green")
     return
 
 
@@ -122,9 +135,10 @@ def get_info(filename: str):
             try:
                 duration = float(audio_stream['duration'])
             except Exception:
+                rich_print('[WARNING] MP4 default metadata not found', style="bold yellow")
                 duration = (datetime.datetime.strptime(audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
             if video_stream is None:
-                rich_print('No video stream found', style="bold red")
+                rich_print('[WARNING] No video stream found', style="bold yellow")
                 bit_rate = int(audio_stream['bit_rate'])
                 return {'bit_rate': bit_rate, 'duration': duration}
 
@@ -132,11 +146,11 @@ def get_info(filename: str):
             height = int(video_stream['height'])
             return {'width': width, 'height': height, 'duration': duration}
     except ffmpeg.Error as e:
-        rich_print(e.stderr, style="bold red")
+        rich_print(f"[ERROR] {e.stderr}", style="bold red")
         sys.exit(1)
 
 
-def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: int, duration: int):
+def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int, verbose: bool = False):
     # Get length of MP3 file to be merged with
     audio_info = get_info(filename_mp3)
 
@@ -149,22 +163,29 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, W: int, H: in
         ss = 0
 
     srt_filename = filename_srt.split('\\')[-1]
+    srt_path = "\\".join(filename_srt.split('\\')[:-1])
+
     create_directory(os.getcwd(), "output")
-    output_path = f"{os.getcwd()}{os.sep}output{os.sep}"
+    outfile = f"{os.getcwd()}{os.sep}output{os.sep}output_{ss}.mp4"
+
     with KeepDir() as keep_dir:
         keep_dir.chdir("background")
         mp4_absolute_path = os.path.abspath(background_mp4)
-    srt_path = "\\".join(filename_srt.split('\\')[:-1])
-    rich_print(f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
+    
+    if verbose:
+        rich_print(f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
                                                                             #'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{output_path}output_{ss}.mp4", "-y", "-threads", f"{multiprocessing.cpu_count()-6}"]
-    rich_print('FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-loglevel", "quiet", "-stats", "-y", "-threads", f"{multiprocessing.cpu_count()-6}"]
+    
+    if verbose:
+        rich_print('[i] FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
+    
     with KeepDir() as keep_dir:
         keep_dir.chdir(srt_path)
         with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
             pass
     
-    return True
+    return outfile
 
 
 def srt_create(model, path: str, series: str, part: int, text: str, filename: str) -> bool:
@@ -191,29 +212,6 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
     transcribe.to_ass(srtFilename+'.ass', word_level=True)
     os.chdir(HOME)
     return srtFilename+".srt"
-    series = series.replace(' ', '_')
-    srtFilename = os.path.join(f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}.srt")
-    if os.path.exists(srtFilename):
-        os.remove(srtFilename)
-
-    segments = transcribe['segments']
-
-    for index,segment in enumerate(segments, start=1):
-        startTime = convert_time(segment['start'])
-        endTime = convert_time(segment['end'])
-        text = segment['text']
-        segmentId = segment['id']+1
-
-        if index == 1 or index == len(segments):
-            segment = f"{segmentId}\n{startTime} --> {endTime}\n<font color=#FFFF00>{text[1:].upper() if text[0] == ' ' else text.upper()}</font>\n\n"
-        else:
-            segment = f"{segmentId}\n{startTime} --> {endTime}\n{text[1:].upper() if text[0] == ' ' else text.upper()}\n\n"
-
-        with open(srtFilename, 'a', encoding='utf-8') as srtFile:
-            srtFile.write(segment)
-
-    os.chdir(HOME)
-    return srtFilename
 
 
 def convert_time(time_in_seconds):
@@ -323,8 +321,8 @@ if __name__ == "__main__":
     try:
         loop.run_until_complete(main())
     except Exception as e:
-        print(e)
+        rich_print(f"[ERROR] {type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}", style="bold red")
         loop.close()
-        exit()
+        sys.exit(1)
     finally:
         loop.close()

@@ -23,4 +23,5 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 - Improved user interface for a more seamless experience.
 
 ## Acknowledgments
-We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with ChatGPT-TikTok.
+- We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with ChatGPT-TikTok.
+- We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision and [jianfch/ stable-ts](https://github.com/jianfch/stable-ts) for a script that modifies OpenAI's Whisper to produce more reliable timestamps.

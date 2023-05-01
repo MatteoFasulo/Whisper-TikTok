@@ -162,3 +162,11 @@ cython_debug/
 # MP3 (Edge-TTS)
 *.mp3
 code/*.mp3
+
+# MP4
+*.mp4
+code/background/*.mp4
+
+code/responses.txt
+code/test.ipynb
+code/accounts.txt

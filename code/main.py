@@ -6,13 +6,14 @@ import sys
 import subprocess
 import asyncio
 import multiprocessing
+import logging
 from typing import Tuple
 import datetime
 
-import torch
+from utils import *
 
-# Rich
-from rich.console import Console
+# PyTorch
+import torch
 
 # ENV
 from dotenv import load_dotenv, find_dotenv
@@ -29,8 +30,21 @@ from edge_tts import VoicesManager
 import ffmpeg
 
 HOME = os.getcwd()
-console = Console()
 
+# Logging
+if not os.path.isdir('log'):
+    os.mkdir('log')
+with KeepDir() as keep_dir:
+    keep_dir.chdir("log")
+    log_filename = f'{datetime.date.today()}.log'
+    logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename),
+        ]
+    )
+    logger = logging.getLogger(__name__)
 #######################
 #        STATIC       #
 #######################
@@ -47,13 +61,16 @@ jsonData = {"series": "Crazy facts that you did not know",
 
 
 async def main() -> bool:
-    with console.status("[bold green]Creating video...") as status:
+    console.clear()
+    logging.debug('Creating video')
+    with console.status("[bold cyan]Creating video...") as status:
         load_dotenv(find_dotenv())
-        console.log(f"[green]Finish loading environment variables[/green]")
+        console.log(f"| [green]OK[/green] | Finish loading environment variables")
+        logging.info('Finish loading environment variables')
 
         assert(torch.cuda.is_available())
-        console.log(f"[green]PyTorch GPU version found[/green]")
-        rich_print('[OK] PyTorch GPU version found', style='bold green')
+        console.log(f"| [green]OK[/green] | PyTorch GPU version found")
+        logging.info('PyTorch GPU version found')
 
         series = jsonData['series']
         part = jsonData['part']
@@ -62,58 +79,46 @@ async def main() -> bool:
 
         download_video(url='https://www.youtube.com/watch?v=intRX7BRA90')
 
-        rich_print('[INFO] Loading OpenAI-Whisper model...', style='yellow')
         model = whisper.load_model("small.en")
+        console.log(f"| [green]OK[/green] | OpenAI-Whisper model loaded")
+        logging.info('OpenAI-Whisper model loaded')
 
         # Text 2 Speech (Edge TTS API)
         for text in jsonData['texts']:
-            rich_print('[INFO] Converting JSON text...', style='yellow')
             req_text, filename = create_full_text(path, series, part, text, outro)
-            rich_print('[OK] Text converted successfully.', style='bold green')
-            rich_print('[INFO] Starting Text2Speech instance...', style='yellow')
+            console.log(f"| [green]OK[/green] | Text converted successfully")
+            logging.info('Text converted successfully')
             await tts(req_text, outfile=filename)
-            rich_print('[OK] Text2Speech mp3 file generated successfully!', style='bold green')
+            console.log(f"| [green]OK[/green] | Text2Speech mp3 file generated successfully!")
+            logging.info('Text2Speech mp3 file generated successfully!')
+
 
             # Whisper Model to create SRT file from Speech recording
-            rich_print('[INFO] Starting model transcription...', style='yellow')
             srt_filename = srt_create(model, path, series, part, text, filename)
-            rich_print('[OK] Transcription srt and ass file saved successfully!', style='bold green')
+            console.log(f"| [green]OK[/green] | Transcription srt and ass file saved successfully!")
+            logging.info('Transcription srt and ass file saved successfully!')
 
-            rich_print('[INFO] Getting background video...', style='yellow')
             background_mp4 = random_background()
             file_info = get_info(background_mp4)
-            rich_print('[INFO] Merging video, audio and subtitles...', style='yellow')
             final_video = prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')))
-            rich_print(f'[OK] MP4 video saved successfully!\nPath: {final_video}', style='bold green')
+            console.log(f"| [green]OK[/green] | MP4 video saved successfully!\nPath: {final_video}")
+            logging.info(f'MP4 video saved successfully!\nPath: {final_video}')
 
             # Increment part so it can fetch the next text in JSON
             break   #TODO: Remove this break
             part += 1
 
+    console.log(f'[bold][red]Done![/red][/bold]')   
     return True
-
-class KeepDir:
-    def __init__(self):
-        self.original_dir = os.getcwd()
-    def __enter__(self):
-        return self
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.chdir(self.original_dir)
-    def chdir(self, path):
-        os.chdir(path)
-
-
-def rich_print(text, style: str = ""):
-    console.print(text, style=style)
 
 
 def download_video(url: str):
     with KeepDir() as keep_dir:
         keep_dir.chdir('background')
-        rich_print("[INFO] Downloading the backgrounds videos... please be patient 🙏", style='yellow')
         with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
             pass
-        rich_print("[OK] Background video downloaded successfully! 🎉", style="bold green")
+        console.log(f"| [green]OK[/green] | Background video downloaded successfully")
+        logging.info('Background video downloaded successfully')
     return
 
 
@@ -125,7 +130,7 @@ def random_background(folder_path: str = "background"):
     return random_file
 
 
-def get_info(filename: str):
+def get_info(filename: str, verbose: bool = False):
     try:
         with KeepDir() as keep_dir:
             keep_dir.chdir("background")
@@ -135,10 +140,14 @@ def get_info(filename: str):
             try:
                 duration = float(audio_stream['duration'])
             except Exception:
-                rich_print('[WARNING] MP4 default metadata not found', style="bold yellow")
+                if verbose:
+                    console.log(f"| [yellow][WARNING][/yellow] | MP4 default metadata not found")
+                    logging.warning('MP4 default metadata not found')
                 duration = (datetime.datetime.strptime(audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
             if video_stream is None:
-                rich_print('[WARNING] No video stream found', style="bold yellow")
+                if verbose:
+                    console.log(f"| [yellow][WARNING][/yellow] | No video stream found")
+                    logging.warning('No video stream found')
                 bit_rate = int(audio_stream['bit_rate'])
                 return {'bit_rate': bit_rate, 'duration': duration}
 
@@ -147,6 +156,7 @@ def get_info(filename: str):
             return {'width': width, 'height': height, 'duration': duration}
     except ffmpeg.Error as e:
         rich_print(f"[ERROR] {e.stderr}", style="bold red")
+        logging.critical(e.stderr)
         sys.exit(1)
 
 
@@ -175,7 +185,7 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
     if verbose:
         rich_print(f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
                                                                             #'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-loglevel", "quiet", "-stats", "-y", "-threads", f"{multiprocessing.cpu_count()-6}"]
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-loglevel", "quiet", "-y", "-threads", f"{multiprocessing.cpu_count()-6}"]
     
     if verbose:
         rich_print('[i] FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')

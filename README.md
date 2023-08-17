@@ -4,7 +4,7 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## Demo Video 🎬
 
-<https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/demo.mp4>
+https://github.com/MatteoFasulo/Whisper-TikTok/assets/74818541/68e25504-c305-4144-bd39-c9acc218c3a4
 
 ## Operating Principle
 

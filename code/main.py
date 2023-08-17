@@ -19,7 +19,7 @@ import torch
 from dotenv import load_dotenv, find_dotenv
 
 # OpenAI Whisper Model PyTorch
-#import whisper
+# import whisper
 import stable_whisper as whisper
 
 # MicrosoftEdge TTS
@@ -38,10 +38,10 @@ with KeepDir() as keep_dir:
     keep_dir.chdir("log")
     log_filename = f'{datetime.date.today()}.log'
     logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_filename),
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_filename),
         ]
     )
     logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ jsonData = {"series": "Crazy facts that you did not know",
             "part": 4,
             "outro": "Follow us for more",
             "random": False,
-            "path": "F:\\PremiereTrash", #Path where .mp3 tts file and .srt file will be saved
+            "path": "F:\\PremiereTrash",  # Path where .mp3 tts file and .srt file will be saved
             "texts": ["Did you know that there are more possible iterations of a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120!", "Hi my name is Matteo and this is a test", "Did you know that there is a species of jellyfish called Turritopsis dohrnii?"]}
 
 #######################
@@ -65,10 +65,11 @@ async def main() -> bool:
     logging.debug('Creating video')
     with console.status("[bold cyan]Creating video...") as status:
         load_dotenv(find_dotenv())
-        console.log(f"| [green]OK[/green] | Finish loading environment variables")
+        console.log(
+            f"| [green]OK[/green] | Finish loading environment variables")
         logging.info('Finish loading environment variables')
 
-        assert(torch.cuda.is_available())
+        assert (torch.cuda.is_available())
         console.log(f"| [green]OK[/green] | PyTorch GPU version found")
         logging.info('PyTorch GPU version found')
 
@@ -85,29 +86,34 @@ async def main() -> bool:
 
         # Text 2 Speech (Edge TTS API)
         for text in jsonData['texts']:
-            req_text, filename = create_full_text(path, series, part, text, outro)
+            req_text, filename = create_full_text(
+                path, series, part, text, outro)
             console.log(f"| [green]OK[/green] | Text converted successfully")
             logging.info('Text converted successfully')
             await tts(req_text, outfile=filename)
-            console.log(f"| [green]OK[/green] | Text2Speech mp3 file generated successfully!")
+            console.log(
+                f"| [green]OK[/green] | Text2Speech mp3 file generated successfully!")
             logging.info('Text2Speech mp3 file generated successfully!')
 
-
             # Whisper Model to create SRT file from Speech recording
-            srt_filename = srt_create(model, path, series, part, text, filename)
-            console.log(f"| [green]OK[/green] | Transcription srt and ass file saved successfully!")
+            srt_filename = srt_create(
+                model, path, series, part, text, filename)
+            console.log(
+                f"| [green]OK[/green] | Transcription srt and ass file saved successfully!")
             logging.info('Transcription srt and ass file saved successfully!')
 
             background_mp4 = random_background()
             file_info = get_info(background_mp4)
-            final_video = prepare_background(background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')))
-            console.log(f"| [green]OK[/green] | MP4 video saved successfully!\nPath: {final_video}")
+            final_video = prepare_background(
+                background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')))
+            console.log(
+                f"| [green]OK[/green] | MP4 video saved successfully!\nPath: {final_video}")
             logging.info(f'MP4 video saved successfully!\nPath: {final_video}')
 
             # Increment part so it can fetch the next text in JSON
             part += 1
 
-    console.log(f'[bold][red]Done![/red][/bold]')   
+    console.log(f'[bold][red]Done![/red][/bold]')
     return True
 
 
@@ -116,7 +122,8 @@ def download_video(url: str):
         keep_dir.chdir('background')
         with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
             pass
-        console.log(f"| [green]OK[/green] | Background video downloaded successfully")
+        console.log(
+            f"| [green]OK[/green] | Background video downloaded successfully")
         logging.info('Background video downloaded successfully')
     return
 
@@ -134,18 +141,23 @@ def get_info(filename: str, verbose: bool = False):
         with KeepDir() as keep_dir:
             keep_dir.chdir("background")
             probe = ffmpeg.probe(filename)
-            video_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-            audio_stream = next((stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
+            video_stream = next(
+                (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+            audio_stream = next(
+                (stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
             try:
                 duration = float(audio_stream['duration'])
             except Exception:
                 if verbose:
-                    console.log(f"| [yellow][WARNING][/yellow] | MP4 default metadata not found")
+                    console.log(
+                        f"| [yellow][WARNING][/yellow] | MP4 default metadata not found")
                     logging.warning('MP4 default metadata not found')
-                duration = (datetime.datetime.strptime(audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
+                duration = (datetime.datetime.strptime(
+                    audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
             if video_stream is None:
                 if verbose:
-                    console.log(f"| [yellow][WARNING][/yellow] | No video stream found")
+                    console.log(
+                        f"| [yellow][WARNING][/yellow] | No video stream found")
                     logging.warning('No video stream found')
                 bit_rate = int(audio_stream['bit_rate'])
                 return {'bit_rate': bit_rate, 'duration': duration}
@@ -164,7 +176,7 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
     audio_info = get_info(filename_mp3)
 
     # Get starting time:
-    audio_duration = int(round(audio_info.get('duration'),0))
+    audio_duration = int(round(audio_info.get('duration'), 0))
     # print(duration-audio_duration)
     ss = random.randint(0, (duration-audio_duration))
     audio_duration = convert_time(audio_info.get('duration'))
@@ -180,20 +192,22 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
     with KeepDir() as keep_dir:
         keep_dir.chdir("background")
         mp4_absolute_path = os.path.abspath(background_mp4)
-    
+
     if verbose:
-        rich_print(f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
-                                                                            #'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-loglevel", "quiet", "-y", "-threads", f"{multiprocessing.cpu_count()-6}"]
-    
+        rich_print(
+            f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
+        # 'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
+    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v",
+            f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-y", "-threads", f"{multiprocessing.cpu_count()/2}"]
+
     if verbose:
         rich_print('[i] FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
-    
+
     with KeepDir() as keep_dir:
         keep_dir.chdir(srt_path)
         with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
             pass
-    
+
     return outfile
 
 
@@ -214,9 +228,11 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
 
     """
     transcribe = model.transcribe(filename, regroup=True)
-    transcribe.split_by_gap(0.5).split_by_length(38).merge_by_gap(0.15, max_words=2)
+    transcribe.split_by_gap(0.5).split_by_length(
+        38).merge_by_gap(0.15, max_words=2)
     series = series.replace(' ', '_')
-    srtFilename = os.path.join(f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}")
+    srtFilename = os.path.join(
+        f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}")
     transcribe.to_srt_vtt(srtFilename+'.srt', word_level=True)
     transcribe.to_ass(srtFilename+'.ass', word_level=True)
     os.chdir(HOME)
@@ -229,7 +245,6 @@ def convert_time(time_in_seconds):
     seconds = int(time_in_seconds % 60)
     milliseconds = int((time_in_seconds - int(time_in_seconds)) * 1000)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
-
 
 
 def batch_create(filename: str) -> None:
@@ -330,7 +345,8 @@ if __name__ == "__main__":
     try:
         loop.run_until_complete(main())
     except Exception as e:
-        rich_print(f"[ERROR] {type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}", style="bold red")
+        rich_print(
+            f"[ERROR] {type(e).__name__} at line {e.__traceback__.tb_lineno} of {__file__}: {e}", style="bold red")
         loop.close()
         sys.exit(1)
     finally:

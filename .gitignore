@@ -164,8 +164,8 @@ cython_debug/
 code/*.mp3
 
 # MP4
-*.mp4
 code/background/*.mp4
+code/output/*.mp4
 
 code/responses.txt
 code/test.ipynb

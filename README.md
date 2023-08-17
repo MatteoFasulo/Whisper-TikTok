@@ -1,14 +1,14 @@
-# Introducing ChatGPT-TikTok 🤖🎥
+# Introducing Whisper-TikTok 🤖🎥
 
-Discover ChatGPT-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, ChatGPT-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
+Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, Whisper-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
 
 ## Demo Video 🎬
 
-<https://github.com/MatteoFasulo/ChatGPT-TikTok/blob/main/demo.mp4>
+<https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/demo.mp4>
 
 ## Operating Principle
 
-Employing ChatGPT-TikTok is a breeze: simply complete the JSON-formatted dictionary located at the outset of the `main.py` file.
+Employing Whisper-TikTok is a breeze: simply complete the JSON-formatted dictionary located at the outset of the `main.py` file.
 
 Summarizing the program's functionality:
 
@@ -32,7 +32,7 @@ The program conducts the **sequence of actions** outlined below:
 
 ## Prerequisites 🛠️
 
-ChatGPT-TikTok has undergone rigorous testing on Windows 10 systems equipped with Python versions 3.8 and 3.9. To streamline the installation of necessary dependencies, execute the following command within your terminal:
+Whisper-TikTok has undergone rigorous testing on Windows 10 systems equipped with Python versions 3.8 and 3.9. To streamline the installation of necessary dependencies, execute the following command within your terminal:
 
 ```python
 pip install -r requirements.txt
@@ -42,7 +42,7 @@ Keep in mind that, due to the utilization of the OpenAI Whisper model for speech
 
 ## Usage Guidelines 📝
 
-To embark on your ChatGPT-TikTok journey, initiate the following command within your terminal:
+To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 
 ```python
 python main.py
@@ -50,7 +50,7 @@ python main.py
 
 ## Code of Conduct
 
-Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to ChatGPT-TikTok.
+Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
 
 ## Contributing
 
@@ -68,5 +68,5 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 ## Acknowledgments
 
-- We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with ChatGPT-TikTok.
+- We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with Whisper-TikTok.
 - We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision and [jianfch/ stable-ts](https://github.com/jianfch/stable-ts) for a script that modifies OpenAI's Whisper to produce more reliable timestamps.

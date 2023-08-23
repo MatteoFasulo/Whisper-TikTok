@@ -2,6 +2,7 @@ import platform
 import os
 import random
 import re
+import json
 import sys
 import subprocess
 import asyncio
@@ -9,8 +10,6 @@ import multiprocessing
 import logging
 from typing import Tuple
 import datetime
-
-from utils import *
 
 # PyTorch
 import torch
@@ -29,11 +28,15 @@ from edge_tts import VoicesManager
 # FFMPEG (Python)
 import ffmpeg
 
+# utils.py
+from utils import *
+
 HOME = os.getcwd()
 
 # Logging
 if not os.path.isdir('log'):
     os.mkdir('log')
+
 with KeepDir() as keep_dir:
     keep_dir.chdir("log")
     log_filename = f'{datetime.date.today()}.log'
@@ -45,15 +48,14 @@ with KeepDir() as keep_dir:
         ]
     )
     logger = logging.getLogger(__name__)
-#######################
-#        STATIC       #
-#######################
-jsonData = {"series": "Crazy facts that you did not know",
-            "part": 4,
-            "outro": "Follow us for more",
-            "random": False,
-            "path": "F:\\PremiereTrash",  # Path where .mp3 tts file and .srt file will be saved
-            "texts": ["Did you know that there are more possible iterations of a game of chess than there are atoms in the observable universe? The number of possible legal moves in a game of chess is around 10^120!", "Hi my name is Matteo and this is a test", "Did you know that there is a species of jellyfish called Turritopsis dohrnii?"]}
+
+
+###########################
+#        VIDEO.JSON       #
+###########################
+
+jsonData = json.load(open('video.json', encoding='utf-8'))
+
 
 #######################
 #         CODE        #
@@ -61,22 +63,24 @@ jsonData = {"series": "Crazy facts that you did not know",
 
 
 async def main() -> bool:
+    # Clear terminal
     console.clear()
+
     logging.debug('Creating video')
     with console.status("[bold cyan]Creating video...") as status:
-        load_dotenv(find_dotenv())
+        load_dotenv(find_dotenv())  # Optional
         console.log(
             f"| [green]OK[/green] | Finish loading environment variables")
         logging.info('Finish loading environment variables')
 
-        assert (torch.cuda.is_available())
-        console.log(f"| [green]OK[/green] | PyTorch GPU version found")
-        logging.info('PyTorch GPU version found')
-
-        series = jsonData['series']
-        part = jsonData['part']
-        outro = jsonData['outro']
-        path = jsonData['path']
+        # Check if GPU is available for PyTorch (CUDA).
+        if torch.cuda.is_available():
+            console.log(f"| [green]OK[/green] | PyTorch GPU version found")
+            logging.info('PyTorch GPU version found')
+        else:
+            console.log(
+                f"| [yellow][WARNING][/yellow] | PyTorch GPU not found, using CPU instead")
+            logging.warning('PyTorch GPU not found')
 
         download_video(url='https://www.youtube.com/watch?v=intRX7BRA90')
 
@@ -85,12 +89,21 @@ async def main() -> bool:
         logging.info('OpenAI-Whisper model loaded')
 
         # Text 2 Speech (Edge TTS API)
-        for text in jsonData['texts']:
+        for video_id, video in enumerate(jsonData):
+            series = video['series']
+            part = video['part']
+            outro = video['outro']
+            path = video['path']
+            text = video['text']
+
             req_text, filename = create_full_text(
                 path, series, part, text, outro)
+
             console.log(f"| [green]OK[/green] | Text converted successfully")
             logging.info('Text converted successfully')
+
             await tts(req_text, outfile=filename)
+
             console.log(
                 f"| [green]OK[/green] | Text2Speech mp3 file generated successfully!")
             logging.info('Text2Speech mp3 file generated successfully!')
@@ -98,20 +111,20 @@ async def main() -> bool:
             # Whisper Model to create SRT file from Speech recording
             srt_filename = srt_create(
                 model, path, series, part, text, filename)
+
             console.log(
                 f"| [green]OK[/green] | Transcription srt and ass file saved successfully!")
             logging.info('Transcription srt and ass file saved successfully!')
 
+            # Background video with srt and duration
             background_mp4 = random_background()
             file_info = get_info(background_mp4)
             final_video = prepare_background(
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')))
+
             console.log(
                 f"| [green]OK[/green] | MP4 video saved successfully!\nPath: {final_video}")
             logging.info(f'MP4 video saved successfully!\nPath: {final_video}')
-
-            # Increment part so it can fetch the next text in JSON
-            part += 1
 
     console.log(f'[bold][red]Done![/red][/bold]')
     return True

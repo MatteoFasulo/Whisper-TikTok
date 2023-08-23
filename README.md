@@ -4,11 +4,17 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## Demo Video 🎬
 
-https://github.com/MatteoFasulo/Whisper-TikTok/assets/74818541/68e25504-c305-4144-bd39-c9acc218c3a4
+<https://github.com/MatteoFasulo/Whisper-TikTok/assets/74818541/68e25504-c305-4144-bd39-c9acc218c3a4>
 
 ## Operating Principle
 
-Employing Whisper-TikTok is a breeze: simply complete the JSON-formatted dictionary located at the outset of the `main.py` file.
+Employing Whisper-TikTok is a breeze: simply modify the [video.json](code/video.json). The JSON file contains the following fields:
+
+- `series`: The name of the series.
+- `part`: The part number of the video.
+- `text`: The text to be spoken in the video.
+- `outro`: The outro text to be spoken in the video.
+- `path`: The path for saving subtitles files.
 
 Summarizing the program's functionality:
 
@@ -19,7 +25,7 @@ Summarizing the program's functionality:
 The program conducts the **sequence of actions** outlined below:
 
 1. Retrieve **environment variables** from the optional .env file.
-2. Validate the presence of **PyTorch** with **CUDA** installation.
+2. Validate the presence of **PyTorch** with **CUDA** installation. If the requisite dependencies are **absent**, the **program will use the CPU instead of the GPU**.
 3. Download a random video from platforms like YouTube, e.g., a Minecraft parkour gameplay clip.
 4. Load the OpenAI Whisper model into memory.
 5. Extract the video text from the provided JSON file and initiate a **Text-to-Speech** request to the Microsoft Edge Cloud TTS API, preserving the response as an .mp3 audio file.
@@ -38,13 +44,37 @@ Whisper-TikTok has undergone rigorous testing on Windows 10 systems equipped wit
 pip install -r requirements.txt
 ```
 
-Keep in mind that, due to the utilization of the OpenAI Whisper model for speech recognition, a GPU is indispensable for program execution. PyTorch will evaluate the availability of the CUDA driver and harness the GPU's capabilities whenever feasible.
+It also requires the command-line tool ffmpeg to be installed on your system, which is available from most package managers:
+
+```bash
+# on Ubuntu or Debian
+
+sudo apt update && sudo apt install ffmpeg
+
+# on Arch Linux
+
+sudo pacman -S ffmpeg
+
+# on MacOS using Homebrew (<https://brew.sh/>)
+
+brew install ffmpeg
+
+# on Windows using Chocolatey (<https://chocolatey.org/>)
+
+choco install ffmpeg
+
+# on Windows using Scoop (<https://scoop.sh/>)
+
+scoop install ffmpeg
+```
+
+Keep in mind that, due to the utilization of the OpenAI Whisper model for speech recognition, a GPU is recommended for optimal performance. However, the program will still function without a GPU, albeit at a slower pace.
 
 ## Usage Guidelines 📝
 
 To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 
-```python
+```bash
 python main.py
 ```
 

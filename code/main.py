@@ -130,9 +130,11 @@ async def main() -> bool:
     return True
 
 
-def download_video(url: str):
+def download_video(url: str, folder: str = 'background'):
+    if not os.path.isdir(folder):
+        os.mkdir(folder)
     with KeepDir() as keep_dir:
-        keep_dir.chdir('background')
+        keep_dir.chdir(folder)
         with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
             pass
         console.log(

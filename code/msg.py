@@ -1,0 +1,5 @@
+STATUS = "[bold cyan]Creating video... | "
+OK = "| [green]OK[/green] | "
+WARNING = "| [yellow][WARNING][/yellow] | "
+DONE = "[bold][red]Done![/red][/bold] "
+ERROR = "| [bold red]ERROR[/bold red] | "

@@ -78,6 +78,62 @@ To embark on your Whisper-TikTok journey, initiate the following command within 
 python main.py
 ```
 
+## Command-Line Options
+
+Whisper-TikTok supports the following command-line options:
+
+```bash
+python main.py [OPTIONS]
+
+Options:
+  --model TEXT        Model to use
+                      [tiny|base|small|medium|large] (Default: small)
+  --non_english       Don't use the English model. (Flag)
+  --url TEXT          YouTube URL to download as background video.
+                      (Default: <https://www.youtube.com/watch?v=intRX7BRA90>)
+  --tts TEXT          Voice to use for TTS (Default: en-US-ChristopherNeural)
+  --list-voices       Use `edge-tts --list-voices` to list all voices.
+  --random_voice      Random voice for TTS (Flag)
+  --gender TEXT       Gender of the random TTS voice [Male|Female].
+  --language TEXT     Language of the random TTS voice
+                      (e.g., en-US)
+  -v, --verbose       Verbose (Flag)
+```
+
+> If you use the --random_voice option, please specify both --gender and --language arguments. Also you will need to specify the --non_english argument if you want to use a non-English voice otherwise the program will use the English model. Whisper model will auto-detect the language of the audio file and use the corresponding model.
+
+## Usage Examples
+
+- Generate a TikTok video using a specific TTS model and voice:
+
+```bash
+python main.py --model medium --tts en-US-EricNeural
+```
+
+- Generate a TikTok video without using the English model:
+
+```bash
+python main.py --non_english --tts de-DE-KillianNeural
+```
+
+- Use a custom YouTube video as the background video:
+
+```bash
+python main.py --url https://www.youtube.com/watch?v=dQw4w9WgXcQ --tts en-US-JennyNeural
+```
+
+- Generate a TikTok video with a random TTS voice:
+
+```bash
+python main.py --random_voice --gender Male --language en-US
+```
+
+- List all available voices:
+
+```bash
+edge-tts --list-voices
+```
+
 ## Code of Conduct
 
 Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.

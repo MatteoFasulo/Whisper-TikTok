@@ -165,8 +165,14 @@ code/*.mp3
 
 # MP4
 code/background/*.mp4
+background/*.mp4
+
 code/output/*.mp4
+output/*.mp4
 
 code/responses.txt
 code/test.ipynb
 code/accounts.txt
+
+# SRT
+code/*.srt

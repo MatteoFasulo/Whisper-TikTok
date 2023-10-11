@@ -34,8 +34,6 @@ The program conducts the **sequence of actions** outlined below:
 8. Integrate the srt and ass files into the chosen video using FFMPEG, creating a final .mp4 output.
 9. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
 
-> Upon reviewing the code, you'll observe the implementation of `stable_whisper`, a variant of the OpenAI Whisper model with specific enhancements. This adaptation accommodates the creation of a karaoke-like effect, wherein spoken words are highlighted at precise timestamps. Recognizing the limitations of the original OpenAI Whisper model in achieving the desired granularity, we transitioned to Stable Whisper. This evolved model empowers users with both word-level and segment-level timestamps, enriching the experience.
-
 ## Prerequisites 🛠️
 
 Whisper-TikTok has undergone rigorous testing on Windows 10 systems equipped with Python versions 3.8 and 3.9. To streamline the installation of necessary dependencies, execute the following command within your terminal:
@@ -155,4 +153,4 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## Acknowledgments
 
 - We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with Whisper-TikTok.
-- We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision and [jianfch/ stable-ts](https://github.com/jianfch/stable-ts) for a script that modifies OpenAI's Whisper to produce more reliable timestamps.
+- We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision

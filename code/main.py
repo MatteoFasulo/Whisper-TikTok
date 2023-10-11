@@ -1,5 +1,6 @@
 import platform
 import os
+from pathlib import Path
 import random
 import re
 import json
@@ -19,12 +20,10 @@ import torch
 from dotenv import load_dotenv, find_dotenv
 
 # OpenAI Whisper Model PyTorch
-# import whisper
-import stable_whisper as whisper
+import whisper
 
 # MicrosoftEdge TTS
 import edge_tts
-from edge_tts import VoicesManager
 
 # FFMPEG (Python)
 import ffmpeg
@@ -96,7 +95,7 @@ async def main() -> bool:
             sys.exit(1)
 
         else:
-            voices = await VoicesManager.create()
+            voices = await edge_tts.VoicesManager.create()
             voices = voices.find(Gender=args.gender, Locale=args.language)
             if len(voices) == 0:
                 # Locale not found
@@ -172,7 +171,7 @@ async def main() -> bool:
             file_info = get_info(background_mp4, verbose=args.verbose)
             final_video = prepare_background(
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')), verbose=args.verbose)
-
+            print('hello')
             console.log(
                 f"{msg.OK}MP4 video saved successfully!\nPath: {final_video}")
             logger.info(f'MP4 video saved successfully!\nPath: {final_video}')
@@ -205,7 +204,7 @@ def random_background(folder_path: str = "background"):
 def get_info(filename: str, verbose: bool = False):
     try:
         with KeepDir() as keep_dir:
-            keep_dir.chdir("background")
+            keep_dir.chdir(f"code{os.sep}background")
             probe = ffmpeg.probe(filename)
             video_stream = next(
                 (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
@@ -250,13 +249,13 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
         ss = 0
 
     srt_filename = filename_srt.split('\\')[-1]
-    srt_path = "\\".join(filename_srt.split('\\')[:-1])
+    srt_path = Path(srt_filename).parent.absolute()
 
     create_directory(os.getcwd(), "output")
     outfile = f"{os.getcwd()}{os.sep}output{os.sep}output_{ss}.mp4"
 
     with KeepDir() as keep_dir:
-        keep_dir.chdir("background")
+        keep_dir.chdir(f"code{os.sep}background")
         mp4_absolute_path = os.path.abspath(background_mp4)
 
     if verbose:
@@ -264,7 +263,7 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
             f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
         # 'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
     args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v",
-            f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx265", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-y", "-threads", f"{multiprocessing.cpu_count()/2}"]
+            f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx264", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-y", "-threads", f"{multiprocessing.cpu_count()/2}"]
 
     if verbose:
         rich_print('[i] FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
@@ -293,17 +292,25 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
         bool: A boolean indicating whether the creation of the .srt file was successful or not.
 
     """
-    transcribe = model.transcribe(
-        filename, regroup=True, fp16=torch.cuda.is_available())
-    transcribe.split_by_gap(0.5).split_by_length(
-        38).merge_by_gap(0.15, max_words=2)
     series = series.replace(' ', '_')
-    srtFilename = os.path.join(
-        f"{path}{os.sep}{series}{os.sep}", f"{series}_{part}")
-    transcribe.to_srt_vtt(srtFilename+'.srt', word_level=True)
-    transcribe.to_ass(srtFilename+'.ass', word_level=True)
-    os.chdir(HOME)
-    return srtFilename+".srt"
+    srt_path = f"{path}{os.sep}{series}{os.sep}"
+
+    word_options = {
+        "highlight_words": True,
+        "max_line_count": 1,
+        "max_line_width": 40,
+        "preserve_segments": False,
+    }
+
+    transcribe = model.transcribe(
+        filename, task="transcribe", word_timestamps=True, fp16=torch.cuda.is_available())
+    vtt_writer = whisper.utils.get_writer(
+        output_format="srt", output_dir=srt_path)
+    vtt_writer(transcribe, filename, word_options)
+
+    srt_filename = f"{srt_path}{series}_{part}.srt"
+
+    return srt_filename
 
 
 def convert_time(time_in_seconds):
@@ -396,7 +403,7 @@ async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", random_vo
         bool: A boolean indicating whether the speech synthesis was successful or not.
 
     """
-    voices = await VoicesManager.create()
+    voices = await edge_tts.VoicesManager.create()
     if random_voice:
         voices = voices.find(Gender=args.gender, Locale=args.language)
         voice = random.choice(voices)["Name"]

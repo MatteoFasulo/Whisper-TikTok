@@ -131,7 +131,6 @@ We extend our thanks to the following contributors and packages that have made W
 
 - [@rany2](https://www.github.com/rany2) for the [edge-tts](https://github.com/rany2/edge-tts) package.
 - [@OpenAI](https://github.com/openai/whisper) for the Whisper model.
-- [jianfch/ stable-ts](https://github.com/jianfch/stable-ts) for enhancing the Whisper model.
 
 ## 12. License <a name="license"></a>
 

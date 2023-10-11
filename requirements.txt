@@ -2,7 +2,6 @@ edge-tts
 ffmpeg-python
 python-dotenv
 rich
-stable-ts
 tqdm
 yt-dlp
 --find-links https://download.pytorch.org/whl/torch_stable.html

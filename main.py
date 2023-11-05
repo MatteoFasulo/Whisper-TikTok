@@ -231,31 +231,23 @@ def get_info(filename: str, verbose: bool = False):
     try:
         with KeepDir() as keep_dir:
             keep_dir.chdir(f"{HOME}{os.sep}background")
-            probe = ffmpeg.probe(filename)
-            video_stream = next(
-                (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-            audio_stream = next(
-                (stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
+
+            # Get video duration
+            result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            duration = float(result.stdout)
+
             try:
-                duration = float(audio_stream['duration'])
-            except Exception:
-                if verbose:
-                    console.log(
-                        f"{msg.WARNING}MP4 default metadata not found")
-                    logger.warning('MP4 default metadata not found')
-                duration = (datetime.datetime.strptime(
-                    audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
-            if video_stream is None:
-                if verbose:
-                    console.log(
-                        f"{msg.WARNING}No video stream found")
-                    logger.warning('No video stream found')
-                bit_rate = int(audio_stream['bit_rate'])
+                # Get video width and height
+                result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                width_height = result.stdout.decode('utf-8').strip().split('\n')
+                width, height = width_height[0], width_height[1]
+
+            except IndexError: # audio stream
+                result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=bit_rate', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                bit_rate = result.stdout.decode('utf-8').strip()
                 return {'bit_rate': bit_rate, 'duration': duration}
 
-            width = int(video_stream['width'])
-            height = int(video_stream['height'])
-            return {'width': width, 'height': height, 'duration': duration}
+            return {'width': int(width), 'height': int(height), 'duration': duration}
     except ffmpeg.Error as e:
         console.log(f"{msg.ERROR}{e.stderr}")
         logger.exception(e.stderr)

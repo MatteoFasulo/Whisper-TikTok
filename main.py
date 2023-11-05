@@ -34,6 +34,7 @@ from utils import *
 # msg.py
 import msg
 
+# Default directory
 HOME = os.getcwd()
 
 # Logging
@@ -87,14 +88,14 @@ async def main() -> bool:
                         help="Verbose")
     args = parser.parse_args()
 
-    if args.random_voice:
+    if args.random_voice: # Random voice
         args.tts = None
         if not args.gender or not args.language:
             console.log(
                 f"{msg.ERROR}When using --random_voice, please specify both --gender and --language arguments.")
             sys.exit(1)
 
-        else:
+        else: # Check if language is valid
             voices = await edge_tts.VoicesManager.create()
             voices = voices.find(Gender=args.gender, Locale=args.language)
             if len(voices) == 0:
@@ -171,7 +172,6 @@ async def main() -> bool:
             file_info = get_info(background_mp4, verbose=args.verbose)
             final_video = prepare_background(
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')), verbose=args.verbose)
-            print('hello')
             console.log(
                 f"{msg.OK}MP4 video saved successfully!\nPath: {final_video}")
             logger.info(f'MP4 video saved successfully!\nPath: {final_video}')
@@ -179,10 +179,16 @@ async def main() -> bool:
     console.log(f'{msg.DONE}')
     return True
 
-
 def download_video(url: str, folder: str = 'background'):
+    """
+    Downloads a video from the given URL and saves it to the specified folder.
+
+    Args:
+        url (str): The URL of the video to download.
+        folder (str, optional): The name of the folder to save the video in. Defaults to 'background'.
+    """
     if not os.path.isdir(folder):
-        os.mkdir(folder)
+        os.mkdir(f"{HOME}{os.sep}{folder}")
     with KeepDir() as keep_dir:
         keep_dir.chdir(folder)
         with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
@@ -192,8 +198,18 @@ def download_video(url: str, folder: str = 'background'):
         logger.info('Background video downloaded successfully')
     return
 
-
-def random_background(folder_path: str = "background"):
+def random_background(folder_path: str = "background") -> str:
+    """
+    Returns the filename of a random file in the specified folder path.
+    
+    Args:
+        folder_path (str): The path to the folder containing the files.
+        
+    Returns:
+        str: The filename of a randomly selected file in the folder.
+    """
+    if not os.path.isdir(folder_path):
+        os.mkdir(folder_path)
     with KeepDir() as keep_dir:
         keep_dir.chdir(f"{HOME}{os.sep}{folder_path}")
         files = os.listdir(".")
@@ -202,9 +218,19 @@ def random_background(folder_path: str = "background"):
 
 
 def get_info(filename: str, verbose: bool = False):
+    """
+    Get information about a video file.
+
+    Args:
+        filename (str): The path to the video file.
+        verbose (bool, optional): Whether to print verbose output. Defaults to False.
+
+    Returns:
+        dict: A dictionary containing information about the video file, including width, height, bit rate, and duration.
+    """
     try:
         with KeepDir() as keep_dir:
-            keep_dir.chdir(f"code{os.sep}background")
+            keep_dir.chdir(f"{HOME}{os.sep}background")
             probe = ffmpeg.probe(filename)
             video_stream = next(
                 (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
@@ -235,14 +261,25 @@ def get_info(filename: str, verbose: bool = False):
         logger.exception(e.stderr)
         sys.exit(1)
 
+def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str, duration: int, verbose: bool = False) -> str:
+    """
+    Prepare a background video with an audio file and a subtitle file.
 
-def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int, verbose: bool = False):
+    Args:
+        background_mp4 (str): The path to the background video file.
+        filename_mp3 (str): The path to the audio file to be merged with the background video.
+        filename_srt (str): The path to the subtitle file to be added to the background video.
+        duration (int): The duration of the output video in seconds.
+        verbose (bool, optional): Whether to print verbose output. Defaults to False.
+
+    Returns:
+        str: The path to the output video file.
+    """
     # Get length of MP3 file to be merged with
     audio_info = get_info(filename_mp3)
 
     # Get starting time:
     audio_duration = int(round(audio_info.get('duration'), 0))
-    # print(duration-audio_duration)
     ss = random.randint(0, (duration-audio_duration))
     audio_duration = convert_time(audio_info.get('duration'))
     if ss < 0:
@@ -251,19 +288,35 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
     srt_filename = filename_srt.split('\\')[-1]
     srt_path = Path(srt_filename).parent.absolute()
 
-    create_directory(os.getcwd(), "output")
-    outfile = f"{os.getcwd()}{os.sep}output{os.sep}output_{ss}.mp4"
+    # Create output directory
+    if not os.path.isdir(f"{HOME}{os.sep}output"):
+        os.mkdir(f"{HOME}{os.sep}output")
+    outfile = f"{HOME}{os.sep}output{os.sep}output_{ss}.mp4"
 
     with KeepDir() as keep_dir:
-        keep_dir.chdir(f"code{os.sep}background")
+        keep_dir.chdir(f"{HOME}{os.sep}background")
         mp4_absolute_path = os.path.abspath(background_mp4)
 
     if verbose:
         rich_print(
             f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
         # 'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
-    args = ["ffmpeg", "-ss", str(ss), "-t", str(audio_duration), "-i", mp4_absolute_path, "-i", filename_mp3, "-map", "0:v", "-map", "1:a", "-filter:v",
-            f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", "-c:v", "libx264", "-preset", "5", "-b:v", "5M", "-c:a", "aac", "-ac", "1", "-b:a", "96K", f"{outfile}", "-y", "-threads", f"{multiprocessing.cpu_count()/2}"]
+    args = [
+        "ffmpeg", 
+        "-ss", str(ss), 
+        "-t", str(audio_duration), 
+        "-i", mp4_absolute_path, 
+        "-i", filename_mp3, 
+        "-map", "0:v", 
+        "-map", "1:a", 
+        "-filter:v", 
+        f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", 
+        "-c:v", "libx264", "-preset", "5", 
+        "-b:v", "5M", 
+        "-c:a", "aac", "-ac", "1", 
+        "-b:a", "96K", 
+        f"{outfile}", "-y", 
+        "-threads", f"{multiprocessing.cpu_count()//2}"]
 
     if verbose:
         rich_print('[i] FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')
@@ -275,22 +328,20 @@ def prepare_background(background_mp4, filename_mp3, filename_srt, duration: int
 
     return outfile
 
-
 def srt_create(model, path: str, series: str, part: int, text: str, filename: str) -> bool:
     """
-    Srt_create is a function that takes in five arguments: a model for speech-to-text conversion, a path to a directory, a series name, a part number, text content, and a filename for the audio file. The function uses the specified model to convert the audio file to text, and creates a .srt file with the transcribed text and timestamps.
+    Create an SRT file for a given video file using the specified model.
 
     Args:
-        model: A model object used for speech-to-text conversion.
-        path (str): A string representing the path to the directory where the .srt file will be created.
-        series (str): A string representing the name of the series.
-        part (int): An integer representing the part number of the series.
-        text (str): A string representing the main content of the audio file.
-        filename (str): A string representing the name of the audio file.
+        model: The model to use for transcription.
+        path (str): The path to the directory where the SRT file should be saved.
+        series (str): The name of the series the video belongs to.
+        part (int): The part number of the video.
+        text (str): The text to transcribe.
+        filename (str): The name of the video file.
 
     Returns:
-        bool: A boolean indicating whether the creation of the .srt file was successful or not.
-
+        bool: True if the SRT file was created successfully, False otherwise.
     """
     series = series.replace(' ', '_')
     srt_path = f"{path}{os.sep}{series}{os.sep}"
@@ -314,23 +365,30 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
 
 
 def convert_time(time_in_seconds):
+    """
+    Converts time in seconds to a string in the format "hh:mm:ss.mmm".
+
+    Args:
+        time_in_seconds (float): The time in seconds to be converted.
+
+    Returns:
+        str: The time in the format "hh:mm:ss.mmm".
+    """
     hours = int(time_in_seconds // 3600)
     minutes = int((time_in_seconds % 3600) // 60)
     seconds = int(time_in_seconds % 60)
     milliseconds = int((time_in_seconds - int(time_in_seconds)) * 1000)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
-
 def batch_create(filename: str) -> None:
     """
-    Batch_create is a function that takes in a filename as input and creates a new file with the concatenated contents of all the files in the './batch/' directory, sorted in alphanumeric order.
+    Batch creates a file by concatenating all files in the './batch/' directory in alphanumeric order.
 
     Args:
-    filename (str): A string representing the name of the output file to be created.
+    - filename (str): the name of the file to be created.
 
     Returns:
-    None: This function does not return anything, but creates a new file with the contents of all the files in the './batch/' directory sorted in alphanumeric order.
-
+    - None
     """
     with open(filename, 'wb') as out:
         def sorted_alphanumeric(data):
@@ -344,64 +402,44 @@ def batch_create(filename: str) -> None:
             filestuff = open('./batch/' + item, 'rb').read()
             out.write(filestuff)
 
-
-def create_directory(path: str, directory: str) -> bool:
-    """
-    Create_directory is a function that takes in two arguments: a path to a directory and a name for a new directory. The function creates a new directory with the specified name in the specified path if it doesn't already exist, and returns a boolean indicating whether the directory was created.
-
-    Args:
-    path (str): A string representing the path to the directory where the new directory will be created.
-    directory (str): A string representing the name of the new directory.
-
-    Returns:
-    bool: Returns True if a new directory was created, False otherwise.
-
-    """
-    current_dir = os.getcwd()
-    os.chdir(path)
-    if not os.path.isdir(directory):
-        os.mkdir(directory)
-        os.chdir(current_dir)
-        return True
-    return False
-
-
 def create_full_text(path: str = '', series: str = '', part: int = 1, text: str = '', outro: str = '') -> Tuple[str, str]:
     """
-    Create_full_text is a function that takes in four arguments: a path to a directory, a series name, a part number, text content, and outro content. The function creates a new text with series, part number, text, and outro content and returns a tuple containing the resulting text and the filename.
+    Creates full text and filename for a given series, part, text and outro.
 
     Args:
-        path (str): A string representing the path to the directory where the new text file will be created. Default value is an empty string.
-        series (str): A string representing the name of the series. Default value is an empty string.
-        part (int): An integer representing the part number of the series. Default value is 1.
-        text (str): A string representing the main content of the text file. Default value is an empty string.
-        outro (str): A string representing the concluding remarks of the text file. Default value is an empty string.
+        path (str): The path where the file will be saved.
+        series (str): The name of the series.
+        part (int): The part number of the series.
+        text (str): The main text of the series.
+        outro (str): The outro of the series.
 
     Returns:
-        Tuple[str, str]: A tuple containing the resulting text and the filename of the text file.
-
+        Tuple[str, str]: A tuple containing the full text and filename.
     """
     req_text = f"{series} Part {part}.\n{text}\n{outro}"
     series = series.replace(' ', '_')
     filename = f"{path}{os.sep}{series}{os.sep}{series}_{part}.mp3"
-    create_directory(path, directory=series)
+    
+    # create directory if not exist
+    if not os.path.isdir(f"{path}{os.sep}{series}"):
+        os.mkdir(f"{path}{os.sep}{series}")
     return req_text, filename
 
 
 async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", random_voice: bool = False, stdout: bool = False, outfile: str = "tts.mp3", args=None) -> bool:
     """
-    Tts is an asynchronous function that takes in four arguments: a final text string, a voice string, a boolean value for random voice selection, a boolean value to indicate if output should be directed to standard output or not, and a filename string for the output file. The function uses Microsoft Azure Cognitive Services to synthesize speech from the input text using the specified voice, and saves the output to a file or prints it to the console.
+    Converts text to speech using Microsoft Edge Text-to-Speech API.
 
     Args:
-        final_text (str): A string representing the text to be synthesized into speech.
-        voice (str): A string representing the name of the voice to be used for speech synthesis. Default value is "en-US-ChristopherNeural".
-        random_voice (bool): A boolean value indicating whether to randomly select a male voice for speech synthesis. Default value is False.
-        stdout (bool): A boolean value indicating whether to output the speech to the console or not. Default value is False.
-        outfile (str): A string representing the name of the output file. Default value is "tts.mp3".
+        final_text (str): The text to be converted to speech.
+        voice (str, optional): The name of the voice to use. Defaults to "en-US-ChristopherNeural".
+        random_voice (bool, optional): Whether to choose a random voice based on the gender and language specified in `args`. Defaults to False.
+        stdout (bool, optional): Whether to output the speech audio to stdout. Defaults to False.
+        outfile (str, optional): The name of the output file. Defaults to "tts.mp3".
+        args (object, optional): An object containing the gender and language to use when selecting a random voice. Defaults to None.
 
     Returns:
-        bool: A boolean indicating whether the speech synthesis was successful or not.
-
+        bool: True if the text was successfully converted to speech and saved to a file, False otherwise.
     """
     voices = await edge_tts.VoicesManager.create()
     if random_voice:

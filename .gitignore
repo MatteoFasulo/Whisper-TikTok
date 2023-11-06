@@ -159,20 +159,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# MP3 (Edge-TTS)
-*.mp3
-code/*.mp3
+# media folder
+media/*
 
-# MP4
-code/background/*.mp4
-background/*.mp4
+# background folder
+background/*
 
-code/output/*.mp4
-output/*.mp4
-
-code/responses.txt
-code/test.ipynb
-code/accounts.txt
-
-# SRT
-code/*.srt
+# output folder
+output/*

@@ -142,11 +142,15 @@ async def main() -> bool:
         logger.info('OpenAI-Whisper model loaded')
 
         # Text 2 Speech (Edge TTS API)
+        media_folder = HOME / 'media'
+        if not media_folder.exists():
+            media_folder.mkdir()
+        
         for video_id, video in enumerate(jsonData):
             series = video['series']
             part = video['part']
             outro = video['outro']
-            path = Path(video['path']).absolute()
+            path = Path(media_folder).absolute()
             text = video['text']
 
             req_text, filename = create_full_text(

@@ -35,14 +35,15 @@ from utils import *
 import msg
 
 # Default directory
-HOME = os.getcwd()
+HOME = Path.cwd()
 
 # Logging
-if not os.path.isdir('log'):
-    os.mkdir('log')
+log_directory = HOME / 'log'
+if not log_directory.exists():
+    log_directory.mkdir()
 
 with KeepDir() as keep_dir:
-    keep_dir.chdir("log")
+    keep_dir.chdir(log_directory)
     log_filename = f'{datetime.date.today()}.log'
     logging.basicConfig(
         level=logging.INFO,
@@ -58,7 +59,8 @@ with KeepDir() as keep_dir:
 #        VIDEO.JSON       #
 ###########################
 
-jsonData = json.load(open('video.json', encoding='utf-8'))
+video_json_path = HOME / 'video.json'
+jsonData = json.loads(video_json_path.read_text(encoding='utf-8'))
 
 
 #######################
@@ -144,7 +146,7 @@ async def main() -> bool:
             series = video['series']
             part = video['part']
             outro = video['outro']
-            path = video['path']
+            path = Path(video['path']).absolute()
             text = video['text']
 
             req_text, filename = create_full_text(
@@ -162,6 +164,7 @@ async def main() -> bool:
             # Whisper Model to create SRT file from Speech recording
             srt_filename = srt_create(
                 whisper_model, path, series, part, text, filename)
+            srt_filename = Path(srt_filename).absolute()
 
             console.log(
                 f"{msg.OK}Transcription srt and ass file saved successfully!")
@@ -169,9 +172,13 @@ async def main() -> bool:
 
             # Background video with srt and duration
             background_mp4 = random_background()
+
             file_info = get_info(background_mp4, verbose=args.verbose)
+
+            filename = Path(filename).absolute()
             final_video = prepare_background(
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')), verbose=args.verbose)
+                
             console.log(
                 f"{msg.OK}MP4 video saved successfully!\nPath: {final_video}")
             logger.info(f'MP4 video saved successfully!\nPath: {final_video}')
@@ -187,8 +194,10 @@ def download_video(url: str, folder: str = 'background'):
         url (str): The URL of the video to download.
         folder (str, optional): The name of the folder to save the video in. Defaults to 'background'.
     """
-    if not os.path.isdir(folder):
-        os.mkdir(f"{HOME}{os.sep}{folder}")
+    directory = HOME / folder
+    if not directory.exists():
+        directory.mkdir()
+
     with KeepDir() as keep_dir:
         keep_dir.chdir(folder)
         with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
@@ -198,23 +207,25 @@ def download_video(url: str, folder: str = 'background'):
         logger.info('Background video downloaded successfully')
     return
 
-def random_background(folder_path: str = "background") -> str:
+def random_background(folder: str = "background") -> str:
     """
-    Returns the filename of a random file in the specified folder path.
+    Returns the filename of a random file in the specified folder.
     
     Args:
-        folder_path (str): The path to the folder containing the files.
+        folder(str): The folder containing the files.
         
     Returns:
         str: The filename of a randomly selected file in the folder.
     """
-    if not os.path.isdir(folder_path):
-        os.mkdir(folder_path)
+    directory = Path(folder).absolute()
+    if not directory.exists():
+        directory.mkdir()
+
     with KeepDir() as keep_dir:
-        keep_dir.chdir(f"{HOME}{os.sep}{folder_path}")
+        keep_dir.chdir(folder)
         files = os.listdir(".")
         random_file = random.choice(files)
-    return random_file
+        return Path(random_file).absolute()
 
 
 def get_info(filename: str, verbose: bool = False):
@@ -229,25 +240,32 @@ def get_info(filename: str, verbose: bool = False):
         dict: A dictionary containing information about the video file, including width, height, bit rate, and duration.
     """
     try:
-        with KeepDir() as keep_dir:
-            keep_dir.chdir(f"{HOME}{os.sep}background")
+        probe = ffmpeg.probe(filename)
+        video_stream = next(
+            (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
+        audio_stream = next(
+            (stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
+        try:
+            duration = float(audio_stream['duration'])
+        except Exception:
+            if verbose:
+                console.log(
+                    f"{msg.WARNING}MP4 default metadata not found")
+                logger.warning('MP4 default metadata not found')
+            duration = (datetime.datetime.strptime(
+                audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
+        if video_stream is None:
+            if verbose:
+                console.log(
+                    f"{msg.WARNING}No video stream found")
+                logger.warning('No video stream found')
+            bit_rate = int(audio_stream['bit_rate'])
+            return {'bit_rate': bit_rate, 'duration': duration}
 
-            # Get video duration
-            result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            duration = float(result.stdout)
+        width = int(video_stream['width'])
+        height = int(video_stream['height'])
+        return {'width': width, 'height': height, 'duration': duration}
 
-            try:
-                # Get video width and height
-                result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=width,height', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                width_height = result.stdout.decode('utf-8').strip().split('\n')
-                width, height = width_height[0], width_height[1]
-
-            except IndexError: # audio stream
-                result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'stream=bit_rate', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                bit_rate = result.stdout.decode('utf-8').strip()
-                return {'bit_rate': bit_rate, 'duration': duration}
-
-            return {'width': int(width), 'height': int(height), 'duration': duration}
     except ffmpeg.Error as e:
         console.log(f"{msg.ERROR}{e.stderr}")
         logger.exception(e.stderr)
@@ -277,27 +295,25 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
     if ss < 0:
         ss = 0
 
-    srt_filename = filename_srt.split('\\')[-1]
-    srt_path = Path(srt_filename).parent.absolute()
+    srt_filename = filename_srt.name
+    srt_path = filename_srt.parent.absolute()
 
     # Create output directory
-    if not os.path.isdir(f"{HOME}{os.sep}output"):
-        os.mkdir(f"{HOME}{os.sep}output")
+    directory = HOME / 'output'
+    if not directory.exists():
+        directory.mkdir()
+    
     outfile = f"{HOME}{os.sep}output{os.sep}output_{ss}.mp4"
-
-    with KeepDir() as keep_dir:
-        keep_dir.chdir(f"{HOME}{os.sep}background")
-        mp4_absolute_path = os.path.abspath(background_mp4)
 
     if verbose:
         rich_print(
-            f"{filename_srt = }\n{mp4_absolute_path = }\n{filename_mp3 = }\n", style='bold green')   #
+            f"{filename_srt = }\n{background_mp4 = }\n{filename_mp3 = }\n", style='bold green')   #
         # 'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
     args = [
         "ffmpeg", 
         "-ss", str(ss), 
         "-t", str(audio_duration), 
-        "-i", mp4_absolute_path, 
+        "-i", background_mp4, 
         "-i", filename_mp3, 
         "-map", "0:v", 
         "-map", "1:a", 
@@ -391,7 +407,7 @@ def batch_create(filename: str) -> None:
             return sorted(data, key=alphanum_key)
 
         for item in sorted_alphanumeric(os.listdir('./batch/')):
-            filestuff = open('./batch/' + item, 'rb').read()
+            filestuff = open(f'.{os.sep}batch.{os.sep}item', 'rb').read()
             out.write(filestuff)
 
 def create_full_text(path: str = '', series: str = '', part: int = 1, text: str = '', outro: str = '') -> Tuple[str, str]:

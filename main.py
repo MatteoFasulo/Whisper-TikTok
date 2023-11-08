@@ -229,7 +229,7 @@ def download_video(url: str, folder: str = 'background'):
 
     with KeepDir() as keep_dir:
         keep_dir.chdir(folder)
-        with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
+        with subprocess.Popen(['yt-dlp', '-f bestvideo[ext=mp4]+bestaudio[ext=m4a]', '--restrict-filenames', url]) as process:
             pass
         console.log(
             f"{msg.OK}Background video downloaded successfully")

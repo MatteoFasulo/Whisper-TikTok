@@ -8,7 +8,7 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## Operating Principle
 
-Employing Whisper-TikTok is a breeze: simply modify the [video.json](code/video.json). The JSON file contains the following fields:
+Employing Whisper-TikTok is a breeze: simply modify the [video.json](video.json). The JSON file contains the following fields:
 
 - `series`: The name of the series.
 - `part`: The part number of the video.

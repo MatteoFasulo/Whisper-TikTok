@@ -92,23 +92,48 @@ async def main() -> bool:
 
     if args.random_voice: # Random voice
         args.tts = None
-        if not args.gender or not args.language:
+        if not args.gender:
+            console.log(
+                f"{msg.ERROR}When using --random_voice, please specify both --gender and --language arguments.")
+            sys.exit(1)
+        
+        elif not args.language:
             console.log(
                 f"{msg.ERROR}When using --random_voice, please specify both --gender and --language arguments.")
             sys.exit(1)
 
-        else: # Check if language is valid
+        elif args.gender and args.language: 
+            # Check if voice is valid
             voices = await edge_tts.VoicesManager.create()
             voices = voices.find(Gender=args.gender, Locale=args.language)
             if len(voices) == 0:
-                # Locale not found
+                # Voice not found
                 console.log(
                     f"{msg.ERROR}Specified TTS language not found. Make sure you are using the correct format. For example: en-US")
                 sys.exit(1)
+            
+            args.tts = voices['Name']
 
             # Check if language is english
             if not str(args.language).startswith('en'):
                 args.non_english = True
+    
+    else:
+        # Check if voice is valid
+        voices = await edge_tts.VoicesManager.create()
+        args.language = '-'.join(i for i in args.tts.split('-')[0:2])
+        voices = voices.find(Locale=args.language)
+        if len(voices) == 0:
+            # Voice not found
+            console.log(
+                f"{msg.ERROR}Specified TTS voice not found. Use `edge-tts --list-voices` to list all voices.")
+            sys.exit(1)
+
+    # Extract language from TTS voice
+    if args.tts:
+        lang_prefix = args.tts.split('-')[0]
+        if not lang_prefix.startswith('en'):
+            args.non_english = True
 
     # Clear terminal
     console.clear()
@@ -138,8 +163,8 @@ async def main() -> bool:
             model = args.model + ".en"
         whisper_model = whisper.load_model(model)
 
-        console.log(f"{msg.OK}OpenAI-Whisper model loaded")
-        logger.info('OpenAI-Whisper model loaded')
+        console.log(f"{msg.OK}OpenAI-Whisper model loaded successfully ({model})")
+        logger.info(f'OpenAI-Whisper model loaded successfully ({model})')
 
         # Text 2 Speech (Edge TTS API)
         media_folder = HOME / 'media'
@@ -159,11 +184,11 @@ async def main() -> bool:
             console.log(f"{msg.OK}Text converted successfully")
             logger.info('Text converted successfully')
 
-            await tts(req_text, outfile=filename, voice=args.tts, random_voice=args.random_voice, args=args)
+            await tts(req_text, outfile=filename, voice=args.tts, args=args)
 
             console.log(
-                f"{msg.OK}Text2Speech mp3 file generated successfully!")
-            logger.info('Text2Speech mp3 file generated successfully!')
+                f"{msg.OK}Text2Speech mp3 file generated successfully with voice {args.tts}")
+            logger.info(f'Text2Speech mp3 file generated successfully with voice {args.tts}')
 
             # Whisper Model to create SRT file from Speech recording
             srt_filename = srt_create(
@@ -171,8 +196,8 @@ async def main() -> bool:
             srt_filename = Path(srt_filename).absolute()
 
             console.log(
-                f"{msg.OK}Transcription srt and ass file saved successfully!")
-            logger.info('Transcription srt and ass file saved successfully!')
+                f"{msg.OK}Transcription srt file saved successfully!")
+            logger.info('Transcription srt file saved successfully!')
 
             # Background video with srt and duration
             background_mp4 = random_background()
@@ -184,8 +209,8 @@ async def main() -> bool:
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')), verbose=args.verbose)
                 
             console.log(
-                f"{msg.OK}MP4 video saved successfully!\nPath: {final_video}")
-            logger.info(f'MP4 video saved successfully!\nPath: {final_video}')
+                f"{msg.OK}MP4 video saved successfully!\nPath: {Path(final_video).absolute()}")
+            logger.info(f'MP4 video saved successfully!\nPath: {Path(final_video).absolute()}')
 
     console.log(f'{msg.DONE}')
     return True
@@ -204,7 +229,7 @@ def download_video(url: str, folder: str = 'background'):
 
     with KeepDir() as keep_dir:
         keep_dir.chdir(folder)
-        with subprocess.Popen(['yt-dlp', '--restrict-filenames', '--merge-output-format', 'mp4', url]) as process:
+        with subprocess.Popen(['yt-dlp', '-f bestvideo[ext=mp4]+bestaudio[ext=m4a]', '--restrict-filenames', url]) as process:
             pass
         console.log(
             f"{msg.OK}Background video downloaded successfully")
@@ -428,7 +453,7 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
     Returns:
         Tuple[str, str]: A tuple containing the full text and filename.
     """
-    req_text = f"{series} Part {part}.\n{text}\n{outro}"
+    req_text = f"{series}. {part}.\n{text}\n{outro}"
     series = series.replace(' ', '_')
     filename = f"{path}{os.sep}{series}{os.sep}{series}_{part}.mp3"
     
@@ -438,14 +463,13 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
     return req_text, filename
 
 
-async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", random_voice: bool = False, stdout: bool = False, outfile: str = "tts.mp3", args=None) -> bool:
+async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", stdout: bool = False, outfile: str = "tts.mp3", args=None) -> bool:
     """
     Converts text to speech using Microsoft Edge Text-to-Speech API.
 
     Args:
         final_text (str): The text to be converted to speech.
         voice (str, optional): The name of the voice to use. Defaults to "en-US-ChristopherNeural".
-        random_voice (bool, optional): Whether to choose a random voice based on the gender and language specified in `args`. Defaults to False.
         stdout (bool, optional): Whether to output the speech audio to stdout. Defaults to False.
         outfile (str, optional): The name of the output file. Defaults to "tts.mp3".
         args (object, optional): An object containing the gender and language to use when selecting a random voice. Defaults to None.
@@ -454,9 +478,6 @@ async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", random_vo
         bool: True if the text was successfully converted to speech and saved to a file, False otherwise.
     """
     voices = await edge_tts.VoicesManager.create()
-    if random_voice:
-        voices = voices.find(Gender=args.gender, Locale=args.language)
-        voice = random.choice(voices)["Name"]
     communicate = edge_tts.Communicate(final_text, voice)
     if not stdout:
         await communicate.save(outfile)

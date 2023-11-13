@@ -14,11 +14,10 @@ Employing Whisper-TikTok is a breeze: simply modify the [video.json](video.json)
 - `part`: The part number of the video.
 - `text`: The text to be spoken in the video.
 - `outro`: The outro text to be spoken in the video.
-- `path`: The path for saving subtitles files.
 
 Summarizing the program's functionality:
 
-> Furnished with a structured JSON dataset containing details such as the **series name**, **video part number**, **video text**, **outro text**, and **path**, the program orchestrates the synthesis of a video incorporating the provided text and outro. Subsequently, the generated video is stored within the designated `output` folder.
+> Furnished with a structured JSON dataset containing details such as the **series name**, **video part number**, **video text** and **outro text**, the program orchestrates the synthesis of a video incorporating the provided text and outro. Subsequently, the generated video is stored within the designated `output` folder.
 
 ### In-Depth Insights
 
@@ -29,17 +28,18 @@ The program conducts the **sequence of actions** outlined below:
 3. Download a random video from platforms like YouTube, e.g., a Minecraft parkour gameplay clip.
 4. Load the OpenAI Whisper model into memory.
 5. Extract the video text from the provided JSON file and initiate a **Text-to-Speech** request to the Microsoft Edge Cloud TTS API, preserving the response as an .mp3 audio file.
-6. Utilize the OpenAI Whisper model to generate a detailed **transcription** of the .mp3 file, available in both .srt and .ass formats.
+6. Utilize the OpenAI Whisper model to generate a detailed **transcription** of the .mp3 file, available in .srt format.
 7. Select a **random background** video from the dedicated folder.
-8. Integrate the srt and ass files into the chosen video using FFMPEG, creating a final .mp4 output.
+8. Integrate the srt file into the chosen video using FFMPEG, creating a final .mp4 output.
 9. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
 
 ## Prerequisites 🛠️
 
-Whisper-TikTok has undergone rigorous testing on Windows 10 systems equipped with Python versions 3.8 and 3.9. To streamline the installation of necessary dependencies, execute the following command within your terminal:
+Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with Python versions 3.8, 3.9 and 3.11. 
+To streamline the installation of necessary dependencies, execute the following command within your terminal:
 
 ```python
-pip install -r requirements.txt
+pip install -U -r requirements.txt
 ```
 
 It also requires the command-line tool ffmpeg to be installed on your system, which is available from most package managers:
@@ -66,7 +66,7 @@ choco install ffmpeg
 scoop install ffmpeg
 ```
 
-Keep in mind that, due to the utilization of the OpenAI Whisper model for speech recognition, a GPU is recommended for optimal performance. However, the program will still function without a GPU, albeit at a slower pace.
+Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly. This performance difference is because GPUs efficiently handle fp16 computation, while CPUs use fp32 or fp64 (depending on your machine), which are slower.
 
 ## Usage Guidelines 📝
 

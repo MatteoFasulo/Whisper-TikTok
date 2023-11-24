@@ -86,23 +86,27 @@ async def main() -> bool:
                         help="Gender of the random TTS voice", type=str)
     parser.add_argument(
         "--language", help="Language of the random TTS voice for example: en-US", type=str)
+    parser.add_argument("--sub_format",
+                        help="Subtitle format", choices=["u", "i", "b"], type=str)
+    parser.add_argument("--font_color", help="Subtitle font color in hex format: #FFFFFF",
+                        type=str)
     parser.add_argument("-v", "--verbose", action='store_true',
                         help="Verbose")
     args = parser.parse_args()
 
-    if args.random_voice: # Random voice
+    if args.random_voice:  # Random voice
         args.tts = None
         if not args.gender:
             console.log(
                 f"{msg.ERROR}When using --random_voice, please specify both --gender and --language arguments.")
             sys.exit(1)
-        
+
         elif not args.language:
             console.log(
                 f"{msg.ERROR}When using --random_voice, please specify both --gender and --language arguments.")
             sys.exit(1)
 
-        elif args.gender and args.language: 
+        elif args.gender and args.language:
             # Check if voice is valid
             voices = await edge_tts.VoicesManager.create()
             voices = voices.find(Gender=args.gender, Locale=args.language)
@@ -111,13 +115,13 @@ async def main() -> bool:
                 console.log(
                     f"{msg.ERROR}Specified TTS language not found. Make sure you are using the correct format. For example: en-US")
                 sys.exit(1)
-            
+
             args.tts = voices['Name']
 
             # Check if language is english
             if not str(args.language).startswith('en'):
                 args.non_english = True
-    
+
     else:
         # Check if voice is valid
         voices = await edge_tts.VoicesManager.create()
@@ -163,14 +167,15 @@ async def main() -> bool:
             model = args.model + ".en"
         whisper_model = whisper.load_model(model)
 
-        console.log(f"{msg.OK}OpenAI-Whisper model loaded successfully ({model})")
+        console.log(
+            f"{msg.OK}OpenAI-Whisper model loaded successfully ({model})")
         logger.info(f'OpenAI-Whisper model loaded successfully ({model})')
 
         # Text 2 Speech (Edge TTS API)
         media_folder = HOME / 'media'
         if not media_folder.exists():
             media_folder.mkdir()
-        
+
         for video_id, video in enumerate(jsonData):
             series = video['series']
             part = video['part']
@@ -188,7 +193,8 @@ async def main() -> bool:
 
             console.log(
                 f"{msg.OK}Text2Speech mp3 file generated successfully with voice {args.tts}")
-            logger.info(f'Text2Speech mp3 file generated successfully with voice {args.tts}')
+            logger.info(
+                f'Text2Speech mp3 file generated successfully with voice {args.tts}')
 
             # Whisper Model to create SRT file from Speech recording
             srt_filename = srt_create(
@@ -199,6 +205,10 @@ async def main() -> bool:
                 f"{msg.OK}Transcription srt file saved successfully!")
             logger.info('Transcription srt file saved successfully!')
 
+            # Apply highlight words to SRT file
+            highlight_words(srt_filename, subtitle_format=args.sub_format,
+                            font_color=args.font_color)
+
             # Background video with srt and duration
             background_mp4 = random_background()
 
@@ -207,13 +217,15 @@ async def main() -> bool:
             filename = Path(filename).absolute()
             final_video = prepare_background(
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')), verbose=args.verbose)
-                
+
             console.log(
                 f"{msg.OK}MP4 video saved successfully!\nPath: {Path(final_video).absolute()}")
-            logger.info(f'MP4 video saved successfully!\nPath: {Path(final_video).absolute()}')
+            logger.info(
+                f'MP4 video saved successfully!\nPath: {Path(final_video).absolute()}')
 
     console.log(f'{msg.DONE}')
     return True
+
 
 def download_video(url: str, folder: str = 'background'):
     """
@@ -236,13 +248,14 @@ def download_video(url: str, folder: str = 'background'):
         logger.info('Background video downloaded successfully')
     return
 
+
 def random_background(folder: str = "background") -> str:
     """
     Returns the filename of a random file in the specified folder.
-    
+
     Args:
         folder(str): The folder containing the files.
-        
+
     Returns:
         str: The filename of a randomly selected file in the folder.
     """
@@ -300,6 +313,7 @@ def get_info(filename: str, verbose: bool = False):
         logger.exception(e.stderr)
         sys.exit(1)
 
+
 def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str, duration: int, verbose: bool = False) -> str:
     """
     Prepare a background video with an audio file and a subtitle file.
@@ -331,7 +345,7 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
     directory = HOME / 'output'
     if not directory.exists():
         directory.mkdir()
-    
+
     outfile = f"{HOME}{os.sep}output{os.sep}output_{ss}.mp4"
 
     if verbose:
@@ -339,20 +353,20 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
             f"{filename_srt = }\n{background_mp4 = }\n{filename_mp3 = }\n", style='bold green')   #
         # 'Alignment=9,BorderStyle=3,Outline=5,Shadow=3,Fontsize=15,MarginL=5,MarginV=25,FontName=Lexend Bold,ShadowX=-7.1,ShadowY=7.1,ShadowColour=&HFF000000,Blur=141'Outline=5
     args = [
-        "ffmpeg", 
-        "-ss", str(ss), 
-        "-t", str(audio_duration), 
-        "-i", background_mp4, 
-        "-i", filename_mp3, 
-        "-map", "0:v", 
-        "-map", "1:a", 
-        "-filter:v", 
-        f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'", 
-        "-c:v", "libx264", "-preset", "5", 
-        "-b:v", "5M", 
-        "-c:a", "aac", "-ac", "1", 
-        "-b:a", "96K", 
-        f"{outfile}", "-y", 
+        "ffmpeg",
+        "-ss", str(ss),
+        "-t", str(audio_duration),
+        "-i", background_mp4,
+        "-i", filename_mp3,
+        "-map", "0:v",
+        "-map", "1:a",
+        "-filter:v",
+        f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'",
+        "-c:v", "libx264", "-preset", "5",
+        "-b:v", "5M",
+        "-c:a", "aac", "-ac", "1",
+        "-b:a", "96K",
+        f"{outfile}", "-y",
         "-threads", f"{multiprocessing.cpu_count()//2}"]
 
     if verbose:
@@ -364,6 +378,7 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
             pass
 
     return outfile
+
 
 def srt_create(model, path: str, series: str, part: int, text: str, filename: str) -> bool:
     """
@@ -384,7 +399,7 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
     srt_path = f"{path}{os.sep}{series}{os.sep}"
 
     word_options = {
-        "highlight_words": True,
+        "highlight_words": True,  # keep this True otherwise the custom style won't be applied
         "max_line_count": 1,
         "max_line_width": 40,
         "preserve_segments": False,
@@ -399,6 +414,42 @@ def srt_create(model, path: str, series: str, part: int, text: str, filename: st
     srt_filename = f"{srt_path}{series}_{part}.srt"
 
     return srt_filename
+
+
+def highlight_words(srt_file: str, subtitle_format: str = "u", font_color: str = "#FFFFFF") -> bool:
+    """
+    Highlights words in a subtitle file by modifying the formatting tags.
+
+    Args:
+        srt_file (str): The path to the subtitle file.
+        subtitle_format (str, optional): The subtitle format to be used. Defaults to "u".
+        font_color (str, optional): The color of the font. Defaults to "#FFFFFF".
+
+    Returns:
+        bool: True if the subtitle file was formatted successfully, False otherwise.
+    """
+    subtitle_format = subtitle_format.lower()
+
+    if not font_color.startswith('#'):
+        console.log(
+            f"{msg.ERROR}Invalid font color. Using default color: #FFFFFF")
+        font_color = "#FFFFFF"
+    else:
+        font_color = font_color.upper()
+
+    with open(srt_file, 'r', encoding='UTF-8') as f:
+        content = f.read()
+
+    content = content.replace(
+        '<u>', f'<font color={font_color}><{subtitle_format}>').replace('</u>', f'</{subtitle_format}></font>')
+
+    with open(srt_file, 'w', encoding='UTF-8') as f:
+        f.write(content)
+
+    console.log(
+        f"{msg.OK}Subtitle file formatted successfully")
+
+    return True
 
 
 def convert_time(time_in_seconds):
@@ -416,6 +467,7 @@ def convert_time(time_in_seconds):
     seconds = int(time_in_seconds % 60)
     milliseconds = int((time_in_seconds - int(time_in_seconds)) * 1000)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
+
 
 def batch_create(filename: str) -> None:
     """
@@ -439,6 +491,7 @@ def batch_create(filename: str) -> None:
             filestuff = open(f'.{os.sep}batch.{os.sep}item', 'rb').read()
             out.write(filestuff)
 
+
 def create_full_text(path: str = '', series: str = '', part: int = 1, text: str = '', outro: str = '') -> Tuple[str, str]:
     """
     Creates full text and filename for a given series, part, text and outro.
@@ -456,7 +509,7 @@ def create_full_text(path: str = '', series: str = '', part: int = 1, text: str 
     req_text = f"{series}. {part}.\n{text}\n{outro}"
     series = series.replace(' ', '_')
     filename = f"{path}{os.sep}{series}{os.sep}{series}_{part}.mp3"
-    
+
     # create directory if not exist
     if not os.path.isdir(f"{path}{os.sep}{series}"):
         os.mkdir(f"{path}{os.sep}{series}")

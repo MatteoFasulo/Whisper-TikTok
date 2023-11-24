@@ -35,7 +35,7 @@ The program conducts the **sequence of actions** outlined below:
 
 ## Prerequisites 🛠️
 
-Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with Python versions 3.8, 3.9 and 3.11. 
+Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with Python versions 3.8, 3.9 and 3.11.
 To streamline the installation of necessary dependencies, execute the following command within your terminal:
 
 ```python
@@ -95,6 +95,8 @@ Options:
   --gender TEXT       Gender of the random TTS voice [Male|Female].
   --language TEXT     Language of the random TTS voice
                       (e.g., en-US)
+  --sub_format TEXT   Subtitle format to use [u|i|b] (Default: u) | b (Bold), u (Underline), i (Italic)
+  --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFFFFF). Suggested: #FFF000 (Yellow)
   -v, --verbose       Verbose (Flag)
 ```
 

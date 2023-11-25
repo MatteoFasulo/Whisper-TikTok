@@ -86,7 +86,7 @@ python main.py [OPTIONS]
 Options:
   --model TEXT        Model to use
                       [tiny|base|small|medium|large] (Default: small)
-  --non_english       Don't use the English model. (Flag)
+  --non_english       Use general model, not the English one specifically. (Flag)
   --url TEXT          YouTube URL to download as background video.
                       (Default: <https://www.youtube.com/watch?v=intRX7BRA90>)
   --tts TEXT          Voice to use for TTS (Default: en-US-ChristopherNeural)

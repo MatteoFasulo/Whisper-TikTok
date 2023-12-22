@@ -87,7 +87,7 @@ async def main() -> bool:
     parser.add_argument(
         "--language", help="Language of the random TTS voice for example: en-US", type=str)
     parser.add_argument("--sub_format",
-                        help="Subtitle format", choices=["u", "i", "b"], type=str)
+                        help="Subtitle format", choices=["u", "i", "b"], default="u", type=str)
     parser.add_argument("--font_color", help="Subtitle font color in hex format: #FFFFFF",
                         type=str)
     parser.add_argument("-v", "--verbose", action='store_true',

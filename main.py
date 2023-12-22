@@ -89,7 +89,7 @@ async def main() -> bool:
     parser.add_argument("--sub_format",
                         help="Subtitle format", choices=["u", "i", "b"], default="u", type=str)
     parser.add_argument("--font_color", help="Subtitle font color in hex format: #FFFFFF",
-                        type=str)
+default="#FFFFFF", type=str)
     parser.add_argument("-v", "--verbose", action='store_true',
                         help="Verbose")
     args = parser.parse_args()

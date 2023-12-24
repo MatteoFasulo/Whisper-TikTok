@@ -167,3 +167,6 @@ background/*
 
 # output folder
 output/*
+
+# Cookies
+cookies.txt

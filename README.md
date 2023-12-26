@@ -14,6 +14,7 @@ Employing Whisper-TikTok is a breeze: simply modify the [video.json](video.json)
 - `part`: The part number of the video.
 - `text`: The text to be spoken in the video.
 - `outro`: The outro text to be spoken in the video.
+- `tags`: The tags to be used for the video.
 
 Summarizing the program's functionality:
 
@@ -31,7 +32,8 @@ The program conducts the **sequence of actions** outlined below:
 6. Utilize the OpenAI Whisper model to generate a detailed **transcription** of the .mp3 file, available in .srt format.
 7. Select a **random background** video from the dedicated folder.
 8. Integrate the srt file into the chosen video using FFMPEG, creating a final .mp4 output.
-9. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
+9. Upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required `cookies.txt` file can be generated using [this guide available here](https://github.com/kairi003/Get-cookies.txt-LOCALLY). The `cookies.txt` file must be placed in the root folder of the project.
+10. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
 
 ## Prerequisites 🛠️
 
@@ -80,7 +82,7 @@ python main.py
 
 Whisper-TikTok supports the following command-line options:
 
-```bash
+```
 python main.py [OPTIONS]
 
 Options:
@@ -95,7 +97,7 @@ Options:
   --gender TEXT       Gender of the random TTS voice [Male|Female].
   --language TEXT     Language of the random TTS voice
                       (e.g., en-US)
-  --sub_format TEXT   Subtitle format to use [u|i|b] (Default: u) | b (Bold), u (Underline), i (Italic)
+  --sub_format TEXT   Subtitle format to use [u|i|b] (Default: b) | b (Bold), u (Underline), i (Italic)
   --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFFFFF). Suggested: #FFF000 (Yellow)
   -v, --verbose       Verbose (Flag)
 ```
@@ -122,6 +124,12 @@ python main.py --non_english --tts de-DE-KillianNeural
 python main.py --url https://www.youtube.com/watch?v=dQw4w9WgXcQ --tts en-US-JennyNeural
 ```
 
+- Modify the font color of the subtitles:
+
+```
+python main.py --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
+```
+
 - Generate a TikTok video with a random TTS voice:
 
 ```bash
@@ -145,7 +153,6 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## Upcoming Features 🔮
 
 - Integration with the OpenAI API to generate more advanced responses.
-- Integration with the TikTok Developer API to upload videos directly to the platform.
 - Improved user interface for a more seamless experience.
 
 ## OpenAI Whisper Forum Discussion

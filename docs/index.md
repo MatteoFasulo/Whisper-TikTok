@@ -44,7 +44,8 @@ Whisper-TikTok performs the following sequence of actions:
 6. Generating a detailed transcription of the audio.
 7. Selecting a random background video.
 8. Integrating subtitles into the background video using FFMPEG.
-9. Voila! You've created a captivating TikTok video.
+9. Uploading the video to TikTok using the TikTok session cookie
+10. Voila! You've created a captivating TikTok video.
 
 ## 4. Prerequisites <a name="prerequisites"></a>
 
@@ -76,7 +77,7 @@ Whisper-TikTok supports the following command-line options:
 - `--random_voice`: Use a random TTS voice (requires specifying gender and language).
 - `--gender`: Specify the gender of the random TTS voice (Male or Female).
 - `--language`: Specify the language of the random TTS voice.
-- `--sub_format`: Specify the subtitle format to use [u|i|b] (Default: u) which is underline
+- `--sub_format`: Specify the subtitle format to use [u|i|b] (Default: b) which is underline
 - `--font_color`: Specify the font color to use in HEX format (Default: #FFFFFF). Suggested: #FFF000 (Yellow)
 
 ## 6. Usage Examples <a name="usage-examples"></a>
@@ -101,6 +102,12 @@ Here are some usage examples of Whisper-TikTok:
   python main.py --url https://www.youtube.com/watch?v=dQw4w9WgXcQ --tts en-US-JennyNeural
   ```
 
+- Modify the font color of the subtitles:
+
+  ```
+  python main.py --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
+  ```
+
 - Generate a TikTok video with a random TTS voice:
 
   ```bash
@@ -120,7 +127,6 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 Stay tuned for these upcoming features in Whisper-TikTok:
 
 - Integration with the OpenAI API for advanced responses.
-- Integration with the TikTok Developer API for direct uploads.
 - Improved user interface for a seamless experience.
 
 ## 10. OpenAI Whisper Forum Discussion <a name="openai-whisper-forum-discussion"></a>

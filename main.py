@@ -30,7 +30,6 @@ import ffmpeg
 
 # TikTok Uploader
 from tiktok_uploader.upload import upload_video
-from tiktok_uploader.auth import AuthBackend
 
 
 # utils.py
@@ -92,7 +91,7 @@ async def main() -> bool:
     parser.add_argument(
         "--language", help="Language of the random TTS voice for example: en-US", type=str)
     parser.add_argument("--sub_format",
-                        help="Subtitle format", choices=["u", "i", "b"], default="u", type=str)
+                        help="Subtitle format", choices=["u", "i", "b"], default="b", type=str)
     parser.add_argument("--font_color", help="Subtitle font color in hex format: #FFFFFF",
                         default="#FFFFFF", type=str)
     parser.add_argument("-v", "--verbose", action='store_true',
@@ -223,18 +222,20 @@ async def main() -> bool:
             filename = Path(filename).absolute()
             final_video = prepare_background(
                 background_mp4, filename_mp3=filename, filename_srt=srt_filename, duration=int(file_info.get('duration')), verbose=args.verbose)
+            final_video = Path(final_video).absolute()
 
             console.log(
-                f"{msg.OK}MP4 video saved successfully!\nPath: {Path(final_video).absolute()}")
+                f"{msg.OK}MP4 video saved successfully!\nPath: {final_video}")
             logger.info(
-                f'MP4 video saved successfully!\nPath: {Path(final_video).absolute()}')
+                f'MP4 video saved successfully!\nPath: {final_video}')
 
             # Upload to TikTok
             console.log(f"{msg.OK}Uploading to TikTok...")
             logger.info('Uploading to TikTok...')
 
+
             uploaded = upload_tiktok(
-                final_video, title=f"{series} - {part}", tags=tags, headless=not args.verbose)
+                str(final_video), title=f"{series} - {part}", tags=tags, headless=not args.verbose)
 
             if uploaded:
                 console.log(f"{msg.OK}Uploaded to TikTok successfully!")
@@ -551,7 +552,6 @@ async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", stdout: b
     Returns:
         bool: True if the text was successfully converted to speech and saved to a file, False otherwise.
     """
-    voices = await edge_tts.VoicesManager.create()
     communicate = edge_tts.Communicate(final_text, voice)
     if not stdout:
         await communicate.save(outfile)

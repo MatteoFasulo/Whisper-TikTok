@@ -97,7 +97,7 @@ Options:
   --gender TEXT       Gender of the random TTS voice [Male|Female].
   --language TEXT     Language of the random TTS voice
                       (e.g., en-US)
-  --sub_format TEXT   Subtitle format to use [u|i|b] (Default: u) | b (Bold), u (Underline), i (Italic)
+  --sub_format TEXT   Subtitle format to use [u|i|b] (Default: b) | b (Bold), u (Underline), i (Italic)
   --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFFFFF). Suggested: #FFF000 (Yellow)
   -v, --verbose       Verbose (Flag)
 ```

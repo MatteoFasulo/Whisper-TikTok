@@ -94,7 +94,7 @@ async def main() -> bool:
     parser.add_argument("--sub_format",
                         help="Subtitle format", choices=["u", "i", "b"], default="u", type=str)
     parser.add_argument("--font_color", help="Subtitle font color in hex format: #FFFFFF",
-default="#FFFFFF", type=str)
+                        default="#FFFFFF", type=str)
     parser.add_argument("-v", "--verbose", action='store_true',
                         help="Verbose")
     args = parser.parse_args()
@@ -233,10 +233,16 @@ default="#FFFFFF", type=str)
             console.log(f"{msg.OK}Uploading to TikTok...")
             logger.info('Uploading to TikTok...')
 
-            upload_tiktok(final_video, title=f"{series} - {part}", tags=tags, headless=not args.verbose)
+            uploaded = upload_tiktok(
+                final_video, title=f"{series} - {part}", tags=tags, headless=not args.verbose)
 
-            console.log(f"{msg.OK}Uploaded to TikTok successfully!")
-            logger.info('Uploaded to TikTok successfully!')
+            if uploaded:
+                console.log(f"{msg.OK}Uploaded to TikTok successfully!")
+                logger.info('Uploaded to TikTok successfully!')
+
+            else:
+                console.log(f"{msg.ERROR}Error uploading to TikTok")
+                logger.error('Error uploading to TikTok')
 
     console.log(f'{msg.DONE}')
     return True
@@ -551,6 +557,7 @@ async def tts(final_text: str, voice: str = "en-US-ChristopherNeural", stdout: b
         await communicate.save(outfile)
     return True
 
+
 def upload_tiktok(file, title: str, tags: list, headless: bool = False):
     if not os.path.isfile('cookies.txt'):
         console.log(f"{msg.ERROR}Cookie file not found. Please check the following link for instructions on how to get your TikTok cookie: https://github.com/kairi003/Get-cookies.txt-LOCALLY")
@@ -561,15 +568,23 @@ def upload_tiktok(file, title: str, tags: list, headless: bool = False):
         logger.info('Cookie file found')
 
         # Merge title and tags
-        tags = ' '.join([f"#{tag}" for tag in tags])
-        description = f"{title} {tags}"
+        if len(tags) > 0:
+            tags = ' '.join([f"#{tag}" for tag in tags])
+            description = f"{title} {tags}"
+        else:
+            description = title
 
         try:
-            upload_video(file, description=description, cookies='cookies.txt', comment=True, stitch=False, duet=False, headless=headless)
+            upload_video(file, description=description, cookies='cookies.txt',
+                         comment=True, stitch=False, duet=False, headless=headless)
+
         except Exception as e:
             console.log(f"{msg.ERROR}Error uploading to TikTok: {e}")
+            logger.exception(e)
+            return False
 
-    return
+        return True
+
 
 if __name__ == "__main__":
 

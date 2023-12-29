@@ -39,7 +39,7 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
         "-map", "0:v",
         "-map", "1:a",
         "-filter:v",
-        f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, subtitles={srt_filename}:force_style=',Alignment=8,BorderStyle=7,Outline=3,Shadow=5,Blur=15,Fontsize=15,MarginL=45,MarginR=55,FontName=Lexend Bold'",
+        f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, ass={srt_filename}",
         "-c:v", "libx264", "-preset", "5",
         "-b:v", "5M",
         "-c:a", "aac", "-ac", "1",

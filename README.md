@@ -98,7 +98,8 @@ Options:
   --language TEXT     Language of the random TTS voice
                       (e.g., en-US)
   --sub_format TEXT   Subtitle format to use [u|i|b] (Default: b) | b (Bold), u (Underline), i (Italic)
-  --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFFFFF). Suggested: #FFF000 (Yellow)
+  --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFF000).
+  --upload_tiktok     Upload the video to TikTok (Flag)
   -v, --verbose       Verbose (Flag)
 ```
 
@@ -163,3 +164,4 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 - We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with Whisper-TikTok.
 - We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision
+- Also [@jianfch](https://github.com/jianfch/stable-ts) for the stable-ts package, which made it possible to use the OpenAI Whisper model with Whisper-TikTok in a stable manner with font color and subtitle format options.

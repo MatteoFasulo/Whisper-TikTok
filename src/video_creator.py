@@ -4,7 +4,7 @@ from pathlib import Path
 
 import stable_whisper as whisper
 from .logger import setup_logger
-from .subtitle_creator import srt_create, highlight_words
+from .subtitle_creator import srt_create
 from .text_to_speech import tts
 from .tiktok import upload_tiktok
 from .video_prepare import prepare_background
@@ -65,15 +65,12 @@ class VideoCreator:
         await tts(self.req_text, outfile=self.mp3_file, voice=self.args.tts, args=self.args)
 
     def generate_transcription(self):
-        srt_filename = srt_create(
-            self.model, self.path, self.series, self.part, self.text, self.mp3_file)
-        srt_filename = Path(srt_filename).absolute()
+        ass_filename = srt_create(
+            self.model, self.path, self.series, self.part, self.text, self.mp3_file, self.args.font_color)
+        ass_filename = Path(ass_filename).absolute()
 
-        self.srt_file = srt_filename
-
-        highlight_words(self.srt_file, subtitle_format=self.args.sub_format,
-                        font_color=self.args.font_color)
-        return srt_filename
+        self.ass_file = ass_filename
+        return ass_filename
 
     def select_background(self):
         background_mp4 = random_background()
@@ -83,7 +80,7 @@ class VideoCreator:
 
     def integrate_subtitles(self):
         final_video = prepare_background(
-            self.mp4_backgroung, filename_mp3=self.mp3_file, filename_srt=self.srt_file, verbose=self.args.verbose)
+            self.mp4_backgroung, filename_mp3=self.mp3_file, filename_srt=self.ass_file, verbose=self.args.verbose)
         final_video = Path(final_video).absolute()
 
         self.mp4_final_video = final_video

@@ -27,8 +27,8 @@ async def parse_args():
         "--language", help="Language of the random TTS voice for example: en-US", type=str)
     parser.add_argument("--sub_format",
                         help="Subtitle format", choices=["u", "i", "b"], default="b", type=str)
-    parser.add_argument("--font_color", help="Subtitle font color in hex format: #FFF000",
-                        default="#FFF000", type=str)
+    parser.add_argument("--font_color", help="Subtitle font color in hex format: FFF000",
+                        default="FFF000", type=str)
     parser.add_argument("--upload_tiktok", help="Upload to TikTok after creating the video",
                         action='store_true', default=False)
     parser.add_argument("-v", "--verbose", action='store_true',

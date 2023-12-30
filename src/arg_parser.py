@@ -5,6 +5,7 @@ import sys
 from src.voice_manager import VoicesManager
 
 import msg
+from utils import rgb_to_bgr
 
 
 async def parse_args():
@@ -27,8 +28,14 @@ async def parse_args():
         "--language", help="Language of the random TTS voice for example: en-US", type=str)
     parser.add_argument("--sub_format",
                         help="Subtitle format", choices=["u", "i", "b"], default="b", type=str)
+    parser.add_argument("--sub_position",
+                        help="Subtitle position", choices=[i for i in range(1, 10)], default=5, type=int)
+    parser.add_argument("--font", help="Subtitle font",
+                        default="Lexend Bold", type=str)
     parser.add_argument("--font_color", help="Subtitle font color in hex format: FFF000",
-                        default="FFF000", type=str)
+                        default="#FFF000", type=str)
+    parser.add_argument(
+        "--font_size", help="Subtitle font size", default=21, type=int)
     parser.add_argument("--upload_tiktok", help="Upload to TikTok after creating the video",
                         action='store_true', default=False)
     parser.add_argument("-v", "--verbose", action='store_true',
@@ -73,5 +80,11 @@ async def parse_args():
         lang_prefix = args.tts.split('-')[0]
         if not lang_prefix.startswith('en'):
             args.non_english = True
+
+    # Cast font color to lowercase
+    args.font_color = args.font_color.lower()
+
+    # Convert font color from RGB to BGR
+    args.font_color = rgb_to_bgr(args.font_color)
 
     return args

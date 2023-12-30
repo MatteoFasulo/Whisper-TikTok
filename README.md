@@ -98,7 +98,10 @@ Options:
   --language TEXT     Language of the random TTS voice
                       (e.g., en-US)
   --sub_format TEXT   Subtitle format to use [u|i|b] (Default: b) | b (Bold), u (Underline), i (Italic)
+  --sub_position TEXT Subtitle position to use [1-9] (Default: 5)
+  --font TEXT         Font to use for subtitles (Default: Lexend Bold)
   --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFF000).
+  --font_size TEXT    Font size to use for subtitles (Default: 21)
   --upload_tiktok     Upload the video to TikTok (Flag)
   -v, --verbose       Verbose (Flag)
 ```

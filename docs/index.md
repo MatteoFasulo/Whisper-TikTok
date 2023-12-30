@@ -78,6 +78,9 @@ Whisper-TikTok supports the following command-line options:
 - `--gender`: Specify the gender of the random TTS voice (Male or Female).
 - `--language`: Specify the language of the random TTS voice.
 - `--sub_format`: Specify the subtitle format to use [u|i|b] (Default: b) which is underline
+- `--sub_position`: Specify the subtitle position to use [1-9] (Default: 5) which is center
+- `--font`: Specify the font to use (Default: Lexend Bold)
+- `--font_size`: Specify the font size to use (Default: 21)
 - `--font_color`: Specify the font color to use in HEX format (Default: #FFFFFF). Suggested: #FFF000 (Yellow)
 
 ## 6. Usage Examples <a name="usage-examples"></a>

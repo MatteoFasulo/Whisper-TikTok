@@ -113,3 +113,21 @@ def convert_time(time_in_seconds):
     seconds = int(time_in_seconds % 60)
     milliseconds = int((time_in_seconds - int(time_in_seconds)) * 1000)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
+
+
+def rgb_to_bgr(rgb: str) -> str:
+    """
+    Converts a color from RGB to BGR.
+
+    Args:
+        rgb (str): The color in RGB format.
+
+    Returns:
+        str: The color in BGR format.
+
+    Example:
+        >>> rgb_to_bgr("FFF000")
+        "000FFF"
+    """
+
+    return rgb[4:6] + rgb[2:4] + rgb[0:2]

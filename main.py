@@ -52,7 +52,7 @@ async def main() -> bool:
         if args.upload_tiktok:
             video_creator.upload_to_tiktok()
 
-    console.log(f'{msg.DONE}')
+    console.log(f'{msg.DONE} {str(video_creator.mp4_final_video)}')
     return 0
 
 

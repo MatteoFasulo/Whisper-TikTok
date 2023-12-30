@@ -65,8 +65,8 @@ class VideoCreator:
         await tts(self.req_text, outfile=self.mp3_file, voice=self.args.tts, args=self.args)
 
     def generate_transcription(self):
-        ass_filename = srt_create(
-            self.model, self.path, self.series, self.part, self.text, self.mp3_file, self.args.font_color)
+        ass_filename = srt_create(self.model,
+                                  self.path, self.series, self.part, self.text, self.mp3_file, **vars(self.args))
         ass_filename = Path(ass_filename).absolute()
 
         self.ass_file = ass_filename

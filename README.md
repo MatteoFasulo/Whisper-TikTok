@@ -1,6 +1,9 @@
 # Introducing Whisper-TikTok 🤖🎥
 
 Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, Whisper-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
+## Webui 🎨
+
+![Webui](docs/WebuiDemo.png)
 
 ## Demo Video 🎬
 
@@ -35,9 +38,18 @@ The program conducts the **sequence of actions** outlined below:
 9. Upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required `cookies.txt` file can be generated using [this guide available here](https://github.com/kairi003/Get-cookies.txt-LOCALLY). The `cookies.txt` file must be placed in the root folder of the project.
 10. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
 
-## Prerequisites 🛠️
+## Installation 🛠️
 
-Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with Python versions 3.8, 3.9 and 3.11.
+Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.8, 3.9 and 3.11**.
+
+First clone the repository
+
+```bash
+git clone https://github.com/MatteoFasulo/Whisper-TikTok.git
+```
+
+# Dependencies 🌿
+
 To streamline the installation of necessary dependencies, execute the following command within your terminal:
 
 ```python
@@ -70,12 +82,20 @@ scoop install ffmpeg
 
 Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly. This performance difference is because GPUs efficiently handle fp16 computation, while CPUs use fp32 or fp64 (depending on your machine), which are slower.
 
-## Usage Guidelines 📝
+## Webui 📝
 
 To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 
 ```bash
-python main.py
+python app.py 
+```
+
+## Command-Line 📝
+
+To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
+
+```bash
+python main.py 
 ```
 
 ## Command-Line Options

@@ -1,3 +1,4 @@
+from pathlib import Path
 import asyncio
 import json
 import platform
@@ -94,17 +95,19 @@ async def main():
 
     video_json = gr.JSON(value=json.load(open("video.json", "r")),
                          label="video.json")
-    
+
     # Get the list of files in "background"
-    folder_path = "./background"
-    files = os.listdir(folder_path)
+    folder_path = Path("background").absolute()
+    files = folder_path.glob('*.mp4')
+    files = [file.name for file in files]
 
     # Create a Dropdown with the list of files
-    background_tab = gr.Dropdown(label="Your Backgrounds", choices=files, info="List of all your downloaded backgrounds.")
+    background_tab = gr.Dropdown(
+        label="Your Backgrounds", choices=files, info="List of all your downloaded backgrounds.")
 
     demo = gr.Interface(
         fn=generate_video,
-        inputs = [
+        inputs=[
             model,
             tts_voice,
             sub_position,

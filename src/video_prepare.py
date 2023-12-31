@@ -9,11 +9,14 @@ HOME = Path.cwd()
 
 
 def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str, verbose: bool = False) -> str:
-    video_duration = int(round(get_info(background_mp4).get('duration'), 0))
-    audio_info = get_info(filename_mp3)
+    video_info = get_info(background_mp4, kind='video')
+    video_duration = int(round(video_info.get('duration'), 0))
+
+    audio_info = get_info(filename_mp3, kind='audio')
     audio_duration = int(round(audio_info.get('duration'), 0))
+
     ss = random.randint(0, (video_duration-audio_duration))
-    audio_duration = convert_time(audio_info.get('duration'))
+    audio_duration = convert_time(audio_duration)
     if ss < 0:
         ss = 0
 

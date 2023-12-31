@@ -1,8 +1,7 @@
-import os
 import subprocess
 from pathlib import Path
 
-from msg import msg
+import msg
 from utils import KeepDir
 
 HOME = Path.cwd()
@@ -22,6 +21,5 @@ def download_video(url: str, folder: str = 'background'):
 
     with KeepDir() as keep_dir:
         keep_dir.chdir(folder)
-        subprocess.run(['yt-dlp', '-f bestvideo[ext=mp4]+bestaudio[ext=m4a]',
+        subprocess.run(['yt-dlp', '-f bestvideo[ext=mp4]',
                        '--restrict-filenames', url], check=True)
-        print(f"{msg.OK}Background video downloaded successfully")

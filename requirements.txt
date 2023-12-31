@@ -12,3 +12,4 @@ mkdocs-material
 openai-whisper
 stable-ts
 tiktok-uploader
+gradio

@@ -54,48 +54,43 @@ def random_background(folder: str = "background") -> str:
         return Path(random_file).absolute()
 
 
-def get_info(filename: str, verbose: bool = False):
-    """
-    Get information about a video file.
+def get_info(filename: str, kind: str):
+    global probe
 
-    Args:
-        filename (str): The path to the video file.
-        verbose (bool, optional): Whether to print verbose output. Defaults to False.
-
-    Returns:
-        dict: A dictionary containing information about the video file, including width, height, bit rate, and duration.
-    """
     try:
         probe = ffmpeg.probe(filename)
-        video_stream = next(
-            (stream for stream in probe['streams'] if stream['codec_type'] == 'video'), None)
-        audio_stream = next(
-            (stream for stream in probe['streams'] if stream['codec_type'] == 'audio'), None)
-        try:
-            duration = float(audio_stream['duration'])
-        except Exception:
-            if verbose:
-                console.log(
-                    f"{msg.WARNING}MP4 default metadata not found")
-                logger.warning('MP4 default metadata not found')
-            duration = (datetime.datetime.strptime(
-                audio_stream['DURATION'], '%H:%M:%S.%f') - datetime.datetime.min).total_seconds()
-        if video_stream is None:
-            if verbose:
-                console.log(
-                    f"{msg.WARNING}No video stream found")
-                logger.warning('No video stream found')
-            bit_rate = int(audio_stream['bit_rate'])
-            return {'bit_rate': bit_rate, 'duration': duration}
-
-        width = int(video_stream['width'])
-        height = int(video_stream['height'])
-        return {'width': width, 'height': height, 'duration': duration}
-
     except ffmpeg.Error as e:
         console.log(f"{msg.ERROR}{e.stderr}")
         logger.exception(e.stderr)
         sys.exit(1)
+
+    if kind == 'video':
+        global video_stream
+
+        # Extract
+        for stream in probe['streams']:
+            if stream['codec_type'] == 'video':
+                video_stream = stream
+                break
+
+        duration = float(video_stream['duration'])
+        width = int(video_stream['width'])
+        height = int(video_stream['height'])
+
+        return {'width': width, 'height': height, 'duration': duration}
+
+    elif kind == 'audio':
+        global audio_stream
+
+        # Extract
+        for stream in probe['streams']:
+            if stream['codec_type'] == 'audio':
+                audio_stream = stream
+                break
+
+        duration = float(audio_stream['duration'])
+
+        return {'duration': duration}
 
 
 def convert_time(time_in_seconds):

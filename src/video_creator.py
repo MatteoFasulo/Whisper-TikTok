@@ -1,5 +1,4 @@
 import json
-import subprocess
 from pathlib import Path
 
 import stable_whisper as whisper
@@ -8,6 +7,7 @@ from .subtitle_creator import srt_create
 from .text_to_speech import tts
 from .tiktok import upload_tiktok
 from .video_prepare import prepare_background
+from .video_downloader import download_video as youtube_download
 from utils import *
 
 HOME = Path.cwd()
@@ -28,18 +28,11 @@ class VideoCreator:
         self.outro = jsonData.get('outro', '')
         self.path = Path(media_folder).absolute()
 
-    def download_video(self, folder: str = 'background'):
-        directory = HOME / folder
-        if not directory.exists():
-            directory.mkdir()
-
-        with KeepDir() as keep_dir:
-            keep_dir.chdir(folder)
-            subprocess.run(['yt-dlp', '-f bestvideo[ext=mp4]+bestaudio[ext=m4a]',
-                            '--restrict-filenames', self.args.url], check=True)
-            console.log(
-                f"{msg.OK}Video downloaded from {self.args.url} to {folder}")
-            logger.info(f"Video downloaded from {self.args.url} to {folder}")
+    def download_video(self, folder='background'):
+        youtube_download(url=self.args.url, folder=folder)
+        console.log(
+            f"{msg.OK}Video downloaded from {self.args.url} to {folder}")
+        logger.info(f"Video downloaded from {self.args.url} to {folder}")
 
     def load_model(self):
         model = self.args.model

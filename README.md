@@ -177,7 +177,6 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## Upcoming Features 🔮
 
 - Integration with the OpenAI API to generate more advanced responses.
-- Improved user interface for a more seamless experience.
 
 ## OpenAI Whisper Forum Discussion
 

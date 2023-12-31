@@ -3,6 +3,7 @@ import json
 import platform
 import sys
 from argparse import Namespace
+import os
 
 import edge_tts
 
@@ -50,6 +51,7 @@ async def generate_video(model, tts_voice, sub_position, font, font_color, font_
 
 
 async def main():
+
     # Model
     model = gr.Dropdown(["tiny", "base", "small", "medium"],
                         label="Whisper Model", value="small", interactive=True, info="The model used to generate the subtitles. The bigger the model, the better the results, but the slower the generation. The tiny model is recommended for testing purposes. Medium model is enough for good results in many languages.")
@@ -65,7 +67,7 @@ async def main():
 
     # Subtitle font
     font = gr.Dropdown(
-        ["Lexend Bold", "Lexend Regular", "Arial"], label="Font", value="Lexend Bold", interactive=True, info="The font used to generate the subtitles")
+        ["Lexend Bold", "Lexend Regular", "Arial", "Roboto", "Big Condensed Black"], label="Font", value="Lexend Bold", interactive=True, info="The font used to generate the subtitles")
 
     # Subtitle font color
     font_color = gr.Textbox(
@@ -92,10 +94,17 @@ async def main():
 
     video_json = gr.JSON(value=json.load(open("video.json", "r")),
                          label="video.json")
+    
+    # Get the list of files in "background"
+    folder_path = "./background"
+    files = os.listdir(folder_path)
+
+    # Create a Dropdown with the list of files
+    background_tab = gr.Dropdown(label="Your Backgrounds", choices=files, info="List of all your downloaded backgrounds.")
 
     demo = gr.Interface(
         fn=generate_video,
-        inputs=[
+        inputs = [
             model,
             tts_voice,
             sub_position,
@@ -107,9 +116,10 @@ async def main():
             upload_tiktok,
             verbose,
             video_json,
+            background_tab
         ],
         outputs="video",
-        title="Whisper-TikTok",
+        title="🏆 Tiktok Whisper 🚀",
         description="Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.",
         article="",
     )

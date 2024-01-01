@@ -4,7 +4,6 @@ import json
 import platform
 import sys
 from argparse import Namespace
-import os
 
 import edge_tts
 
@@ -14,7 +13,22 @@ from src.video_creator import VideoCreator
 from utils import rgb_to_bgr
 
 
-async def generate_video(model, tts_voice, sub_position, font, font_color, font_size, url, non_english, upload_tiktok, verbose, *args, **kwargs):
+async def generate_video(
+        model,
+        tts_voice,
+        sub_position,
+        font,
+        font_color,
+        font_size,
+        url,
+        non_english,
+        upload_tiktok,
+        verbose,
+        video_json,
+        background_tab,
+        video_num,
+        *args,
+        **kwargs):
 
     args = Namespace(
         model=model,
@@ -27,9 +41,10 @@ async def generate_video(model, tts_voice, sub_position, font, font_color, font_
         non_english=non_english,
         upload_tiktok=upload_tiktok,
         verbose=verbose,
+        mp4_background=background_tab,
     )
 
-    video_creator = VideoCreator(args)
+    video_creator = VideoCreator(video_json[video_num], args)
 
     video_creator.download_video()
 
@@ -91,7 +106,7 @@ async def main():
 
     # Verbose
     verbose = gr.Checkbox(
-        label="Verbose", info="Print the output of the commands used to create the video on your terminal. Useful for debugging.")
+        label="Verbose", info="Print the output of the commands used to create the video on your terminal. Useful for debugging.", interactive=True)
 
     video_json = gr.JSON(value=json.load(open("video.json", "r")),
                          label="video.json")
@@ -103,7 +118,18 @@ async def main():
 
     # Create a Dropdown with the list of files
     background_tab = gr.Dropdown(
-        label="Your Backgrounds", choices=files, info="List of all your downloaded backgrounds.")
+        label="Your Backgrounds", choices=files, info="List of all your downloaded backgrounds.", interactive=True)
+
+    # Choose which video to generate
+    videos = video_json.value
+
+    video_num = gr.Dropdown(
+        label="Video",
+        choices=[f"{video['series']} - {video['part']}" for video in videos],
+        info="Choose which video to generate from video.json file.",
+        type="index",
+        interactive=True
+    )
 
     demo = gr.Interface(
         fn=generate_video,
@@ -119,10 +145,11 @@ async def main():
             upload_tiktok,
             verbose,
             video_json,
-            background_tab
+            background_tab,
+            video_num,
         ],
         outputs="video",
-        title="🏆 Tiktok Whisper 🚀",
+        title="🏆 Whisper-TikTok 🚀",
         description="Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.",
         article="",
     )

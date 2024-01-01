@@ -44,26 +44,30 @@ async def generate_video(
         mp4_background=background_tab,
     )
 
-    video_creator = VideoCreator(video_json[video_num], args)
+    async def get_video(video_data, args):
+        video_creator = VideoCreator(video_data, args)
 
-    video_creator.download_video()
+        video_creator.download_video()
 
-    video_creator.load_model()
+        video_creator.load_model()
 
-    video_creator.create_text()
+        video_creator.create_text()
 
-    await video_creator.text_to_speech()
+        await video_creator.text_to_speech()
 
-    video_creator.generate_transcription()
+        video_creator.generate_transcription()
 
-    video_creator.select_background()
+        video_creator.select_background()
 
-    video_creator.integrate_subtitles()
+        video_creator.integrate_subtitles()
 
-    if upload_tiktok:
-        video_creator.upload_to_tiktok()
+        if upload_tiktok:
+            video_creator.upload_to_tiktok()
 
-    return video_creator.mp4_final_video
+        return video_creator.mp4_final_video
+
+    tasks = [get_video(video_json[i], args) for i in video_num]
+    await asyncio.gather(*tasks)
 
 
 async def main():
@@ -128,6 +132,7 @@ async def main():
         choices=[f"{video['series']} - {video['part']}" for video in videos],
         info="Choose which video to generate from video.json file.",
         type="index",
+        multiselect=True,
         interactive=True
     )
 

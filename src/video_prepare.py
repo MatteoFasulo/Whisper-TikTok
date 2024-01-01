@@ -41,14 +41,15 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
         "-i", filename_mp3,
         "-map", "0:v",
         "-map", "1:a",
-        "-filter:v",
-        f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=bicubic, gblur=sigma=2, ass={srt_filename}",
-        "-c:v", "libx264", "-preset", "5",
-        "-b:v", "5M",
-        "-c:a", "aac", "-ac", "1",
-        "-b:a", "96K",
-        f"{outfile}", "-y",
-        "-threads", f"{multiprocessing.cpu_count()//2}"]
+        "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=lanczos, gblur=sigma=2, ass={srt_filename}",
+        "-c:v", "libx264",
+        "-crf", "23",
+        "-c:a", "aac",
+        "-ac", "2",
+        "-b:a", "192K",
+        f"{outfile}",
+        "-y",
+        "-threads", f"{multiprocessing.cpu_count()}"]
 
     if verbose:
         rich_print('[i] FFMPEG Command:\n'+' '.join(args)+'\n', style='yellow')

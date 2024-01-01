@@ -1,11 +1,19 @@
-{
-    "series": "Crazy facts that you did not know",
-    "part": "Part 4",
-    "outro": "Follow us for more",
-    "text": "Sku",
-    "tags": [
-        "chess",
-        "facts",
-        "crazy"
-    ]
-}
+[
+    {
+        "series": "Crazy facts that you did not know",
+        "part": "Part 4",
+        "outro": "Follow us for more",
+        "text": "Sku",
+        "tags": [
+            "chess",
+            "facts",
+            "crazy"
+        ]
+    },
+    {
+        "series": "Crazy facts that you did not know",
+        "part": "Part 5",
+        "outro": "Follow us for more",
+        "text": "Test"
+    }
+]

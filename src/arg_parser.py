@@ -33,7 +33,7 @@ async def parse_args():
     parser.add_argument("--font", help="Subtitle font",
                         default="Lexend Bold", type=str)
     parser.add_argument("--font_color", help="Subtitle font color in hex format: FFF000",
-                        default="#FFF000", type=str)
+                        default="FFF000", type=str)
     parser.add_argument(
         "--font_size", help="Subtitle font size", default=21, type=int)
     parser.add_argument("--upload_tiktok", help="Upload to TikTok after creating the video",
@@ -83,6 +83,10 @@ async def parse_args():
 
     # Cast font color to lowercase
     args.font_color = args.font_color.lower()
+
+    # Remove # from font color
+    if args.font_color.startswith('#'):
+        args.font_color = args.font_color[1:]
 
     # Convert font color from RGB to BGR
     args.font_color = rgb_to_bgr(args.font_color)

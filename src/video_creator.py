@@ -12,20 +12,19 @@ from utils import *
 
 HOME = Path.cwd()
 logger = setup_logger()
-video_json_path = HOME / 'video.json'
-jsonData = json.loads(video_json_path.read_text(encoding='utf-8'))
 media_folder = HOME / 'media'
 
 
 class VideoCreator:
-    def __init__(self, args):
+    def __init__(self, video, args):
         self.args = args
+        self.video = video
 
-        self.series = jsonData.get('series', '')
-        self.part = jsonData.get('part', '')
-        self.text = jsonData.get('text', '')
-        self.tags = jsonData.get('tags', list())
-        self.outro = jsonData.get('outro', '')
+        self.series = video.get('series', '')
+        self.part = video.get('part', '')
+        self.text = video.get('text', '')
+        self.tags = video.get('tags', list())
+        self.outro = video.get('outro', '')
         self.path = Path(media_folder).absolute()
 
     def download_video(self, folder='background'):

@@ -67,7 +67,13 @@ async def generate_video(
         return video_creator.mp4_final_video
 
     tasks = [get_video(video_json[i], args) for i in video_num]
-    await asyncio.gather(*tasks)
+    results = await asyncio.gather(*tasks)
+
+    if len(results) == 1:
+        return results[0]
+
+    else:
+        return results[-1]
 
 
 async def main():
@@ -133,6 +139,7 @@ async def main():
         info="Choose which video to generate from video.json file.",
         type="index",
         multiselect=True,
+        value=[0],
         interactive=True
     )
 

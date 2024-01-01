@@ -65,14 +65,20 @@ class VideoCreator:
         return ass_filename
 
     def select_background(self):
-        background_mp4 = random_background()
+        if not self.args.mp4_background:
+            background_mp4 = random_background()
 
-        self.mp4_backgroung = background_mp4
+        else:
+            with KeepDir() as keep_dir:
+                keep_dir.chdir("background")
+                background_mp4 = Path(self.args.mp4_background).absolute()
+
+        self.mp4_background = background_mp4
         return background_mp4
 
     def integrate_subtitles(self):
         final_video = prepare_background(
-            self.mp4_backgroung, filename_mp3=self.mp3_file, filename_srt=self.ass_file, verbose=self.args.verbose)
+            self.mp4_background, filename_mp3=self.mp3_file, filename_srt=self.ass_file, verbose=self.args.verbose)
         final_video = Path(final_video).absolute()
 
         self.mp4_final_video = final_video

@@ -181,6 +181,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## Upcoming Features 🔮
 
 - Integration with the OpenAI API to generate more advanced responses.
+- Generate content by extracting it from reddit <https://github.com/MatteoFasulo/Whisper-TikTok/issues/22>
 
 ## OpenAI Whisper Forum Discussion
 

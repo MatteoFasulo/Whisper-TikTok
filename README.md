@@ -86,7 +86,7 @@ scoop install ffmpeg
 
 Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly. This performance difference is because GPUs efficiently handle fp16 computation, while CPUs use fp32 or fp64 (depending on your machine), which are slower.
 
-## Webui 📝
+## Webui 🔧
 
 To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 
@@ -94,7 +94,7 @@ To embark on your Whisper-TikTok journey, initiate the following command within 
 python app.py 
 ```
 
-## Command-Line 📝
+## Command-Line ♨️
 
 To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 

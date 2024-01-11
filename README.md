@@ -42,7 +42,7 @@ The program conducts the **sequence of actions** outlined below:
 There is a webui hosted thanks to streamlit. To do it, just click on this link that will take you directly to the webui.
 ### https://convert.streamlit.app/
 
-## Installation 🛠️
+## Local Installation 🛠️
 
 Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.8, 3.9 and 3.11**.
 

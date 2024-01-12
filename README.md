@@ -37,8 +37,12 @@ The program conducts the **sequence of actions** outlined below:
 8. Integrate the srt file into the chosen video using FFMPEG, creating a final .mp4 output.
 9. Upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required `cookies.txt` file can be generated using [this guide available here](https://github.com/kairi003/Get-cookies.txt-LOCALLY). The `cookies.txt` file must be placed in the root folder of the project.
 10. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
+## Webui Access 🔐
 
-## Installation 🛠️
+There is a webui hosted thanks to streamlit. To do it, just click on this link that will take you directly to the webui.
+### https://convert.streamlit.app/
+
+## Local Installation 🛠️
 
 Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.8, 3.9 and 3.11**.
 
@@ -82,7 +86,7 @@ scoop install ffmpeg
 
 Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly. This performance difference is because GPUs efficiently handle fp16 computation, while CPUs use fp32 or fp64 (depending on your machine), which are slower.
 
-## Webui 📝
+## Webui 🔧
 
 To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 
@@ -90,7 +94,7 @@ To embark on your Whisper-TikTok journey, initiate the following command within 
 python app.py 
 ```
 
-## Command-Line 📝
+## Command-Line ♨️
 
 To embark on your Whisper-TikTok journey, initiate the following command within your terminal:
 
@@ -177,6 +181,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## Upcoming Features 🔮
 
 - Integration with the OpenAI API to generate more advanced responses.
+- Generate content by extracting it from reddit <https://github.com/MatteoFasulo/Whisper-TikTok/issues/22>
 
 ## OpenAI Whisper Forum Discussion
 

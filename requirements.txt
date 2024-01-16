@@ -13,3 +13,4 @@ openai-whisper
 stable-ts
 tiktok-uploader
 streamlit
+praw

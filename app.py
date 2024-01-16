@@ -12,8 +12,6 @@ import streamlit as st
 from src.video_creator import VideoCreator
 from utils import rgb_to_bgr
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 result = None
 
 
@@ -148,6 +146,7 @@ async def main():
     LEFT, RIGHT = st.columns(2)
 
     with LEFT:
+        st.subheader("General settings")
         tts_voice = st.selectbox(
             "TTS Voice",
             [f"{i['ShortName']} | {i['Gender']} | Tags: {i['VoiceTag']['VoicePersonalities']}" for i in await edge_tts.list_voices()], index=111, help="The voice used to generate the audio. The voice must be in the same language as the subtitles."
@@ -194,6 +193,8 @@ async def main():
                 "Verbose", help="Print the output of the commands used to create the video on your terminal. Useful for debugging.")
 
         st.divider()
+
+        st.subheader("Video settings")
 
         st.write("JSON file with the videos")
         video_json = st.json(json.load(open("video.json")), expanded=False)

@@ -27,8 +27,10 @@ def srt_create(whisper_model, path: str, series: str, part: int, text: str, file
 
     transcribe = whisper_model.transcribe(
         filename, regroup=True, fp16=torch.cuda.is_available())
-    transcribe.split_by_gap(0.5).split_by_length(
-        38).merge_by_gap(0.15, max_words=2)
+
+    transcribe.split_by_gap(0.5).split_by_length(kwargs.get(
+        'max_characters')).merge_by_gap(0.15, max_words=kwargs.get('max_words'))
+
     transcribe.to_srt_vtt(str(absolute_srt_path), word_level=True)
     transcribe.to_ass(str(absolute_ass_path), word_level=True,
                       highlight_color=kwargs.get('font_color'), **word_dict)

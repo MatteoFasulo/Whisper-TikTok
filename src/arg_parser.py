@@ -36,6 +36,10 @@ async def parse_args():
                         default="FFF000", type=str)
     parser.add_argument(
         "--font_size", help="Subtitle font size", default=21, type=int)
+    parser.add_argument('--max_characters', default=38,
+                        type=int, help='Max characters per line')
+    parser.add_argument('--max_words', default=2, type=int,
+                        help='Max words per line')
     parser.add_argument("--upload_tiktok", help="Upload to TikTok after creating the video",
                         action='store_true', default=False)
     parser.add_argument("-v", "--verbose", action='store_true',

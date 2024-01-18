@@ -197,7 +197,8 @@ async def main():
         st.subheader("Video settings")
 
         st.write("JSON file with the videos")
-        video_json = st.json(json.load(open("video.json")), expanded=False)
+        with open('video.json', encoding='utf-8') as fh:
+            video_json = st.json(json.load(fh), expanded=False)
 
         # Get the list of files in "background"
         folder_path = Path("background").absolute()

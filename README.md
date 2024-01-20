@@ -46,7 +46,7 @@ There is a webui hosted thanks to streamlit. To do it, just click on this link t
 
 To auto install Whisper-TikTok on your system, follow the instructions below based on your operating system:
 
-### For Linux Users
+### For Linux Users (Bash) 🟩
 
 1. Download the .sh file
 2. Open a terminal.
@@ -58,7 +58,7 @@ To auto install Whisper-TikTok on your system, follow the instructions below bas
 
    This script will check and install necessary dependencies, create a Conda environment, clone the repository, install Python dependencies, and prompt you to choose between running the web user interface (webui) or the script.
 
-### For Windows Users
+### For Windows Users (PowerShell) 🟥
 
 Click on the Whisper-TikTok-Windows.bat file and let him do the work.
 

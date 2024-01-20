@@ -42,7 +42,49 @@ The program conducts the **sequence of actions** outlined below:
 There is a webui hosted thanks to streamlit. To do it, just click on this link that will take you directly to the webui.
 ### https://convert.streamlit.app/
 
-## Local Installation 🛠️
+## Auto Installation 🤖
+
+To auto install Whisper-TikTok on your system, follow the instructions below based on your operating system:
+
+### For Linux Users
+
+1. Open a terminal.
+2. Navigate to the project directory.
+3. Run the following command:
+
+    ```bash
+    ./Whisper-TikTok-Linux.sh
+    ```
+
+   This script will check and install necessary dependencies, create a Conda environment, clone the repository, install Python dependencies, and prompt you to choose between running the web user interface (webui) or the script.
+
+### For Windows Users
+
+Click on the Whisper-TikTok-Windows.bat file and let him do the work.
+
+OR
+
+1. Open a Command Prompt.
+3. Run the following command:
+
+    ```batch
+    Whisper-TikTok-Windows.bat
+    ```
+
+This batch script performs a similar set of tasks as the Linux script, ensuring that Conda, Git, Python, and other dependencies are installed. It then prompts you to choose between running the web user interface (webui) or the script.
+
+## What the Script Does
+
+- **Check and Install Conda:** Verifies if Conda is installed; if not, installs the latest version.
+- **Create Conda Environment:** Sets up a Conda environment with Python 3.11.
+- **Clone Repository:** Clones the Whisper-TikTok repository from GitHub.
+- **Install Dependencies:** Installs Python dependencies specified in the `requirements.txt` file.
+- **Check and Install FFmpeg:** Ensures FFmpeg is installed; if not, checks the system package manager (apt, brew, etc.) or installs it using Scoop on Windows.
+- **Run the Program:** Prompts the user to choose between running the web user interface (webui) or the script (main.py).
+
+Feel free to reach out if you have any questions or encounter issues while running the script.
+
+## Manual Installation 🛠️
 
 Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.8, 3.9 and 3.11**.
 

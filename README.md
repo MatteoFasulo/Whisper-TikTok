@@ -48,8 +48,8 @@ To auto install Whisper-TikTok on your system, follow the instructions below bas
 
 ### For Linux Users
 
-1. Open a terminal.
-2. Navigate to the project directory.
+1. Download the .sh file
+2. Open a terminal.
 3. Run the following command:
 
     ```bash
@@ -64,7 +64,8 @@ Click on the Whisper-TikTok-Windows.bat file and let him do the work.
 
 OR
 
-1. Open a Command Prompt.
+1. Download the .bat file
+2. Open a Command Prompt.
 3. Run the following command:
 
     ```batch

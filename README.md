@@ -56,7 +56,7 @@ To auto install Whisper-TikTok on your system, follow the instructions below bas
     ./Whisper-TikTok-Linux.sh
     ```
 
-   This script will check and install necessary dependencies, create a Conda environment, clone the repository, install Python dependencies, and prompt you to choose between running the web user interface (webui) or the script.
+This script will check and install necessary dependencies, create a Conda environment, clone the repository, install Python dependencies, and prompt you to choose between running the web user interface (webui) or the script.
 
 ### For Windows Users (PowerShell) 🟥
 
@@ -95,7 +95,7 @@ First clone the repository
 git clone https://github.com/MatteoFasulo/Whisper-TikTok.git
 ```
 
-# Dependencies 🌿
+## Dependencies 🌿
 
 To streamline the installation of necessary dependencies, execute the following command within your terminal:
 

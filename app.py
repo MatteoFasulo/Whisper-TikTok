@@ -102,11 +102,19 @@ def df_to_json(df):
         # Convert the DataFrame to a JSON string
         json_str = df.to_json(orient='records', indent=4, force_ascii=False)
 
+        # raise an error if the dataframe has no rows (at least one is required)
+        if df.shape[0] == 0:
+            st.error("You must add at least one video to the JSON")
+            return
+
         # Save the JSON string to a file
         with open('video.json', 'w', encoding='UTF-8') as f:
             f.write(json_str)
 
         st.success("JSON saved successfully!")
+
+    except ValueError as e:
+        st.error("You must fill all the fields in the JSON")
     except Exception as e:
         st.error(f"Error saving JSON: {e}")
 
@@ -140,6 +148,7 @@ async def main():
     st.write("Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.")
 
     st.subheader("JSON Editor", help="Here you can edit the JSON file with the videos. Copy-and-paste is supported and compatible with Google Sheets, Excel, and others. You can do bulk-editing by dragging the handle on a cell (similar to Excel)!")
+    st.write("ℹ️ The JSON file is saved automatically when you click the button below. Every time you edit the JSON file, you must click the button to save the changes otherwise they will be lost.")
     edited_df = st.data_editor(json_to_df('video.json'),
                                num_rows="dynamic")
     st.button("Save JSON", on_click=df_to_json, args=(

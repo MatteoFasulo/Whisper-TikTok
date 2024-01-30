@@ -8,6 +8,7 @@ from argparse import Namespace
 
 import edge_tts
 import streamlit as st
+import pandas as pd
 
 from src.video_creator import VideoCreator
 from utils import rgb_to_bgr
@@ -90,6 +91,26 @@ async def generate_video(
         return results[-1]
 
 
+@st.cache_data
+def json_to_df(json_file):
+    return pd.read_json(json_file)
+
+
+@st.cache_data
+def df_to_json(df):
+    try:
+        # Convert the DataFrame to a JSON string
+        json_str = df.to_json(orient='records', indent=4, force_ascii=False)
+
+        # Save the JSON string to a file
+        with open('video.json', 'w', encoding='UTF-8') as f:
+            f.write(json_str)
+
+        st.success("JSON saved successfully!")
+    except Exception as e:
+        st.error(f"Error saving JSON: {e}")
+
+
 # Streamlit Config
 st.set_page_config(
     page_title="Whisper-TikTok",
@@ -115,13 +136,14 @@ st.set_page_config(
 
 async def main():
 
-    _, mid, _ = st.columns(3)
+    st.title("🏆 Whisper-TikTok 🚀")
+    st.write("Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.")
 
-    with mid:
-
-        st.title("🏆 Whisper-TikTok 🚀")
-        st.write(
-            "Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.")
+    st.subheader("JSON Editor", help="Here you can edit the JSON file with the videos. Copy-and-paste is supported and compatible with Google Sheets, Excel, and others. You can do bulk-editing by dragging the handle on a cell (similar to Excel)!")
+    edited_df = st.data_editor(json_to_df('video.json'),
+                               num_rows="dynamic")
+    st.button("Save JSON", on_click=df_to_json, args=(
+        edited_df,), help="Save the JSON file with the videos")
 
     st.divider()
 

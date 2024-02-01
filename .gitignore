@@ -170,3 +170,8 @@ output/*
 
 # Cookies
 cookies.txt
+
+# reddit2json
+.env
+Pipfile
+Pipfile.lock

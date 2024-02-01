@@ -14,3 +14,5 @@ stable-ts
 tiktok-uploader
 streamlit
 praw
+requests
+openai

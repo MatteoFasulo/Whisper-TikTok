@@ -65,6 +65,10 @@ st.set_page_config(
     }
 )
 
+st.page_link("app.py", label="Home", icon="🏠")
+st.page_link("https://github.com/MatteoFasulo/Whisper-TikTok",
+             label="GitHub", icon="🌎")
+
 with st.sidebar:
     with st.expander("ℹ️ How to use"):
         st.write(

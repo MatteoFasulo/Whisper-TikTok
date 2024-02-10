@@ -43,7 +43,7 @@ class VideoCreator:
         return whisper_model
 
     def create_text(self):
-        req_text = f"{self.series} - {self.part}.\n{self.text}\n{self.outro}"
+        req_text = f"{self.series} - Part {self.part}.\n{self.text}\n{self.outro}"
         series = self.series.replace(' ', '_')
         filename = f"{self.path}{os.sep}{series}{os.sep}{series}_{self.part}.mp3"
 
@@ -65,13 +65,18 @@ class VideoCreator:
         return ass_filename
 
     def select_background(self):
-        if not self.args.mp4_background:
-            background_mp4 = random_background()
+        try:
+            # Background video selected with WebUI
+            background_mp4 = self.args.mp4_background
 
-        else:
             with KeepDir() as keep_dir:
                 keep_dir.chdir("background")
-                background_mp4 = Path(self.args.mp4_background).absolute()
+                background_mp4 = Path(background_mp4).absolute()
+        except AttributeError:
+            # CLI execution
+            background_mp4 = random_background()
+
+        background_mp4 = str(Path(background_mp4).absolute())
 
         self.mp4_background = background_mp4
         return background_mp4

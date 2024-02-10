@@ -20,6 +20,7 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
     if ss < 0:
         ss = 0
 
+    srt_raw = filename_srt
     srt_filename = filename_srt.name
     srt_path = filename_srt.parent.absolute()
 
@@ -41,7 +42,7 @@ def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str
         "-i", filename_mp3,
         "-map", "0:v",
         "-map", "1:a",
-        "-filter:v", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=lanczos, gblur=sigma=2, ass={srt_filename}",
+        "-vf", f"crop=ih/16*9:ih, scale=w=1080:h=1920:flags=lanczos, gblur=sigma=2, ass='{srt_raw.absolute()}'",
         "-c:v", "libx264",
         "-crf", "23",
         "-c:a", "aac",

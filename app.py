@@ -211,7 +211,7 @@ async def main():
                 "Subtitle alignment (position)", 1, 9, 5, help="The position of the subtitles. 1 is the bottom left corner, 5 is the center, 9 is the top right corner. This is the alignment feature of FFMPEG subtitles.")
         with right:
             max_words = st.number_input(
-                "Maximum number of words per line", min_value=1, max_value=5, value=2, step=1, help="The maximum number of words per line for the subtitles. This is the feature for stable whisper model. It is recommended to use a value between 1 and 3.")
+                "Maximum number of words per line", min_value=2, max_value=5, value=2, step=1, help="The maximum number of words per line for the subtitles. This is the feature for stable whisper model. It is recommended to use a value between 2 and 3.")
 
         # Background Video URL
         url = st.text_input(

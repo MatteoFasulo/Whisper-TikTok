@@ -39,7 +39,7 @@ async def parse_args():
     parser.add_argument('--max_characters', default=38,
                         type=int, help='Max characters per line')
     parser.add_argument('--max_words', default=2, type=int,
-                        help='Max words per line')
+                        help='Max words per segment')
     parser.add_argument("--upload_tiktok", help="Upload to TikTok after creating the video",
                         action='store_true', default=False)
     parser.add_argument("-v", "--verbose", action='store_true',

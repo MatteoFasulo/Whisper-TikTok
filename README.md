@@ -1,6 +1,7 @@
 # Introducing Whisper-TikTok 🤖🎥
 
 Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, Whisper-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
+
 ## Webui 🎨
 
 ![Webui](docs/WebuiDemo.png)
@@ -37,10 +38,12 @@ The program conducts the **sequence of actions** outlined below:
 8. Integrate the srt file into the chosen video using FFMPEG, creating a final .mp4 output.
 9. Upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required `cookies.txt` file can be generated using [this guide available here](https://github.com/kairi003/Get-cookies.txt-LOCALLY). The `cookies.txt` file must be placed in the root folder of the project.
 10. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
+
 ## Webui Access 🔐
 
 There is a webui hosted thanks to streamlit. To do it, just click on this link that will take you directly to the webui.
-### https://convert.streamlit.app/
+
+### <https://convert.streamlit.app/>
 
 ## Local Installation 🛠️
 
@@ -126,6 +129,8 @@ Options:
   --font TEXT         Font to use for subtitles (Default: Lexend Bold)
   --font_color TEXT   Font color to use for subtitles in HEX format (Default: #FFF000).
   --font_size INT    Font size to use for subtitles (Default: 21)
+  --max_characters INT Maximum number of characters per line (Default: 38)
+  --max_words INT    Maximum number of words per segment (Default: 2)
   --upload_tiktok     Upload the video to TikTok (Flag)
   -v, --verbose       Verbose (Flag)
 ```
@@ -174,14 +179,13 @@ edge-tts --list-voices
 
 ### Accelerate Video Creation with reddit2json
 
-reddit2json is a Python script that transforms Reddit post URLs into a JSON file, streamlining the process of creating video.json files. This tool not only converts Reddit links but also offers functionalities such as translating Reddit post content using DeepL and modifying content through custom OpenAI GPT calls. 
+reddit2json is a Python script that transforms Reddit post URLs into a JSON file, streamlining the process of creating video.json files. This tool not only converts Reddit links but also offers functionalities such as translating Reddit post content using DeepL and modifying content through custom OpenAI GPT calls.
 
 #### reddit2json: Directly Convert Reddit Links to JSON
 
 reddit2json is designed to process a list of Reddit post URLs, converting them into a JSON format that can be used directly for video creation. This tool enhances the video creation process by providing a faster and more efficient way to generate video.json files.
 
 [Here is the detailed README for reddit2json](https://github.com/duozokker/reddit2json/blob/main/README.md) which includes instructions for installation, setting up the .env file, example calls, and more.
-
 
 ## Code of Conduct
 

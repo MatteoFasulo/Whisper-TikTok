@@ -1,5 +1,9 @@
 # Introducing Whisper-TikTok 🤖🎥
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=MatteoFasulo/Whisper-TikTok&type=Date)](https://star-history.com/#MatteoFasulo/Whisper-TikTok&Date)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -217,7 +221,7 @@ Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to
 
 We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
 
-## Upcoming Features 🔮
+## Upcoming Features
 
 - Integration with the OpenAI API to generate more advanced responses.
 - Generate content by extracting it from reddit <https://github.com/MatteoFasulo/Whisper-TikTok/issues/22>

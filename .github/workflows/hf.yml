@@ -17,4 +17,4 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           REPO_NAME: ${{ github.repository }}
-        run: git push https://MatteoFasulo:$HF_TOKEN@huggingface.co/spaces/MatteoFasulo/$REPO_NAME main
+        run: git push https://MatteoFasulo:$HF_TOKEN@huggingface.co/spaces/$REPO_NAME main

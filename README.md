@@ -184,7 +184,7 @@ python main.py --url https://www.youtube.com/watch?v=dQw4w9WgXcQ --tts en-US-Jen
 
 - Modify the font color of the subtitles:
 
-```
+```bash
 python main.py --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
 ```
 

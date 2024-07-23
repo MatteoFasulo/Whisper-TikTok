@@ -65,8 +65,8 @@ The program conducts the **sequence of actions** outlined below:
 
 ## Web App (Online)
 
-There is a Web App hosted thanks to Streamlit which is public available, just click on the link that will take you directly to the Web App.
-> <https://convert.streamlit.app>
+There is a Web App hosted thanks to Streamlit which is public available in HuggingFace, just click on the link that will take you directly to the Web App.
+> <https://huggingface.co/spaces/MatteoFasulo/Whisper-TikTok-Demo>
 
 ## Local Installation
 

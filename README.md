@@ -36,17 +36,13 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## How it Works
 
-Employing Whisper-TikTok is a breeze: simply modify the [video.json](video.json). The JSON file contains the following fields:
+Employing Whisper-TikTok is a breeze: simply modify the [clips.csv](clips.csv). The CSV file contains the following attributes:
 
 - `series`: The name of the series.
 - `part`: The part number of the video.
 - `text`: The text to be spoken in the video.
-- `outro`: The outro text to be spoken in the video.
 - `tags`: The tags to be used for the video.
-
-Summarizing the program's functionality:
-
-> Furnished with a structured JSON dataset containing details such as the **series name**, **video part number**, **video text** and **outro text**, the program orchestrates the synthesis of a video incorporating the provided text and outro. Subsequently, the generated video is stored within the designated `output` folder.
+- `outro`: The outro text to be spoken in the video.
 
 <details>
 <summary>Details</summary>
@@ -115,14 +111,14 @@ choco install ffmpeg
 scoop install ffmpeg
 ```
 
->Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly. This performance difference is because GPUs efficiently handle fp16 computation, while CPUs use fp32 or fp64 (depending on your machine), which are slower.
+> Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for Automatic Speech Recognition (ASR). However, the program will also work without a GPU, but it will run more slowly.
 
 ## Web-UI (Local)
 
 To run the Web-UI locally, execute the following command within your terminal:
 
 ```bash
-streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+streamlit run app.py
 ```
 
 ## Command-Line
@@ -202,36 +198,25 @@ edge-tts --list-voices
 
 ## Additional Resources
 
-### Accelerate Video Creation
-> Contributed by [@duozokker](<https://github.com/duozokker>)
-
-**reddit2json** is a Python script that transforms Reddit post URLs into a JSON file, streamlining the process of creating video.json files. This tool not only converts Reddit links but also offers functionalities such as translating Reddit post content using DeepL and modifying content through custom OpenAI GPT calls.
-
-#### reddit2json: Directly Convert Reddit Links to JSON
-
-reddit2json is designed to process a list of Reddit post URLs, converting them into a JSON format that can be used directly for video creation. This tool enhances the video creation process by providing a faster and more efficient way to generate video.json files.
-
-[Here is the detailed README for reddit2json](https://github.com/duozokker/reddit2json/blob/main/README.md) which includes instructions for installation, setting up the .env file, example calls, and more.
-
-## Code of Conduct
+### Code of Conduct
 
 Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
 
-## Contributing
+### Contributing
 
 We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
 
-## Upcoming Features
+### Upcoming Features
 
 - Integration with the OpenAI API to generate more advanced responses.
 - Generate content by extracting it from reddit <https://github.com/MatteoFasulo/Whisper-TikTok/issues/22>
 
-## Acknowledgments
+### Acknowledgments
 
 - We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with Whisper-TikTok.
 - We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision
 - Also [@jianfch](https://github.com/jianfch/stable-ts) for the stable-ts package, which made it possible to use the OpenAI Whisper model with Whisper-TikTok in a stable manner with font color and subtitle format options.
 
-## License
+### License
 
 Whisper-TikTok is licensed under the [Apache License, Version 2.0](https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/LICENSE).

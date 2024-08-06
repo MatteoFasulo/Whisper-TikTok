@@ -1,13 +1,10 @@
 import subprocess
 from pathlib import Path
 
-import msg
-from utils import KeepDir
-
 HOME = Path.cwd()
 
 
-def download_video(url: str, folder: str = 'background'):
+def download_video(url: str, folder: str = 'background') -> None:
     """
     Downloads a video from the given URL and saves it to the specified folder.
 
@@ -19,7 +16,5 @@ def download_video(url: str, folder: str = 'background'):
     if not directory.exists():
         directory.mkdir()
 
-    with KeepDir() as keep_dir:
-        keep_dir.chdir(folder)
-        subprocess.run(['yt-dlp', '-f bestvideo[ext=mp4]',
-                       '--restrict-filenames', url], check=True)
+    subprocess.run(['yt-dlp', '-f bestvideo[ext=mp4]', '--restrict-filenames', '--windows-filenames', f'-P {directory}', url], check=True)
+    return None

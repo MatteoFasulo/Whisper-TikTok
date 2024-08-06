@@ -1,6 +1,5 @@
-import os
 import sys
-import json
+import csv
 from pathlib import Path
 import asyncio
 import platform
@@ -10,11 +9,10 @@ import edge_tts
 import streamlit as st
 import pandas as pd
 
-from src.video_creator import VideoCreator
+from src.video_creator import ClipMaker
 from utils import rgb_to_bgr
 
 result = None
-
 
 async def generate_video(
         model,
@@ -27,9 +25,8 @@ async def generate_video(
         non_english,
         upload_tiktok,
         verbose,
-        video_json,
-        background_tab,
         video_num,
+        background_tab,
         max_words,
         *args,
         **kwargs):
@@ -49,18 +46,18 @@ async def generate_video(
         max_words=max_words
     )
 
-    async def get_video(video_data, args):
+    async def get_clip(clip, args):
         with st.status("Generating video...", expanded=False) as status:
-            video_creator = VideoCreator(video_data, args)
+            video_creator = ClipMaker(clip=clip, args=args)
 
             status.update(label="Downloading video...")
-            video_creator.download_video()
+            video_creator.download_background_video()
 
             status.update(label="Loading model...")
             video_creator.load_model()
 
             status.update(label="Creating text...")
-            video_creator.create_text()
+            video_creator.merge_clip_text()
 
             status.update(label="Generating audio...")
             await video_creator.text_to_speech()
@@ -73,6 +70,7 @@ async def generate_video(
 
             status.update(label="Integrating subtitles...")
             video_creator.integrate_subtitles()
+            print('HERE x3')
 
             if upload_tiktok:
                 status.update(label="Uploading to TikTok...")
@@ -82,43 +80,24 @@ async def generate_video(
                           state="complete", expanded=False)
             return str(video_creator.mp4_final_video)
 
-    tasks = [get_video(video_json[i], args)
-             for i, name in enumerate(video_num)]
-    results = await asyncio.gather(*tasks)
+    task = [get_clip(clip, args) for clip in video_num]
+    result = await asyncio.gather(*task)
 
-    if len(results) == 1:
-        return results[0]
-
+    if len(result) == 1:
+        return result[0]
     else:
-        return results[-1]
+        return result[-1] # Return the last video generated if multiple videos are generated
+
+@st.cache_data
+def csv_to_df(csv_file):
+    return pd.read_csv(csv_file, sep='|', encoding='utf-8')
 
 
 @st.cache_data
-def json_to_df(json_file):
-    return pd.read_json(json_file)
-
-
-@st.cache_data
-def df_to_json(df):
-    try:
-        # Convert the DataFrame to a JSON string
-        json_str = df.to_json(orient='records', indent=4, force_ascii=False)
-
-        # raise an error if the dataframe has no rows (at least one is required)
-        if df.shape[0] == 0:
-            st.error("You must add at least one video to the JSON")
-            return
-
-        # Save the JSON string to a file
-        with open('video.json', 'w', encoding='UTF-8') as f:
-            f.write(json_str)
-
-        st.success("JSON saved successfully!")
-
-    except ValueError as e:
-        st.error("You must fill all the fields in the JSON")
-    except Exception as e:
-        st.error(f"Error saving JSON: {e}")
+def df_to_csv(df):
+    # Save the edited dataframe to the CSV file
+    df.to_csv("clips.csv", index=False, sep='|')
+    return df
 
 
 # Streamlit Config
@@ -143,22 +122,17 @@ st.set_page_config(
     }
 )
 
-st.page_link("pages/reddit.py", label="Reddit", icon="🤖")
-st.page_link("https://github.com/MatteoFasulo/Whisper-TikTok",
-             label="GitHub", icon="🌎")
-
-
 async def main():
 
     st.title("🏆 Whisper-TikTok 🚀")
     st.write("Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.")
 
-    st.subheader("JSON Editor", help="Here you can edit the JSON file with the videos. Copy-and-paste is supported and compatible with Google Sheets, Excel, and others. You can do bulk-editing by dragging the handle on a cell (similar to Excel)!")
-    st.write("ℹ️ The JSON file is saved automatically when you click the button below. Every time you edit the JSON file, you must click the button to save the changes otherwise they will be lost.")
-    edited_df = st.data_editor(json_to_df('video.json'),
+    st.subheader("Clip Editor", help="Here you can edit the CSV file with the clips data. Copy-and-paste is supported and compatible with Google Sheets, Excel, and others. You can do bulk-editing by dragging the handle on a cell (similar to Excel)!")
+    st.write("ℹ️ The CSV file is saved automatically when you click the button below. Every time you edit the CSV file, you must click the button to save the changes otherwise they will be lost.")
+    edited_df = st.data_editor(csv_to_df("clips.csv"),
                                num_rows="dynamic")
-    st.button("Save JSON", on_click=df_to_json, args=(
-        edited_df,), help="Save the JSON file with the videos")
+    st.button("Save CSV", on_click=df_to_csv, args=(
+        edited_df,), help="Save the CSV file with the clips")
 
     st.divider()
 
@@ -169,15 +143,14 @@ async def main():
         with st.expander("ℹ️ How to use"):
             st.write(
                 """
-                1. Choose the video to generate using the dropdown menu.
+                1. Choose the clip to generate using the dropdown menu.
                 2. Choose the model to use for the subtitles.
                 3. Choose the voice to use for the text-to-speech.
-                4. Choose the background video to use for the TikTok video.
+                4. Choose the background video to use for the clip.
                 5. Choose the position of the subtitles.
                 6. Choose the font, font color, and font size for the subtitles.
-                7. Choose the URL of the background video to use for the TikTok video.
-                8. Check the "Non-english" checkbox if you want to generate a video in a non-english language.
-                9. Check the "Upload to TikTok" checkbox if you want to upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required cookies.txt file can be generated using this guide
+                7. Check the "Non-english" checkbox if you want to generate a clip in a non-english language.
+                8. Check the "Upload to TikTok" checkbox if you want to upload the clip to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required cookies.txt file can be generated using the guide specified in the README. The cookies.txt file must be placed in the root folder of the project.
                 """)
 
     LEFT, RIGHT = st.columns(2)
@@ -238,9 +211,7 @@ async def main():
 
         st.subheader("Video settings")
 
-        st.write("JSON file with the videos")
-        with open('video.json', encoding='utf-8') as fh:
-            video_json = st.json(json.load(fh), expanded=False)
+        st.write("CSV file with the clips")
 
         # Get the list of files in "background"
         folder_path = Path("background").absolute()
@@ -249,26 +220,26 @@ async def main():
 
         # Create a Dropdown with the list of files
         background_tab = st.selectbox(
-            "Your Backgrounds", files, index=0, help="The background video to use for the TikTok video")
+            "Your Backgrounds", files, index=0, help="The background video to use for the clip")
 
-        # Choose which video to generate
-        videos = json.load(open("video.json"))
+        # Choose which clip to generate the video for
+        with open('clips.csv', 'r', encoding='utf-8') as csvfile:
+            clips = csv.DictReader(csvfile, delimiter='|')
 
-        video_num = st.multiselect(
-            "Video",
-            options=videos,
-            format_func=lambda video: f"{video['series']} - {video['part']}",
-            default=[videos[0]],
-            help="The video to generate. If you want to generate multiple videos, select them as a multiselect."
-        )
+            video_num = st.multiselect(
+                "Video",
+                options=clips,
+                format_func=lambda video: f"{video['series']} - {video['part']}",
+                help="The clip to generate. If you want to generate multiple clips, select them as a multiselect."
+            )
 
-        if st.button("Generate Video"):
+        if st.button("Generate Clip"):
             if not video_num:
-                st.error("You must select at least one video to generate")
+                st.error("You must select at least one clip to generate")
                 return
             global result
             result = await generate_video(model, tts_voice, sub_position, font, font_color, font_size,
-                                          url, non_english, upload_tiktok, verbose, videos, background_tab, video_num, max_words)
+                                          url, non_english, upload_tiktok, verbose, video_num, background_tab, max_words)
 
     with RIGHT:
         if result:

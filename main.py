@@ -1,6 +1,6 @@
 # utils.py
 import asyncio
-import json
+import csv
 import platform
 from dotenv import find_dotenv, load_dotenv
 from utils import *
@@ -8,24 +8,18 @@ from utils import *
 # msg.py
 import msg
 
-# logger.py
-from src.logger import setup_logger
-
 # arg_parser.py
 from src.arg_parser import parse_args
 
 # video_creator.py
-from src.video_creator import VideoCreator
+from src.video_creator import ClipMaker
 
 # Default directory
 HOME = Path.cwd()
 
-# Logging
-logger = setup_logger()
-
-# JSON video file
-video_json_path = HOME / 'video.json'
-jsonData = json.loads(video_json_path.read_text(encoding='utf-8'))
+# List of clips to generate
+video_csv = HOME / 'clips.csv'
+video_data = csv.DictReader(open(video_csv, 'r', encoding='utf-8'), delimiter='|')
 
 
 #######################
@@ -33,25 +27,23 @@ jsonData = json.loads(video_json_path.read_text(encoding='utf-8'))
 #######################
 
 
-async def main() -> bool:
+async def main(video_list) -> bool:
     console.clear()  # Clear terminal
 
     args = await parse_args()
-    videos = jsonData
 
-    for video in videos:
-        logger.debug('Creating video')
+    for video in video_list:
         with console.status(msg.STATUS) as status:
-            load_dotenv(find_dotenv())  # Optional
 
-            console.log(
-                f"{msg.OK}Finish loading environment variables")
-            logger.info('Finish loading environment variables')
+            # Load env vars (if any)
+            load_dotenv(find_dotenv())
 
-            video_creator = VideoCreator(video, args)
-            video_creator.download_video()
+            console.log(f"{msg.OK}Finish loading environment variables")
+
+            video_creator = ClipMaker(video, args)
+            video_creator.download_background_video()
             video_creator.load_model()
-            video_creator.create_text()
+            video_creator.merge_clip_text()
             await video_creator.text_to_speech()
             video_creator.generate_transcription()
             video_creator.select_background()
@@ -60,7 +52,7 @@ async def main() -> bool:
                 video_creator.upload_to_tiktok()
 
         console.log(f'{msg.DONE} {str(video_creator.mp4_final_video)}')
-    return 0
+    return True
 
 
 if __name__ == "__main__":
@@ -70,7 +62,7 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
 
-    loop.run_until_complete(main())
+    loop.run_until_complete(main(video_list=video_data))
 
     loop.close()
 

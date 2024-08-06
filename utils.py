@@ -1,4 +1,3 @@
-import datetime
 import os
 from pathlib import Path
 import random
@@ -8,32 +7,15 @@ import ffmpeg
 from rich.console import Console
 
 import msg
-from src.logger import setup_logger
-
 
 console = Console()
-logger = setup_logger()
-
-
-class KeepDir:
-    def __init__(self):
-        self.original_dir = os.getcwd()
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        os.chdir(self.original_dir)
-
-    def chdir(self, path):
-        os.chdir(path)
 
 
 def rich_print(text, style: str = ""):
     console.print(text, style=style)
 
 
-def random_background(folder: str = "background") -> str:
+def random_background(folder: str = "background") -> Path:
     """
     Returns the filename of a random file in the specified folder.
 
@@ -41,18 +23,21 @@ def random_background(folder: str = "background") -> str:
         folder(str): The folder containing the files.
 
     Returns:
-        str: The filename of a randomly selected file in the folder.
+        Path: The absolute path of the random file.
     """
+    # Get the absolute path of the folder
     directory = Path(folder).absolute()
+
+    # Create the folder if it does not exist
     if not directory.exists():
         directory.mkdir()
 
-    with KeepDir() as keep_dir:
-        keep_dir.chdir(folder)
-        files = os.listdir(".")
-        random_file = random.choice(files)
-        return Path(random_file).absolute()
+    # Select a random background video for the clip inside the folder
+    random_file = random.choice(os.listdir(directory))
 
+    # Return the absolute path of the random file adding the folder path
+    # Concat the folder path with the random file name
+    return directory / random_file
 
 def get_info(filename: str, kind: str):
     global probe
@@ -61,7 +46,6 @@ def get_info(filename: str, kind: str):
         probe = ffmpeg.probe(filename)
     except ffmpeg.Error as e:
         console.log(f"{msg.ERROR}{e.stderr}")
-        logger.exception(e.stderr)
         sys.exit(1)
 
     if kind == 'video':

@@ -70,7 +70,6 @@ async def generate_video(
 
             status.update(label="Integrating subtitles...")
             video_creator.integrate_subtitles()
-            print('HERE x3')
 
             if upload_tiktok:
                 status.update(label="Uploading to TikTok...")

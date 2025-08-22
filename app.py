@@ -6,11 +6,11 @@ import asyncio
 import platform
 from argparse import Namespace
 
-import edge_tts
 import streamlit as st
 import pandas as pd
 
 from src.video_creator import VideoCreator
+from src.voice_manager import VoicesManager
 from utils import rgb_to_bgr
 
 result = None
@@ -98,60 +98,28 @@ def json_to_df(json_file):
     return pd.read_json(json_file)
 
 
-@st.cache_data
-def df_to_json(df):
+def get_speechify_voices():
+    """Get available Speechify voices for the Streamlit interface"""
     try:
-        # Convert the DataFrame to a JSON string
-        json_str = df.to_json(orient='records', indent=4, force_ascii=False)
-
-        # raise an error if the dataframe has no rows (at least one is required)
-        if df.shape[0] == 0:
-            st.error("You must add at least one video to the JSON")
-            return
-
-        # Save the JSON string to a file
-        with open('video.json', 'w', encoding='UTF-8') as f:
-            f.write(json_str)
-
-        st.success("JSON saved successfully!")
-
-    except ValueError as e:
-        st.error("You must fill all the fields in the JSON")
+        voices_manager = VoicesManager()
+        voices = voices_manager.get_available_voices()
+        return voices
     except Exception as e:
-        st.error(f"Error saving JSON: {e}")
-
-
-# Streamlit Config
-st.set_page_config(
-    page_title="Whisper-TikTok",
-    page_icon="💬",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': 'https://github.com/MatteoFasulo/Whisper-TikTok',
-        'Report a bug': "https://github.com/MatteoFasulo/Whisper-TikTok/issues",
-        'About':
-            """
-            # Whisper-TikTok
-            Whisper-TikTok is an innovative AI-powered tool that leverages the prowess of Edge TTS, OpenAI-Whisper, and FFMPEG to craft captivating TikTok videos also with a web application interface!
-
-            Mantainer: https://github.com/MatteoFasulo
-
-            If you find a bug or if you just have questions about the project feel free to reach me at https://github.com/MatteoFasulo/Whisper-TikTok
-            Any contribution to this project is welcome to improve the quality of work!
-            """
-    }
-)
-
-st.page_link("pages/reddit.py", label="Reddit", icon="🤖")
-st.page_link("https://github.com/MatteoFasulo/Whisper-TikTok",
-             label="GitHub", icon="🌎")
+        st.error(f"Error fetching Speechify voices: {e}")
+        st.error("Make sure SPEECHIFY_API_KEY environment variable is set")
+        return []
 
 
 async def main():
+    st.set_page_config(
+        page_title="Whisper TikTok",
+        page_icon="🎵",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
 
-    st.title("🏆 Whisper-TikTok 🚀")
-    st.write("Create a TikTok video with text-to-speech of Microsoft Edge's TTS and subtitles of Whisper model.")
+    st.title("🎵 Whisper TikTok")
+    st.write("Create a TikTok video with text-to-speech using Speechify API and subtitles of Whisper model.")
 
     st.subheader("JSON Editor", help="Here you can edit the JSON file with the videos. Copy-and-paste is supported and compatible with Google Sheets, Excel, and others. You can do bulk-editing by dragging the handle on a cell (similar to Excel)!")
     st.write("ℹ️ The JSON file is saved automatically when you click the button below. Every time you edit the JSON file, you must click the button to save the changes otherwise they will be lost.")
@@ -184,10 +152,24 @@ async def main():
 
     with LEFT:
         st.subheader("General settings")
-        tts_voice = st.selectbox(
-            "TTS Voice",
-            [f"{i['ShortName']} | {i['Gender']} | Tags: {i['VoiceTag']['VoicePersonalities']}" for i in await edge_tts.list_voices()], index=111, help="The voice used to generate the audio. The voice must be in the same language as the subtitles."
-        )
+        
+        # Get Speechify voices
+        voices = get_speechify_voices()
+        if voices:
+            voice_options = [f"{i['ShortName']} | {i['Gender']} | {i['Locale']} | Tags: {i['VoiceTag']['VoicePersonalities']}" for i in voices]
+            tts_voice = st.selectbox(
+                "TTS Voice",
+                voice_options, 
+                index=0, 
+                help="The voice used to generate the audio. The voice must be in the same language as the subtitles."
+            )
+        else:
+            # Fallback to default voice if Speechify is not available
+            tts_voice = st.text_input(
+                "TTS Voice",
+                value="scott",
+                help="Speechify voice ID (e.g., 'scott', 'sarah') or edge-tts format for backward compatibility"
+            )
 
         left, mid, right = st.columns(3)
 
@@ -275,15 +257,33 @@ async def main():
             # Put the video in a container
             st.video(result)
 
-if __name__ == "__main__":
 
+@st.cache_data
+def df_to_json(df):
+    try:
+        # Convert the DataFrame to a JSON string
+        json_str = df.to_json(orient='records', indent=4, force_ascii=False)
+
+        # raise an error if the dataframe has no rows (at least one is required)
+        if df.shape[0] == 0:
+            st.error("You must add at least one video to the JSON")
+            return
+
+        # Save the JSON string to a file
+        with open('video.json', 'w', encoding='UTF-8') as f:
+            f.write(json_str)
+
+        st.success("JSON saved successfully!")
+
+    except ValueError as e:
+        st.error("You must fill all the fields in the JSON")
+    except Exception as e:
+        st.error(f"Error saving JSON: {e}")
+
+if __name__ == "__main__":
+    # Check if we're on Windows and set the event loop policy
     if platform.system() == 'Windows':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-    loop = asyncio.new_event_loop()
-
-    loop.run_until_complete(main())
-
-    loop.close()
-
-    sys.exit(0)
+    
+    # Run the main function
+    asyncio.run(main())

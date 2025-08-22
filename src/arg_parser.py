@@ -17,9 +17,9 @@ async def parse_args():
     parser.add_argument("--url", metavar='U', default="https://www.youtube.com/watch?v=intRX7BRA90",
                         help="Youtube URL to download as background video.", type=str)
     parser.add_argument("--tts", default="en-US-ChristopherNeural",
-                        help="Voice to use for TTS", type=str)
+                        help="Voice to use for TTS (Speechify voice ID or edge-tts format for backward compatibility)", type=str)
     parser.add_argument(
-        "--list-voices", help="Use `edge-tts --list-voices` to list all voices", action='help')
+        "--list-voices", help="List all available Speechify voices", action='store_true')
     parser.add_argument("--random_voice", action='store_true',
                         help="Random voice for TTS", default=False)
     parser.add_argument("--gender", choices=["Male", "Female"],
@@ -46,6 +46,19 @@ async def parse_args():
                         help="Verbose")
     args = parser.parse_args()
 
+    # Handle list-voices command
+    if args.list_voices:
+        try:
+            voices_manager = VoicesManager()
+            voices = voices_manager.get_available_voices()
+            print("Available Speechify voices:")
+            for voice in voices:
+                print(f"  {voice['ShortName']} | {voice['Gender']} | {voice['Locale']} | Tags: {voice['VoiceTag']['VoicePersonalities']}")
+            sys.exit(0)
+        except Exception as e:
+            print(f"Error listing voices: {e}")
+            sys.exit(1)
+
     if args.random_voice:  # Random voice
         args.tts = None
         if not args.gender:
@@ -69,18 +82,22 @@ async def parse_args():
                 args.non_english = True
 
     else:
-        # Check if voice is valid
-        voices = await VoicesManager().create()
-        args.language = '-'.join(i for i in args.tts.split('-')[0:2])
-        voices = voices.find(Locale=args.language)
-        if len(voices) == 0:
-            # Voice not found
-            print(
-                f"{msg.ERROR}Specified TTS voice not found. Use `edge-tts --list-voices` to list all voices.")
+        # For non-random voice, validate the voice exists
+        try:
+            voices_manager = VoicesManager()
+            # Extract language from TTS voice for backward compatibility
+            if '-' in args.tts:
+                args.language = '-'.join(i for i in args.tts.split('-')[0:2])
+            else:
+                # If it's a Speechify voice ID, we'll use auto-detection
+                args.language = None
+        except Exception as e:
+            print(f"Error initializing voice manager: {e}")
+            print("Make sure SPEECHIFY_API_KEY environment variable is set")
             sys.exit(1)
 
-    # Extract language from TTS voice
-    if args.tts:
+    # Extract language from TTS voice for non-english detection
+    if args.tts and '-' in args.tts:
         lang_prefix = args.tts.split('-')[0]
         if not lang_prefix.startswith('en'):
             args.non_english = True

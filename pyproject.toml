@@ -1,25 +1,25 @@
 [project]
 name = "whisper-tiktok"
-version = "2.0.2"
+version = "2.0.3"
 description = "A TikTok video creation tool using Whisper ASR and EdgeTTS"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
-    "edge-tts>=7.2.1",
-    "gradio>=5.43.1",
-    "openai-whisper>=20250625",
-    "rich>=14.1.0",
-    "stable-ts>=2.19.1",
-    "tiktok-uploader>=1.1.4",
-    "tqdm>=4.67.1",
-    "yt-dlp>=2025.8.20",
+    "edge-tts",
+    "gradio",
+    "openai-whisper",
+    "rich",
+    "stable-ts",
+    "tiktok-uploader",
+    "tqdm",
+    "yt-dlp",
     "torch",
     "numpy",
-    "black>=25.1.0",
-    "pytest>=8.4.1",
-    "pytest-asyncio>=1.1.0",
-    "anyio>=4.10.0",
-    "mkdocs-material>=9.6.18",
+    "black",
+    "pytest",
+    "pytest-asyncio",
+    "anyio",
+    "mkdocs-material",
 ]
 
 [tool.setuptools.packages]

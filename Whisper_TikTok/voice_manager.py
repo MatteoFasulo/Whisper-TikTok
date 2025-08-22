@@ -1,5 +1,4 @@
 import sys
-
 import edge_tts
 
 
@@ -14,4 +13,4 @@ class VoicesManager:
         if len(voices) == 0:
             print(f"Specified TTS language not found. Make sure you are using the correct format. For example: en-US")
             sys.exit(1)
-        return voices['Name']
+        return voices["Name"]

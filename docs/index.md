@@ -2,30 +2,26 @@
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Video (demo)](#demo-video)
-- [How it works?](#how-it-works)
-- [Web App (Online)](#web-app-online)
-- [Streamlit Web App](#streamlit-web-app)
-- [Local Installation](#local-installation)
-- [Dependencies](#dependencies)
-- [Web-UI (Local)](#web-ui-local)
-- [Command-Line](#command-line)
-- [Usage Examples](#usage-examples)
-- [Additional Resources](#additional-resources)
-- [Code of Conduct](#code-of-conduct)
-- [Contributing](#contributing)
-- [Upcoming Features](#upcoming-features)
-- [Acknowledgments](#acknowledgments)
-- [License](#license)
+1. [Introduction](#introduction)
+2. [Demo Video](#demo-video)
+3. [Operating Principle](#operating-principle)
+    - [In-Depth Insights](#in-depth-insights)
+4. [Installation](#installation)
+5. [Usage Guidelines](#usage-guidelines)
+    - [Command-Line Options](#command-line-options)
+6. [Usage Examples](#usage-examples)
+7. [Code of Conduct](#code-of-conduct)
+8. [Contributing](#contributing)
+9. [Upcoming Features](#upcoming-features)
+10. [OpenAI Whisper Forum Discussion](#openai-whisper-forum-discussion)
+11. [Acknowledgments](#acknowledgments)
 
 ## Introduction
-
 Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, Whisper-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
 
 ## Streamlit Web App
 
-![Webui](./WebuiDemo.png)
+![Webui](docs/WebuiDemo.png)
 
 ## Demo Video
 
@@ -33,46 +29,69 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## How it Works
 
-Employing Whisper-TikTok is a breeze: simply modify the [video.json](video.json). The JSON file contains the following fields:
+Employing Whisper-TikTok is a breeze: simply modify the [clips.csv](clips.csv). The CSV file contains the following attributes:
 
 - `series`: The name of the series.
 - `part`: The part number of the video.
 - `text`: The text to be spoken in the video.
-- `outro`: The outro text to be spoken in the video.
 - `tags`: The tags to be used for the video.
-
-Summarizing the program's functionality:
-
-> Furnished with a structured JSON dataset containing details such as the **series name**, **video part number**, **video text** and **outro text**, the program orchestrates the synthesis of a video incorporating the provided text and outro. Subsequently, the generated video is stored within the designated `output` folder.
+- `outro`: The outro text to be spoken in the video.
 
 <details>
 <summary>Details</summary>
 
 The program conducts the **sequence of actions** outlined below:
 
-1. Retrieve **environment variables** from the optional .env file.
-2. Validate the presence of **PyTorch** with **CUDA** installation. If the requisite dependencies are **absent**, the **program will use the CPU instead of the GPU**.
-3. Download a random video from platforms like YouTube, e.g., a Minecraft parkour gameplay clip.
-4. Load the OpenAI Whisper model into memory.
-5. Extract the video text from the provided JSON file and initiate a **Text-to-Speech** request to the Microsoft Edge Cloud TTS API, preserving the response as an .mp3 audio file.
-6. Utilize the OpenAI Whisper model to generate a detailed **transcription** of the .mp3 file, available in .srt format.
-7. Select a **random background** video from the dedicated folder.
-8. Integrate the srt file into the chosen video using FFMPEG, creating a final .mp4 output.
-9. Upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required `cookies.txt` file can be generated using [this guide available here](https://github.com/kairi003/Get-cookies.txt-LOCALLY). The `cookies.txt` file must be placed in the root folder of the project.
-10. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
+## 4. Installation <a name="installation"></a>
 
-</details>
+Whisper-TikTok has been tested in Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.9, 3.10, and 3.11**.
 
-## Web App (Online)
+First clone the repository
+
+```bash
+git clone https://github.com/MatteoFasulo/Whisper-TikTok.git
+```
+
+Then, navigate to the Whisper-TikTok directory:
+
+```bash
+cd Whisper-TikTok
+```
+
+It is highly recommended to use a virtual environment. Create one using:
+
+```bash
+python -m venv whisper-tiktok-env
+```
+
+Activate the virtual environment:
+
+- On Windows:
+
+  ```bash
+  whisper-tiktok-env\Scripts\activate
+  ```
+
+- On Ubuntu:
+
+  ```bash
+  source whisper-tiktok-env/bin/activate
+  ```
+
+Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
 
 There is a Web App hosted thanks to Streamlit which is public available in HuggingFace, just click on the link that will take you directly to the Web App.
-> <https://huggingface.co/spaces/MatteoFasulo/Whisper-TikTok-Demo>
+> https://huggingface.co/spaces/MatteoFasulo/Whisper-TikTok-Demo
 
-## Local Installation
+To use Whisper-TikTok, follow these guidelines:
 
-Whisper-TikTok has undergone rigorous testing on Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.8, 3.9 and 3.11**.
-
-If you want to run Whisper-TikTok locally, you can clone the repository using the following command:
+- Ensure you have a stable internet connection for downloading videos and uploading to TikTok.
+- Have your TikTok session cookie ready for video uploads.
+- Familiarize yourself with the command-line options for advanced usage.
 
 ```bash
 git clone https://github.com/MatteoFasulo/Whisper-TikTok.git
@@ -112,14 +131,14 @@ choco install ffmpeg
 scoop install ffmpeg
 ```
 
->Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly. This performance difference is because GPUs efficiently handle fp16 computation, while CPUs use fp32 or fp64 (depending on your machine), which are slower.
+> Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for Automatic Speech Recognition (ASR). However, the program will also work without a GPU, but it will run more slowly.
 
 ## Web-UI (Local)
 
 To run the Web-UI locally, execute the following command within your terminal:
 
 ```bash
-streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+streamlit run app.py
 ```
 
 ## Command-Line
@@ -132,10 +151,13 @@ python main.py
 
 ### CLI Options
 
-Whisper-TikTok supports the following command-line options:
+Whisper-TikTok offers several command-line options:
 
-```
-python main.py [OPTIONS]
+- `--help`: Show help message and exit.
+- `--version`: Show program's version number and exit.
+- `--input INPUT`: Specify the input JSON file. Default is `video.json`.
+- `--output OUTPUT`: Specify the output video file. Default is `output.mp4`.
+- `--tiktok-cookie TIKTOK_COOKIE`: Specify your TikTok session cookie.
 
 Options:
   --model TEXT              Model to use [tiny|base|small|medium|large] (Default: small)
@@ -157,79 +179,60 @@ Options:
   -v, --verbose             Verbose (Flag)
 ```
 
-> If you use the --random_voice option, please specify both --gender and --language arguments. Also you will need to specify the --non_english argument if you want to use a non-English voice otherwise the program will use the English model. Whisper model will auto-detect the language of the audio file and use the corresponding model.
+Here are some examples of how to use Whisper-TikTok:
 
-## Usage Examples
+- Basic usage with default settings:
 
-- Generate a TikTok video using a specific TTS model and voice:
+  ```bash
+  python -m Whisper_TikTok.main
+  ```
 
-```bash
-python main.py --model medium --tts en-US-EricNeural
-```
+- Specifying a custom input file and output file:
 
-- Generate a TikTok video without using the English model:
+  ```bash
+  python -m Whisper_TikTok.main --input my_video.json --output my_video.mp4
+  ```
 
-```bash
-python main.py --non_english --tts de-DE-KillianNeural
-```
+- Using your TikTok session cookie:
 
-- Use a custom YouTube video as the background video:
-
-```bash
-python main.py --url https://www.youtube.com/watch?v=dQw4w9WgXcQ --tts en-US-JennyNeural
-```
-
-- Modify the font color of the subtitles:
-
-```
-python main.py --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
-```
-
-- Generate a TikTok video with a random TTS voice:
-
-```bash
-python main.py --random_voice --gender Male --language en-US
-```
+  ```bash
+  python -m Whisper_TikTok.main --tiktok-cookie my_tiktok_cookie
+  ```
 
 - List all available voices:
 
-```bash
-edge-tts --list-voices
-```
+This project adheres to a Code of Conduct. By participating, you are expected to uphold this code. Please report any unacceptable behavior to the project maintainers.
 
 ## Additional Resources
 
-### Accelerate Video Creation
->
-> Contributed by [@duozokker](<https://github.com/duozokker>)
+Contributions are welcome! Please follow these steps to contribute:
 
-**reddit2json** is a Python script that transforms Reddit post URLs into a JSON file, streamlining the process of creating video.json files. This tool not only converts Reddit links but also offers functionalities such as translating Reddit post content using DeepL and modifying content through custom OpenAI GPT calls.
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Make your changes and commit them.
+4. Push to your forked repository.
+5. Submit a pull request.
 
-#### reddit2json: Directly Convert Reddit Links to JSON
-
-reddit2json is designed to process a list of Reddit post URLs, converting them into a JSON format that can be used directly for video creation. This tool enhances the video creation process by providing a faster and more efficient way to generate video.json files.
-
-[Here is the detailed README for reddit2json](https://github.com/duozokker/reddit2json/blob/main/README.md) which includes instructions for installation, setting up the .env file, example calls, and more.
-
-## Code of Conduct
+Please ensure your code adheres to the project's coding standards and includes appropriate tests.
 
 Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
 
-## Contributing
+Planned features for future releases include:
 
-We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
+- Enhanced video editing capabilities.
+- Support for additional languages in voiceovers.
+- Improved error handling and recovery.
+- User-friendly GUI for easier usage.
 
-## Upcoming Features 🔮
+### Upcoming Features
 
-- Integration with the OpenAI API to generate more advanced responses.
-- Generate content by extracting it from reddit <https://github.com/MatteoFasulo/Whisper-TikTok/issues/22>
+Join the discussion on the OpenAI Whisper forum to share your thoughts, ask questions, and connect with other users: [OpenAI Whisper Forum](https://community.openai.com/c/whisper).
 
-## Acknowledgments
+### Acknowledgments
 
-- We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with Whisper-TikTok.
-- We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision
-- Also [@jianfch](https://github.com/jianfch/stable-ts) for the stable-ts package, which made it possible to use the OpenAI Whisper model with Whisper-TikTok in a stable manner with font color and subtitle format options.
+Whisper-TikTok acknowledges the following resources and contributors:
 
-## License
-
-Whisper-TikTok is licensed under the [Apache License, Version 2.0](https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/LICENSE).
+- [OpenAI Whisper](https://openai.com/research/whisper/) for the transcription model.
+- [Microsoft Edge Cloud TTS API](https://docs.microsoft.com/en-us/microsoft-edge/web-api/tts-api/) for the text-to-speech service.
+- [FFMPEG](https://ffmpeg.org/) for video processing.
+- All contributors and users who provide feedback and support.

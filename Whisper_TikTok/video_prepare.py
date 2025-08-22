@@ -8,22 +8,24 @@ from .utils import get_info, convert_time
 HOME = Path.cwd()
 
 
-def prepare_background(background_mp4: str, filename_mp3: str, filename_srt: str, verbose: bool = False) -> str:
+def prepare_background(
+    background_mp4: str, filename_mp3: str, filename_srt: str, verbose: bool = False
+) -> str:
     """Prepares a background video by overlaying audio and subtitles.
 
-        This function takes a background video, an audio file, and a subtitle file as input.
-        It randomly selects a starting point in the background video, crops and scales the video,
-        applies a gaussian blur, overlays the subtitles, and combines it with the audio.
+    This function takes a background video, an audio file, and a subtitle file as input.
+    It randomly selects a starting point in the background video, crops and scales the video,
+    applies a gaussian blur, overlays the subtitles, and combines it with the audio.
 
-        Args:
-            background_mp4 (str): Path to the background video file (MP4).
-            filename_mp3 (str): Path to the audio file (MP3).
-            filename_srt (str): Path to the subtitle file (SRT).
-            verbose (bool, optional): If True, prints verbose output. Defaults to False.
+    Args:
+        background_mp4 (str): Path to the background video file (MP4).
+        filename_mp3 (str): Path to the audio file (MP3).
+        filename_srt (str): Path to the subtitle file (SRT).
+        verbose (bool, optional): If True, prints verbose output. Defaults to False.
 
-        Returns:
-            str: Path to the output video file (MP4).
-        """
+    Returns:
+        str: Path to the output video file (MP4).
+    """
     video_info = get_info(background_mp4, kind="video")
     video_duration = int(round(video_info.get("duration"), 0))
 

@@ -12,6 +12,7 @@ annotated-types==0.7.0
     # via pydantic
 anyio==4.10.0
     # via
+    #   whisper-tiktok (pyproject.toml)
     #   gradio
     #   httpx
     #   starlette
@@ -22,6 +23,14 @@ attrs==25.3.0
     #   aiohttp
     #   outcome
     #   trio
+babel==2.17.0
+    # via mkdocs-material
+backports-asyncio-runner==1.2.0
+    # via pytest-asyncio
+backrefs==5.9
+    # via mkdocs-material
+black==25.1.0
+    # via whisper-tiktok (pyproject.toml)
 brotli==1.1.0
     # via gradio
 certifi==2025.8.3
@@ -35,13 +44,19 @@ charset-normalizer==3.4.3
     # via requests
 click==8.2.1
     # via
+    #   black
+    #   mkdocs
+    #   mkdocs-material
     #   typer
     #   uvicorn
+colorama==0.4.6
+    # via mkdocs-material
 edge-tts==7.2.1
     # via whisper-tiktok (pyproject.toml)
 exceptiongroup==1.3.0
     # via
     #   anyio
+    #   pytest
     #   trio
     #   trio-websocket
 fastapi==0.116.1
@@ -62,6 +77,8 @@ fsspec==2025.7.0
     #   gradio-client
     #   huggingface-hub
     #   torch
+ghp-import==2.1.0
+    # via mkdocs
 gradio==5.43.1
     # via whisper-tiktok (pyproject.toml)
 gradio-client==1.12.1
@@ -93,20 +110,42 @@ idna==3.10
     #   requests
     #   trio
     #   yarl
+iniconfig==2.1.0
+    # via pytest
 jinja2==3.1.6
     # via
     #   gradio
+    #   mkdocs
+    #   mkdocs-material
     #   torch
 llvmlite==0.43.0
     # via numba
+markdown==3.8.2
+    # via
+    #   mkdocs
+    #   mkdocs-material
+    #   pymdown-extensions
 markdown-it-py==4.0.0
     # via rich
 markupsafe==3.0.2
     # via
     #   gradio
     #   jinja2
+    #   mkdocs
 mdurl==0.1.2
     # via markdown-it-py
+mergedeep==1.3.4
+    # via
+    #   mkdocs
+    #   mkdocs-get-deps
+mkdocs==1.6.1
+    # via mkdocs-material
+mkdocs-get-deps==0.2.0
+    # via mkdocs
+mkdocs-material==9.6.18
+    # via whisper-tiktok (pyproject.toml)
+mkdocs-material-extensions==1.3.1
+    # via mkdocs-material
 more-itertools==10.7.0
     # via openai-whisper
 mpmath==1.3.0
@@ -115,6 +154,8 @@ multidict==6.6.4
     # via
     #   aiohttp
     #   yarl
+mypy-extensions==1.1.0
+    # via black
 networkx==3.4.2
     # via torch
 numba==0.60.0
@@ -127,7 +168,6 @@ numpy==1.22.4
     #   openai-whisper
     #   pandas
     #   stable-ts
-    #   torchvision
 nvidia-cublas-cu12==12.1.3.1
     # via
     #   nvidia-cudnn-cu12
@@ -171,16 +211,29 @@ outcome==1.3.0.post0
     #   trio-websocket
 packaging==25.0
     # via
+    #   black
     #   gradio
     #   gradio-client
     #   huggingface-hub
+    #   mkdocs
+    #   pytest
     #   webdriver-manager
+paginate==0.5.7
+    # via mkdocs-material
 pandas==2.3.2
     # via gradio
-pillow==11.3.0
+pathspec==0.12.1
     # via
-    #   gradio
-    #   torchvision
+    #   black
+    #   mkdocs
+pillow==11.3.0
+    # via gradio
+platformdirs==4.3.8
+    # via
+    #   black
+    #   mkdocs-get-deps
+pluggy==1.6.0
+    # via pytest
 propcache==0.3.2
     # via
     #   aiohttp
@@ -195,11 +248,24 @@ pydantic-core==2.33.2
 pydub==0.25.1
     # via gradio
 pygments==2.19.2
-    # via rich
+    # via
+    #   mkdocs-material
+    #   pytest
+    #   rich
+pymdown-extensions==10.16.1
+    # via mkdocs-material
 pysocks==1.7.1
     # via urllib3
+pytest==8.4.1
+    # via
+    #   whisper-tiktok (pyproject.toml)
+    #   pytest-asyncio
+pytest-asyncio==1.1.0
+    # via whisper-tiktok (pyproject.toml)
 python-dateutil==2.9.0.post0
-    # via pandas
+    # via
+    #   ghp-import
+    #   pandas
 python-dotenv==1.1.1
     # via webdriver-manager
 python-multipart==0.0.20
@@ -212,13 +278,19 @@ pyyaml==6.0.2
     # via
     #   gradio
     #   huggingface-hub
+    #   mkdocs
+    #   mkdocs-get-deps
+    #   pymdown-extensions
+    #   pyyaml-env-tag
+pyyaml-env-tag==1.1
+    # via mkdocs
 regex==2025.7.34
     # via tiktoken
 requests==2.32.5
     # via
     #   huggingface-hub
+    #   mkdocs-material
     #   tiktoken
-    #   torchvision
     #   webdriver-manager
 rich==14.1.0
     # via
@@ -258,6 +330,10 @@ tiktoken==0.11.0
     # via openai-whisper
 toml==0.10.2
     # via tiktok-uploader
+tomli==2.2.1
+    # via
+    #   black
+    #   pytest
 tomlkit==0.13.3
     # via gradio
 torch==2.2.0
@@ -266,13 +342,8 @@ torch==2.2.0
     #   openai-whisper
     #   stable-ts
     #   torchaudio
-    #   torchvision
 torchaudio==2.2.0
-    # via
-    #   whisper-tiktok (pyproject.toml)
-    #   stable-ts
-torchvision==0.17.0
-    # via whisper-tiktok (pyproject.toml)
+    # via stable-ts
 tqdm==4.67.1
     # via
     #   whisper-tiktok (pyproject.toml)
@@ -295,6 +366,7 @@ typing-extensions==4.14.1
     # via
     #   aiosignal
     #   anyio
+    #   black
     #   edge-tts
     #   exceptiongroup
     #   fastapi
@@ -320,6 +392,8 @@ urllib3==2.5.0
     #   selenium
 uvicorn==0.35.0
     # via gradio
+watchdog==6.0.0
+    # via mkdocs
 webdriver-manager==4.0.2
     # via tiktok-uploader
 websocket-client==1.8.0

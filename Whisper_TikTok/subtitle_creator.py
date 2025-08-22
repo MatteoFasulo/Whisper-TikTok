@@ -32,7 +32,7 @@ def srt_create(whisper_model, path: str, series: str, part: int, filename: str, 
     absolute_ass_path.parent.mkdir(parents=True, exist_ok=True)
 
     word_dict = {
-        "Fontname": kwargs.get("font", "Arial"),
+        "Fontname": kwargs.get("font", "Lexend Bold"),
         "Alignment": kwargs.get("sub_position", 5),
         "BorderStyle": "1",
         "Outline": "1",

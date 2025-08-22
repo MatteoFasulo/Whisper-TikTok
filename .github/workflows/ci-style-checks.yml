@@ -45,7 +45,7 @@ jobs:
           pip install pytest pycodestyle pylint mypy black ruff types-six types-PyYAML types-setuptools
 
       - name: pycodestyle
-        run: pycodestyle --ignore=C0330,C0415,E203,E231,W503 --max-line-length=120 Whisper_TikTok
+        run: pycodestyle --ignore=C0330,C0415,E203,E231,W503 --max-line-length=88 Whisper_TikTok
 
       - name: pylint
         if: ${{ always() }}

@@ -16,5 +16,7 @@ def download_video(url: str, folder: str = "background"):
     directory = HOME / folder
     os.makedirs(directory, exist_ok=True)
 
-    subprocess.Popen(["yt-dlp", "-f bestvideo[ext=mp4]", "--restrict-filenames", url], cwd=directory).wait()
+    subprocess.Popen(
+        ["yt-dlp", "-f bestvideo[ext=mp4]", "--restrict-filenames", url], cwd=directory
+    ).wait()
     return

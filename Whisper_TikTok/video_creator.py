@@ -77,14 +77,21 @@ class VideoCreator:
         """
         Converts the text to speech and saves it as an audio file.
         """
-        await tts(self.req_text, outfile=self.mp3_file, voice=self.args.tts, args=self.args)
+        await tts(
+            self.req_text, outfile=self.mp3_file, voice=self.args.tts, args=self.args
+        )
 
     def generate_transcription(self):
         """
         Generates the transcription for the video.
         """
         ass_filename = srt_create(
-            self.model, self.path, self.series, self.part, self.mp3_file, **vars(self.args)
+            self.model,
+            self.path,
+            self.series,
+            self.part,
+            self.mp3_file,
+            **vars(self.args),
         )
         ass_filename = Path(ass_filename).absolute()
         self.logger.info(f"Generated transcription: {ass_filename}")
@@ -106,7 +113,10 @@ class VideoCreator:
         Integrates the subtitles into the video.
         """
         final_video = prepare_background(
-            self.mp4_background, filename_mp3=self.mp3_file, filename_srt=self.ass_file, verbose=self.args.verbose
+            self.mp4_background,
+            filename_mp3=self.mp3_file,
+            filename_srt=self.ass_file,
+            verbose=self.args.verbose,
         )
         final_video = Path(final_video).absolute()
         self.logger.info(f"Integrated subtitles into video: {final_video}")

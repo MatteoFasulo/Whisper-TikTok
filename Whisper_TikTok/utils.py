@@ -6,14 +6,16 @@ import subprocess
 from pathlib import Path
 from typing import NamedTuple
 
+
 class FFProbeResult(NamedTuple):
     """Represents the result of running FFprobe.
 
-        Attributes:
-            return_code (int): The return code of the FFprobe process.
-            json (str): The JSON output from FFprobe.
-            error (str): The error message from FFprobe, if any.
-        """
+    Attributes:
+        return_code (int): The return code of the FFprobe process.
+        json (str): The JSON output from FFprobe.
+        error (str): The error message from FFprobe, if any.
+    """
+
     return_code: int
     json: str
     error: str
@@ -41,34 +43,50 @@ def random_background(folder: str = "background") -> str:
 def get_ffprobe_result(filename: str) -> FFProbeResult:
     """Executes ffprobe on the given file and returns the result.
 
-        Args:
-            filename (str): The path to the file to be analyzed.
+    Args:
+        filename (str): The path to the file to be analyzed.
 
-        Returns:
-            FFProbeResult: An FFProbeResult object containing the return code,
-                             JSON output, and error message from ffprobe.
-        """
-    command_array = ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", filename]
-    result = subprocess.run(command_array, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-    return FFProbeResult(return_code=result.returncode, json=result.stdout, error=result.stderr)
+    Returns:
+        FFProbeResult: An FFProbeResult object containing the return code,
+                         JSON output, and error message from ffprobe.
+    """
+    command_array = [
+        "ffprobe",
+        "-v",
+        "quiet",
+        "-print_format",
+        "json",
+        "-show_format",
+        "-show_streams",
+        filename,
+    ]
+    result = subprocess.run(
+        command_array,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+    )
+    return FFProbeResult(
+        return_code=result.returncode, json=result.stdout, error=result.stderr
+    )
 
 
 def get_info(filename: str, kind: str) -> dict:
     """Extracts media information from a file using ffprobe.
 
-        Args:
-            filename (str): The path to the media file.
-            kind (str): The type of media to extract information for ("video" or "audio").
+    Args:
+        filename (str): The path to the media file.
+        kind (str): The type of media to extract information for ("video" or "audio").
 
-        Returns:
-            dict: A dictionary containing media information.
-                For video, it returns {"width": width, "height": height, "duration": duration}.
-                For audio, it returns {"duration": duration}.
-                Returns an empty dictionary if the media kind is unknown.
+    Returns:
+        dict: A dictionary containing media information.
+            For video, it returns {"width": width, "height": height, "duration": duration}.
+            For audio, it returns {"duration": duration}.
+            Returns an empty dictionary if the media kind is unknown.
 
-        Raises:
-            RuntimeError: If ffprobe fails to execute.
-        """
+    Raises:
+        RuntimeError: If ffprobe fails to execute.
+    """
     result = get_ffprobe_result(filename)
     if result.return_code != 0:
         raise RuntimeError(f"ffprobe failed with error: {result.error}")

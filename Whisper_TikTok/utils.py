@@ -71,7 +71,7 @@ def get_info(filename: str, kind: str) -> dict:
         """
     result = get_ffprobe_result(filename)
     if result.return_code != 0:
-        raise RuntimeError(f"ffprobe error: {result.error}")
+        raise RuntimeError(f"ffprobe failed with error: {result.error}")
 
     d = json.loads(result.json)
 

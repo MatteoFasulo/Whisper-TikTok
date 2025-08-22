@@ -13,21 +13,14 @@ dependencies = [
     "tiktok-uploader>=1.1.4",
     "tqdm>=4.67.1",
     "yt-dlp>=2025.8.20",
-    "torch==2.2.0",
-    "torchvision==0.17.0",
-    "torchaudio==2.2.0",
-    "numpy==1.22.4",
+    "torch",
+    "numpy",
     "black>=25.1.0",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",
     "anyio>=4.10.0",
     "mkdocs-material>=9.6.18",
 ]
-
-[[tool.uv.index]]
-name = "torch"
-url = "https://download.pytorch.org/whl/cu126"
-explicit = true
 
 [tool.setuptools.packages]
 find = {}

@@ -25,56 +25,12 @@
 
 ## Introduction
 Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, Whisper-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
-<<<<<<< HEAD
-
-## Streamlit Web App
-
-![Webui](docs/WebuiDemo.png)
-=======
->>>>>>> 0932bc7 (Update code with new structure:)
 
 ## Demo Video
 
 <https://github.com/MatteoFasulo/Whisper-TikTok/assets/74818541/68e25504-c305-4144-bd39-c9acc218c3a4>
 
-<<<<<<< HEAD
-## How it Works
-
-Employing Whisper-TikTok is a breeze: simply modify the [clips.csv](clips.csv). The CSV file contains the following attributes:
-
-- `series`: The name of the series.
-- `part`: The part number of the video.
-- `text`: The text to be spoken in the video.
-- `tags`: The tags to be used for the video.
-- `outro`: The outro text to be spoken in the video.
-
-<details>
-<summary>Details</summary>
-
-The program conducts the **sequence of actions** outlined below:
-
-1. Retrieve **environment variables** from the optional .env file.
-2. Validate the presence of **PyTorch** with **CUDA** installation. If the requisite dependencies are **absent**, the **program will use the CPU instead of the GPU**.
-3. Download a random video from platforms like YouTube, e.g., a Minecraft parkour gameplay clip.
-4. Load the OpenAI Whisper model into memory.
-5. Extract the video text from the provided JSON file and initiate a **Text-to-Speech** request to the Microsoft Edge Cloud TTS API, preserving the response as an .mp3 audio file.
-6. Utilize the OpenAI Whisper model to generate a detailed **transcription** of the .mp3 file, available in .srt format.
-7. Select a **random background** video from the dedicated folder.
-8. Integrate the srt file into the chosen video using FFMPEG, creating a final .mp4 output.
-9. Upload the video to TikTok using the TikTok session cookie. For this step it is required to have a TikTok account and to be logged in on your browser. Then the required `cookies.txt` file can be generated using [this guide available here](https://github.com/kairi003/Get-cookies.txt-LOCALLY). The `cookies.txt` file must be placed in the root folder of the project.
-10. Voila! In a matter of minutes, you've crafted a captivating TikTok video while sipping your favorite coffee ☕️.
-
-</details>
-
-## Web App (Online)
-
-There is a Web App hosted thanks to Streamlit which is public available in HuggingFace, just click on the link that will take you directly to the Web App.
-> https://huggingface.co/spaces/MatteoFasulo/Whisper-TikTok-Demo
-
-## Local Installation
-=======
 ## Installation 🛠️
->>>>>>> 0932bc7 (Update code with new structure:)
 
 Whisper-TikTok has been tested in Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.9, 3.10, and 3.11**.
 
@@ -84,15 +40,7 @@ If you want to run Whisper-TikTok locally, you can clone the repository using th
 git clone https://github.com/MatteoFasulo/Whisper-TikTok.git
 ```
 
-<<<<<<< HEAD
-> However, there is also a Docker image available for Whisper-TikTok which can be used to run the program in a containerized environment.
-
-# Dependencies
-
-To streamline the installation of necessary dependencies, execute the following command within your terminal:
-=======
 Install the required dependencies using pip:
->>>>>>> 0932bc7 (Update code with new structure:)
 
 ```python
 pip install -r requirements.txt
@@ -140,19 +88,7 @@ choco install ffmpeg
 scoop install ffmpeg
 ```
 
-<<<<<<< HEAD
-> Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for Automatic Speech Recognition (ASR). However, the program will also work without a GPU, but it will run more slowly.
-
-## Web-UI (Local)
-
-To run the Web-UI locally, execute the following command within your terminal:
-
-```bash
-streamlit run app.py
-```
-=======
 Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly due to CPU limitations.
->>>>>>> 0932bc7 (Update code with new structure:)
 
 ## Command-Line
 
@@ -214,11 +150,7 @@ python -m Whisper_TikTok.main --url https://www.youtube.com/watch?v=dQw4w9WgXcQ 
 - Modify the font color of the subtitles:
 
 ```bash
-<<<<<<< HEAD
-python main.py --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
-=======
 python -m Whisper_TikTok.main --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
->>>>>>> 0932bc7 (Update code with new structure:)
 ```
 
 - Generate a TikTok video with a random TTS voice:
@@ -243,16 +175,7 @@ Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to
 
 We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
 
-<<<<<<< HEAD
-### Upcoming Features
-
-- Integration with the OpenAI API to generate more advanced responses.
-- Generate content by extracting it from reddit <https://github.com/MatteoFasulo/Whisper-TikTok/issues/22>
-
-### Acknowledgments
-=======
 ## Acknowledgments
->>>>>>> 0932bc7 (Update code with new structure:)
 
 - We'd like to give a huge thanks to [@rany2](https://www.github.com/rany2) for their [edge-tts](https://github.com/rany2/edge-tts) package, which made it possible to use the Microsoft Edge Cloud TTS API with Whisper-TikTok.
 - We also acknowledge the contributions of the Whisper model by [@OpenAI](https://github.com/openai/whisper) for robust speech recognition via large-scale weak supervision

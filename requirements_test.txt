@@ -1,0 +1,38 @@
+--find-links https://download.pytorch.org/whl/cpu
+
+# base
+numpy==1.26.4
+six==1.17.0
+tqdm==4.67.1
+pandas==2.3.1
+numba~=0.59.1
+multiprocess>=0.70.12
+edge-tts
+openai-whisper
+rich
+stable-ts
+tiktok-uploader
+yt-dlp
+
+# PyTorch
+torch==2.8.0
+torchaudio==2.8.0
+torchvision==0.23.0
+
+# tests and style checking
+pytest~=8.4.1
+pytest-mock~=3.14.1
+pytest-cov~=6.2.1
+pytest-asyncio
+anyio
+pylint==3.3.8
+mypy==1.17.1
+pycodestyle==2.14.0
+black==25.1.0
+ruff==0.12.10
+types-six==1.17.0.20250515
+types-PyYAML==6.0.12.20250809
+types-setuptools==80.9.0.20250809
+
+# whisper_tiktok
+-e .

@@ -1,7 +1,8 @@
+"""Module for various utility functions."""
+
 import os
 import json
 import random
-import datetime
 import subprocess
 from pathlib import Path
 from typing import NamedTuple
@@ -21,7 +22,7 @@ class FFProbeResult(NamedTuple):
     error: str
 
 
-def random_background(folder: str = "background") -> str:
+def random_background(folder: str = "background") -> Path:
     """
     Returns the filename of a random file in the specified folder.
 
@@ -29,7 +30,7 @@ def random_background(folder: str = "background") -> str:
         folder(str): The folder containing the files.
 
     Returns:
-        str: The filename of a randomly selected file in the folder.
+        Path: The path to a randomly selected file in the folder.
     """
     directory = Path(folder).absolute()
     os.makedirs(directory, exist_ok=True)
@@ -65,10 +66,9 @@ def get_ffprobe_result(filename: str) -> FFProbeResult:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         universal_newlines=True,
+        check=False,
     )
-    return FFProbeResult(
-        return_code=result.returncode, json=result.stdout, error=result.stderr
-    )
+    return FFProbeResult(return_code=result.returncode, json=result.stdout, error=result.stderr)
 
 
 def get_info(filename: str, kind: str) -> dict:
@@ -95,10 +95,14 @@ def get_info(filename: str, kind: str) -> dict:
 
     if kind == "video":
         streams = d.get("streams", [])
+        video_stream = None
         for stream in streams:
             if stream["codec_type"] == "video":
                 video_stream = stream
                 break
+
+        if video_stream is None:
+            raise ValueError("No video stream found")
 
         duration = float(video_stream["duration"])
         width = int(video_stream["width"])
@@ -106,20 +110,22 @@ def get_info(filename: str, kind: str) -> dict:
 
         return {"width": width, "height": height, "duration": duration}
 
-    elif kind == "audio":
+    if kind == "audio":
         streams = d.get("streams", [])
+        audio_stream = None
         for stream in streams:
             if stream["codec_type"] == "audio":
                 audio_stream = stream
                 break
 
+        if audio_stream is None:
+            raise ValueError("No audio stream found")
+
         duration = float(audio_stream["duration"])
 
         return {"duration": duration}
 
-    else:
-        logger.warning(f"Unknown media kind: {kind}")
-        return {}
+    return {}
 
 
 def convert_time(time_in_seconds):

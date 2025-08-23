@@ -1,19 +1,13 @@
 [
     {
         "series": "Crazy facts that you did not know",
-        "part": "4",
+        "part": "Part 1",
+        "text": "The King is invaluable",
         "outro": "Follow us for more",
-        "text": "Sku",
         "tags": [
             "chess",
             "facts",
             "crazy"
         ]
-    },
-    {
-        "series": "Crazy facts that you did not know",
-        "part": "5",
-        "outro": "Follow us for more",
-        "text": "Test"
     }
 ]

@@ -24,3 +24,7 @@ dependencies = [
 
 [tool.setuptools.packages]
 find = {}
+
+[[tool.mypy.overrides]]
+module = ["tiktok_uploader.*", "stable_whisper.*"]
+follow_untyped_imports = true

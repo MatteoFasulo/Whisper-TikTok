@@ -1,5 +1,8 @@
+"""Main module for the Whisper TikTok application."""
+
 import os
 import sys
+import argparse
 import logging
 from pathlib import Path
 import asyncio
@@ -37,8 +40,9 @@ jsonData = json.loads(video_json_path.read_text(encoding="utf-8"))
 
 
 async def main() -> None:
-    import argparse
-
+    """
+    Main entry point for the application.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model",
@@ -47,9 +51,7 @@ async def main() -> None:
         choices=["tiny", "base", "small", "medium", "large"],
         type=str,
     )
-    parser.add_argument(
-        "--non_english", action="store_true", help="Don't use the english model."
-    )
+    parser.add_argument("--non_english", action="store_true", help="Don't use the english model.")
     parser.add_argument(
         "--url",
         metavar="U",
@@ -95,7 +97,7 @@ async def main() -> None:
     parser.add_argument(
         "--sub_position",
         help="Subtitle position",
-        choices=[i for i in range(1, 10)],
+        choices=list(range(1, 10)),
         default=5,
         type=int,
     )
@@ -113,29 +115,22 @@ async def main() -> None:
         action="store_true",
         default=False,
     )
-    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose")
     args = parser.parse_args()
 
     if args.random_voice:  # Random voice
         args.tts = None
         if not args.gender:
-            print(
-                "When using --random_voice, please specify both --gender and --language arguments."
-            )
+            print("When using --random_voice, please specify both --gender and --language.")
             sys.exit(1)
 
         elif not args.language:
-            print(
-                "When using --random_voice, please specify both --gender and --language arguments."
-            )
+            print("When using --random_voice, please specify both --gender and --language.")
             sys.exit(1)
 
         elif args.gender and args.language:
             # Check if voice is valid
             voices_manager_obj = await VoicesManager().create()
-            voices = await VoicesManager().find(
-                voices_manager_obj, args.gender, args.language
-            )
+            voices = await VoicesManager().find(voices_manager_obj, args.gender, args.language)
             args.tts = voices["Name"]
 
             # Check if language is english
@@ -149,9 +144,7 @@ async def main() -> None:
         voices = voices.find(Locale=args.language)
         if len(voices) == 0:
             # Voice not found
-            print(
-                "Specified TTS voice not found. Use `edge-tts --list-voices` to list all voices."
-            )
+            print("Specified TTS voice not found. Use `edge-tts --list-voices` to list all voices.")
             sys.exit(1)
 
     # Extract language from TTS voice
@@ -177,17 +170,23 @@ async def main() -> None:
 
     for video in jsonData:
         logger.info("Creating video")
-        with console.status("Creating video\t") as status:
+        with console.status("Creating video\t") as _:
 
             video_creator = VideoCreator(video, args, logger)
 
-            video_creator.download_video()
-            video_creator.load_model()
-            video_creator.create_text()
-            await video_creator.text_to_speech()
-            video_creator.generate_transcription()
-            video_creator.select_background()
-            video_creator.integrate_subtitles()
+            full_text = (
+                f"{video_creator.video['series']} - {video_creator.video['part']}.\n"
+                f"{video_creator.video['text']}\n"
+                f"{video_creator.video['outro']}"
+            )
+
+            video_creator.download_video(url=args.url, folder="background")
+            await video_creator.text_to_speech(
+                req_text=full_text,
+                voice=str(args.tts),
+            )
+            video_creator.generate_transcription(model=args.model, non_english=args.non_english)
+            video_creator.create_final_video()
             if args.upload_tiktok:
                 video_creator.upload_to_tiktok()
 
@@ -198,7 +197,7 @@ async def main() -> None:
 if __name__ == "__main__":
 
     if platform.system() == "Windows":
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # type: ignore
 
     loop = asyncio.get_event_loop()
 

@@ -1,23 +1,23 @@
-import os
-import random
-from pathlib import Path
+"""Test SRT creation."""
+
 import pytest
 import stable_whisper as whisper
-from Whisper_TikTok import subtitle_creator, text_to_speech, video_prepare
+from whisper_tiktok import text_to_speech, subtitle_creator
+
 
 @pytest.mark.asyncio
 async def test_srt_create(tmp_path):
-    BACKGROUND_FOLDER = Path("background")
-    series = "My Series"
-    part = 1
+    """Test the srt_create function.
+
+    Args:
+        tmp_path: pytest fixture for a temporary path.
+    """
 
     model = whisper.load_model("small.en")
 
     input_text = "Hello, this is a test. It will take just a moment."
-    await text_to_speech.tts(input_text, outfile=str(tmp_path / "output.mp3"))
-    
-    mp3_filename = str(tmp_path / "output.mp3")
+    await text_to_speech.tts(input_text, outfile=tmp_path / "output.mp3")
 
-    ass_filename = subtitle_creator.srt_create(model, str(tmp_path), "My Series", 1, str(mp3_filename), font="Arial")
+    mp3_filename = tmp_path / "output.mp3"
 
-    return Path(ass_filename).absolute()
+    subtitle_creator.srt_create(model, mp3_filename=mp3_filename, out_folder=tmp_path, uuid="test-uuid")

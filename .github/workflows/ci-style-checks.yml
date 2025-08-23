@@ -45,22 +45,22 @@ jobs:
           pip install pytest pycodestyle pylint mypy black ruff types-six types-PyYAML types-setuptools
 
       - name: pycodestyle
-        run: pycodestyle --ignore=C0330,C0415,E203,E231,W503 --max-line-length=88 Whisper_TikTok
+        run: pycodestyle --ignore=C0330,C0415,E203,E231,W503 --max-line-length=120 whisper_tiktok
 
       - name: pylint
         if: ${{ always() }}
-        run: pylint --fail-under=9.6 Whisper_TikTok
+        run: pylint --fail-under=9.6 whisper_tiktok
 
       - name: mypy
         if: ${{ always() }}
-        run: mypy Whisper_TikTok
+        run: mypy whisper_tiktok
 
       - name: ruff
         if: ${{ always() }}
-        run: ruff check Whisper_TikTok tests/
+        run: ruff check whisper_tiktok tests/
 
       - name: black
         if: ${{ always() }}
         run: |
-          black --line-length 120 --check Whisper_TikTok
+          black --line-length 120 --check whisper_tiktok
           black --line-length 120 --check tests/

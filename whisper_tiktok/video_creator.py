@@ -1,39 +1,55 @@
 """Module for creating videos from audio and subtitles."""
 
+import os
+import uuid
 from argparse import Namespace
 from logging import Logger
 from pathlib import Path
-import uuid
 
-import stable_whisper as whisper
+import stable_whisper
 
 from .subtitle_creator import srt_create
 from .text_to_speech import tts
 from .tiktok import upload_tiktok
-from .video_prepare import prepare_background
-from .video_downloader import download_video as youtube_download
 from .utils import random_background
+from .video_downloader import download_video as youtube_download
+from .video_prepare import prepare_background
 
 HOME = Path.cwd()
 media_folder = HOME / "media"
 output_folder = HOME / "output"
 
+def get_whisper_model(model: str, non_english: bool):
+        """
+        Loads the Whisper model based on the provided parameters.
+
+        Args:
+            model (str): The Whisper model to use.
+            non_english (bool): Whether the video is in a non-English language.
+
+        Returns:
+            whisper.Whisper: The loaded Whisper model.
+        """
+        if model != "large" and not non_english:
+            model = model + ".en"
+        whisper_model = stable_whisper.load_hf_whisper(f"openai/whisper-{model}")
+        return whisper_model
 
 class VideoCreator:
     """
     VideoCreator is responsible for creating videos from the provided metadata and arguments.
     """
 
-    def __init__(self, video: dict, args: Namespace, logger: Logger):
+    def __init__(self, args: Namespace, logger: Logger, video: dict | None = None):
         """
         Initializes the VideoCreator with video metadata, arguments, and a logger.
 
         Args:
-            video (dict): The video metadata.
             args (Namespace): The command-line arguments.
             logger (Logger): The logger instance.
+            video (dict | None): The video metadata.
         """
-        self.video = video
+        self.video = video if video is not None else {}
         self.args = args
         self.logger = logger
 
@@ -57,8 +73,10 @@ class VideoCreator:
             url (str): The URL of the video to download.
             folder (str): The folder to download the video to.
         """
-        youtube_download(url=url, folder=folder)
-        self.logger.info(f"Video downloaded from {url} to {folder}")
+        status, info = youtube_download(url=url, folder=folder)
+        if status:
+            self.logger.info(f"Video downloaded from {url} to {info}")
+        return status, info
 
     async def text_to_speech(self, req_text: str, voice: str):
         """
@@ -78,10 +96,8 @@ class VideoCreator:
             model (str): The Whisper model to use.
             non_english (bool): Whether the video is in a non-English language.
         """
-        if model != "large" and not non_english:
-            model = model + ".en"
-        whisper_model = whisper.load_model(model)
-        self.logger.info(f"Loaded Whisper model: {model}")
+        whisper_model = get_whisper_model(model, non_english)
+        self.logger.info(f"Using Whisper model: {whisper_model}")
 
         srt_create(
             whisper_model,
@@ -124,3 +140,10 @@ class VideoCreator:
             headless=False,
         )
         self.logger.info("Uploaded video to TikTok")
+
+    @property
+    def available_backgrounds(self):
+        """
+        Returns a list of available background videos.
+        """
+        return os.listdir(os.path.join(os.getcwd(), "background"))

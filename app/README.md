@@ -18,7 +18,7 @@ This will start the server on [http://localhost:3000](http://localhost:3000). Yo
 
 ## Fast API
 
-The FastAPI server will be running on [http://localhost:8000](http://localhost:8000). You can view the API documentation at [http://localhost:8000/docs](http://localhost:8000/api/py/docs).
+The FastAPI server will be running on [http://localhost:8000](http://localhost:8000). You can view the API documentation at [http://localhost:8000/api/py/docs](http://localhost:8000/api/py/docs).
 
 The main idea of the Fast API endpoint is to expose the functionality of the underlying python library with GET and POST requests that can be handled by the Next.js frontend.
 

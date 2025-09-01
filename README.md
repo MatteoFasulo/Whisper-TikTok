@@ -26,7 +26,7 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## Installation 🛠️
 
-Whisper-TikTok has been tested in Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.9, 3.10, and 3.11**.
+Whisper-TikTok has been tested in Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.10, and 3.11**.
 
 If you want to run Whisper-TikTok locally, you can clone the repository using the following command:
 

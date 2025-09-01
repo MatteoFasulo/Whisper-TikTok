@@ -18,6 +18,7 @@ def srt_create(whisper_model, mp3_filename: Path, out_folder: Path, uuid: str, *
             - font_color: The highlight color for the .ass file.
     """
     srt_filename = out_folder / f"{uuid}.srt"
+    vtt_filename = out_folder / f"{uuid}.vtt"
     ass_filename = out_folder / f"{uuid}.ass"
 
     word_dict = {
@@ -32,9 +33,10 @@ def srt_create(whisper_model, mp3_filename: Path, out_folder: Path, uuid: str, *
         "MarginR": "0",
     }
 
-    transcribe = whisper_model.transcribe(str(mp3_filename), regroup=True, fp16=True)
+    transcribe = whisper_model.transcribe(str(mp3_filename), regroup=True)
     transcribe.split_by_gap(0.5).split_by_length(38).merge_by_gap(0.15, max_words=2)
     transcribe.to_srt_vtt(str(srt_filename), word_level=True)
+    transcribe.to_srt_vtt(str(vtt_filename), word_level=True)
     transcribe.to_ass(
         str(ass_filename),
         word_level=True,

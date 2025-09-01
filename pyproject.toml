@@ -1,13 +1,23 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+
+requires = [ "setuptools>=61.2" ]
+
 [project]
 name = "whisper-tiktok"
 version = "2.0.3"
 description = "A TikTok video creation tool using Whisper ASR and EdgeTTS"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
 dependencies = [
     "edge-tts",
     "gradio",
-    "openai-whisper",
     "rich",
     "stable-ts",
     "tiktok-uploader",
@@ -19,12 +29,25 @@ dependencies = [
     "pytest",
     "pytest-asyncio",
     "anyio",
-    "mkdocs-material",
+    "numba>=0.57",
+    "llvmlite>=0.40",
+    "fastapi[standard]>=0.116.1",
+    "uvicorn>=0.35.0",
 ]
+optional-dependencies.dev = [ "black", "flake8", "isort", "pytest", "scipy" ]
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
+exclude = [ "tests*" ]
+namespaces = false
 
 [[tool.mypy.overrides]]
 module = ["tiktok_uploader.*", "stable_whisper.*"]
 follow_untyped_imports = true
+
+[tool.black]
+
+[tool.isort]
+profile = "black"
+include_trailing_comma = true
+line_length = 120
+multi_line_output = 3

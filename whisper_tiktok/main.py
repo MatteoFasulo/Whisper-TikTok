@@ -1,13 +1,13 @@
 """Main module for the Whisper TikTok application."""
 
-import os
-import sys
 import argparse
-import logging
-from pathlib import Path
 import asyncio
 import json
+import logging
+import os
 import platform
+import sys
+from pathlib import Path
 
 from rich.console import Console
 
@@ -172,7 +172,7 @@ async def main() -> None:
         logger.info("Creating video")
         with console.status("Creating video\t") as _:
 
-            video_creator = VideoCreator(video, args, logger)
+            video_creator = VideoCreator(args=args, logger=logger, video=video)
 
             full_text = (
                 f"{video_creator.video['series']} - {video_creator.video['part']}.\n"
@@ -180,13 +180,20 @@ async def main() -> None:
                 f"{video_creator.video['outro']}"
             )
 
-            video_creator.download_video(url=args.url, folder="background")
+            status, info = video_creator.download_video(url=args.url, folder="background")
+            if not status:
+                console.print(f"[bold red]Error downloading video: {info}[/bold red]")
+                sys.exit(1)
+
             await video_creator.text_to_speech(
                 req_text=full_text,
                 voice=str(args.tts),
             )
+
             video_creator.generate_transcription(model=args.model, non_english=args.non_english)
+
             video_creator.create_final_video()
+
             if args.upload_tiktok:
                 video_creator.upload_to_tiktok()
 

@@ -1,0 +1,4 @@
+[submodule "AutoReel"]
+	path = AutoReel
+	url = git@github.com:MatteoFasulo/AutoReel.git
+	branch = master

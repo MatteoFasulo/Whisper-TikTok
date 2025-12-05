@@ -36,6 +36,7 @@ dev = [
     "mypy",
     "bandit",
     "mkdocs-material",
+    "pycodestyle",
 ]
 
 [tool.setuptools.packages]

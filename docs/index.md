@@ -101,7 +101,6 @@ python -m Whisper_TikTok.main [OPTIONS]
 
 Options:
   --model TEXT              Model to use [tiny|base|small|medium|large] (Default: small)
-  --non_english             Use general model, not the English one specifically. (Flag)
   --url TEXT                YouTube URL to download as background video. (Default: <https://www.youtube.com/watch?v=intRX7BRA90>)
   --tts TEXT                Voice to use for TTS (Default: en-US-ChristopherNeural)
   --list-voices             Use `edge-tts --list-voices` to list all voices.
@@ -119,7 +118,7 @@ Options:
   -v, --verbose             Verbose (Flag)
 ```
 
-> If you use the --random_voice option, please specify both --gender and --language arguments. Also you will need to specify the --non_english argument if you want to use a non-English voice otherwise the program will use the English model. Whisper model will auto-detect the language of the audio file and use the corresponding model.
+> If you use the --random_voice option, please specify both --gender and --language arguments. Whisper model will auto-detect the language of the audio file and use the corresponding model.
 
 ## Usage Examples
 
@@ -127,12 +126,6 @@ Options:
 
 ```bash
 python -m Whisper_TikTok.main --model medium --tts en-US-EricNeural
-```
-
-- Generate a TikTok video without using the English model:
-
-```bash
-python -m Whisper_TikTok.main --non_english --tts de-DE-KillianNeural
 ```
 
 - Use a custom YouTube video as the background video:

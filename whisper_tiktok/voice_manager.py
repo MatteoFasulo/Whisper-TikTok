@@ -1,42 +1,31 @@
-"""Module for managing voice synthesis using edge-tts."""
+from typing import Any
 
-import sys
 import edge_tts
 
 
 class VoicesManager:
-    """
-    A class for managing voices using edge-tts.
-
-    This class provides methods for creating and finding voices based on gender and locale.
-    """
-
     @staticmethod
     async def create():
-        """Asynchronously retrieves available voices using edge-tts.
-
-        Returns:
-            typing.List[edge_tts.Voice]: A list of available voices.
-        """
+        """Create and return voices manager object."""
         return await edge_tts.VoicesManager.create()
 
     @staticmethod
-    def find(voices, gender, locale):
-        """Finds a voice based on gender and locale.
+    def find(voices, gender: str, locale: str) -> Any:
+        """Find a voice by gender and locale.
 
         Args:
-            voices: A list of available voices.
-            gender: The desired gender of the voice.
-            locale: The desired locale of the voice.
+            voices: Voices manager object from create()
+            gender: Gender filter (Male/Female)
+            locale: Language locale filter (e.g., en-US)
 
         Returns:
-            The name of the found voice.
+            Dictionary with voice information
 
         Raises:
-            SystemExit: If no voice is found with the specified gender and locale.
+            ValueError: If no voice found
         """
-        voices = voices.find(Gender=gender, Locale=locale)
-        if len(voices) == 0:
-            print("Specified TTS language not found. Make sure you are using the correct format!")
-            sys.exit(1)
-        return voices["Name"]
+        result = voices.find(Gender=gender, Locale=locale)
+        if not result or len(result) == 0:
+            raise ValueError(f"No voice found for {gender} - {locale}")
+        # Return the first result as a dict-like object
+        return result[0]

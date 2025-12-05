@@ -2,29 +2,100 @@
 name = "whisper-tiktok"
 version = "2.0.3"
 description = "A TikTok video creation tool using Whisper ASR and EdgeTTS"
+authors = [
+    { name="Matteo Fasulo", email="info@matteofasulo.com" },
+]
+license = "Apache-2.0"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
-    "edge-tts",
-    "gradio",
-    "openai-whisper",
-    "rich",
-    "stable-ts",
-    "tiktok-uploader",
-    "tqdm",
-    "yt-dlp",
-    "torch",
-    "numpy",
-    "black",
+    "dependency-injector>=4.0,<5.0",
+    "edge-tts>=7.2.3",
+    "numpy>=2.3.5",
+    "openai-whisper>=20250625",
+    "pre-commit>=4.5.0",
+    "rich>=14.2.0",
+    "stable-ts>=2.19.1",
+    "tiktok-uploader>=1.1.5",
+    "torch>=2.6.0,<2.8.0",
+    "tqdm>=4.67.1",
+    "typer>=0.20.0",
+    "yt-dlp>=2025.11.12",
+]
+
+[project.optional-dependencies]
+dev = [
     "pytest",
+    "pytest-cov",
     "pytest-asyncio",
     "anyio",
+    "black",
+    "isort",
+    "ruff",
+    "pylint",
+    "mypy",
+    "bandit",
     "mkdocs-material",
 ]
 
 [tool.setuptools.packages]
 find = {}
 
+[tool.isort]
+py_version = 311
+profile = "black"
+line_length = 120
+
+[tool.black]
+line-length = 120
+target-version = ['py311', 'py312']
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_defs = false
+
+[tool.pylint.messages_control]
+disable = [
+    "C0103",  # invalid-name
+    "C0114",  # missing-module-docstring
+    "R0903",  # too-few-public-methods
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --strict-markers"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+lint.select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # Pyflakes
+    "I",    # isort
+    "C",    # flake8-comprehensions
+    "B",    # flake8-bugbear
+]
+lint.ignore = ["E501"]  # line too long (handled by black)
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 5.
+max-complexity = 20
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu126" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
 [[tool.mypy.overrides]]
 module = ["tiktok_uploader.*", "stable_whisper.*"]
-follow_untyped_imports = true
+follow_imports = "skip"

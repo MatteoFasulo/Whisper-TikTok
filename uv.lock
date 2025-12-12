@@ -2601,7 +2601,7 @@ dependencies = [
     { name = "yt-dlp" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "anyio" },
     { name = "bandit" },
@@ -2619,24 +2619,12 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anyio", marker = "extra == 'dev'" },
-    { name = "bandit", marker = "extra == 'dev'" },
-    { name = "black", marker = "extra == 'dev'" },
     { name = "dependency-injector", specifier = ">=4.0,<5.0" },
     { name = "edge-tts", specifier = ">=7.2.3" },
-    { name = "isort", marker = "extra == 'dev'" },
-    { name = "mkdocs-material", marker = "extra == 'dev'" },
-    { name = "mypy", marker = "extra == 'dev'" },
     { name = "numpy", specifier = ">=2.3.5" },
     { name = "openai-whisper", specifier = ">=20250625" },
     { name = "pre-commit", specifier = ">=4.5.0" },
-    { name = "pycodestyle", marker = "extra == 'dev'" },
-    { name = "pylint", marker = "extra == 'dev'" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'" },
-    { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "rich", specifier = ">=14.2.0" },
-    { name = "ruff", marker = "extra == 'dev'" },
     { name = "stable-ts", specifier = ">=2.19.1" },
     { name = "tiktok-uploader", specifier = ">=1.1.5" },
     { name = "torch", specifier = ">=2.6.0,<2.8.0", index = "https://download.pytorch.org/whl/cu126" },
@@ -2644,7 +2632,22 @@ requires-dist = [
     { name = "typer", specifier = ">=0.20.0" },
     { name = "yt-dlp", specifier = ">=2025.11.12" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "anyio" },
+    { name = "bandit" },
+    { name = "black" },
+    { name = "isort" },
+    { name = "mkdocs-material" },
+    { name = "mypy" },
+    { name = "pycodestyle" },
+    { name = "pylint" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
 
 [[package]]
 name = "wsproto"

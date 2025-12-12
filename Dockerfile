@@ -1,5 +1,7 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
+ENV UV_LINK_MODE copy
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         build-essential \

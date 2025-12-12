@@ -23,7 +23,7 @@ dependencies = [
     "yt-dlp>=2025.11.12",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest",
     "pytest-cov",

@@ -3,26 +3,27 @@ on:
     push:
         branches:
             - main
+            - dev*
 permissions:
     contents: write
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.12"]
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
+    deploy:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ["3.12"]
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
-      - uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: ${{ matrix.python-version }}
 
-      - run: pip install mkdocs-material
+            - run: pip install mkdocs-material
 
-      - run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          mkdocs gh-deploy --force
+            - run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  mkdocs gh-deploy --force

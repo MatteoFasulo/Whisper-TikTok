@@ -2,5 +2,4 @@
 *.log
 *.txt
 *.mp4
-*.toml
 .venv

@@ -1,19 +1,23 @@
-# Pull Request Template
+# Pull Request
 
-## Description
+## Summary
 
 Please include a brief description of the purpose of this pull request.
 
-## Changes Made
+## Motivation & Context
 
-List the changes you made in this pull request. Include details about new features, bug fixes, or any other modifications.
+- Why is this change necessary?
+- What problem does it solve?
+- Reference any relevant GitHub issues (e.g., fixes #123).
 
-## Related Issues
+## Changes Introduced
 
-If this pull request is related to any GitHub issues, please link them here.
+Provide a clear description of the changes made, including:
 
-- Fixes #XX
-- Addresses #YY
+- Major features added
+- Bugs fixed
+- Refactoring and improvements
+- Other relevant updates
 
 ## Checklist
 
@@ -26,6 +30,8 @@ Please review and check the following items before submitting your pull request:
 - [ ] I have added new tests, if applicable.
 - [ ] I have reviewed my code to ensure it is clean and efficient.
 - [ ] I have added any required comments or explanations for complex code changes.
+
+---
 
 ## Screenshots (if applicable)
 

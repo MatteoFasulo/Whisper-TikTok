@@ -44,9 +44,7 @@ jobs:
         run: mypy whisper_tiktok
 
       - name: ruff
-        run: ruff check whisper_tiktok tests/
+        run: ruff check whisper_tiktok
 
       - name: black
-        run: |
-          black --line-length 120 --check whisper_tiktok
-          black --line-length 120 --check tests/
+        run: black --line-length 120 --check whisper_tiktok

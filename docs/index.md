@@ -139,11 +139,11 @@ you will find a list of available voices together with some information about ea
 
 ### Code of Conduct
 
-Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
+Please review our [Code of Conduct](https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
 
 ### Contributing
 
-We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
+We welcome contributions from the community! Please see our [Contributing Guidelines](https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/CONTRIBUTING.md) for more information.
 
 ## Acknowledgments
 

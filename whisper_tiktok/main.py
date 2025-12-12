@@ -18,8 +18,6 @@ from whisper_tiktok.factories.video_factory import VideoCreatorFactory
 from whisper_tiktok.utils.color_utils import rgb_to_bgr
 from whisper_tiktok.voice_manager import VoicesManager
 
-__version__ = "2.0.0"
-
 # Create Typer app
 app = typer.Typer(
     name="whisper-tiktok",
@@ -27,13 +25,6 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
-
-
-def version_callback(value: bool):
-    """Show version and exit."""
-    if value:
-        console.print(f"[bold blue]Whisper TikTok[/bold blue] v{__version__}")
-        raise typer.Exit()
 
 
 @app.callback()

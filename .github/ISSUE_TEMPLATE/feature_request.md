@@ -1,9 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: "[Feature["
+title: "[Feature]"
 labels: enhancement
-assignees: MatteoFasulo, GianlucaIavicoli
+assignees: MatteoFasulo
 
 ---
 

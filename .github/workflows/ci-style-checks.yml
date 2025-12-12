@@ -32,19 +32,16 @@ jobs:
           sudo apt-get -y -q install ffmpeg libavcodec-extra
 
       - name: Install the project
-        run: uv sync
-
-      - name: pycodestyle
-        run: pycodestyle --ignore=C0330,C0415,E203,E231,W503 --max-line-length=120 whisper_tiktok
-
-      - name: pylint
-        run: pylint --fail-under=9.6 whisper_tiktok
-
-      - name: mypy
-        run: mypy whisper_tiktok
+        run: uv sync --extra dev
 
       - name: ruff
-        run: ruff check whisper_tiktok
+        run: uv run ruff check whisper_tiktok
 
       - name: black
-        run: black --line-length 120 --check whisper_tiktok
+        run: uv run black --line-length 88 --check whisper_tiktok
+
+      - name: mypy
+        run: uv run mypy whisper_tiktok
+
+      - name: pylint
+        run: uv run pylint --fail-under=9.6 whisper_tiktok

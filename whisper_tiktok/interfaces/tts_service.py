@@ -8,4 +8,3 @@ class ITTSService(ABC):
     @abstractmethod
     async def synthesize(self, text: str, output_file: Path, voice: str) -> None:
         """Synthesize speech from text."""
-        pass

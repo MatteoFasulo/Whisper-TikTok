@@ -27,10 +27,11 @@ class ProcessingStrategy(ABC):
     @abstractmethod
     async def execute(self, context: ProcessingContext) -> ProcessingContext:
         """Execute processing step and update context."""
-        pass
 
 
 class DownloadBackgroundStrategy(ProcessingStrategy):
+    """Strategy for downloading background video."""
+
     def __init__(self, downloader: IVideoDownloader, logger: Logger):
         self.downloader = downloader
         self.logger = logger
@@ -44,6 +45,8 @@ class DownloadBackgroundStrategy(ProcessingStrategy):
 
 
 class TTSGenerationStrategy(ProcessingStrategy):
+    """Strategy for generating TTS audio."""
+
     def __init__(self, tts_service: ITTSService, logger: Logger):
         self.tts_service = tts_service
         self.logger = logger
@@ -65,6 +68,8 @@ class TTSGenerationStrategy(ProcessingStrategy):
 
 
 class TranscriptionStrategy(ProcessingStrategy):
+    """Strategy for transcribing audio to generate subtitles."""
+
     def __init__(self, transcription_service: ITranscriptionService, logger: Logger):
         self.transcription_service = transcription_service
         self.logger = logger
@@ -91,6 +96,8 @@ class TranscriptionStrategy(ProcessingStrategy):
 
 
 class VideoCompositionStrategy(ProcessingStrategy):
+    """Strategy for composing the final video."""
+
     def __init__(self, ffmpeg_service: FFmpegService, logger: Logger):
         self.ffmpeg_service = ffmpeg_service
         self.logger = logger
@@ -124,6 +131,8 @@ class VideoCompositionStrategy(ProcessingStrategy):
 
 
 class TikTokUploadStrategy(ProcessingStrategy):
+    """Strategy for uploading videos to TikTok."""
+
     def __init__(self, uploader, logger: Logger):
         self.uploader = uploader
         self.logger = logger

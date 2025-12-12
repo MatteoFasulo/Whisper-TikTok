@@ -35,7 +35,9 @@ class Container(containers.DeclarativeContainer):
 
     command_executor = providers.Factory(CommandExecutor, logger=logger)
 
-    ffmpeg_service = providers.Factory(FFmpegService, executor=command_executor, logger=logger)  # Changed
+    ffmpeg_service = providers.Factory(
+        FFmpegService, executor=command_executor, logger=logger
+    )  # Changed
 
     video_downloader = providers.Factory(
         VideoDownloaderService,

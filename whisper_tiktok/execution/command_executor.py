@@ -7,13 +7,9 @@ from pathlib import Path
 class CommandExecutionError(Exception):
     """Custom exception for command execution errors."""
 
-    pass
-
 
 class CommandTimeoutError(Exception):
     """Custom exception for command timeouts."""
-
-    pass
 
 
 @dataclass
@@ -26,6 +22,7 @@ class ExecutionResult:
 
     @property
     def success(self) -> bool:
+        """Indicates if the command executed successfully."""
         return self.returncode == 0
 
 
@@ -35,7 +32,9 @@ class CommandExecutor:
     def __init__(self, logger: Logger):
         self.logger = logger
 
-    def execute(self, command: str, cwd: Path | None = None, timeout: int | None = None) -> ExecutionResult:
+    def execute(
+        self, command: str, cwd: Path | None = None, timeout: int | None = None
+    ) -> ExecutionResult:
         """Execute command and return result."""
 
         self.logger.debug(f"Executing: {command}")
@@ -48,9 +47,13 @@ class CommandExecutor:
                 text=True,
             ) as process:
                 stdout, stderr = process.communicate(timeout=timeout)
-                result = ExecutionResult(returncode=process.returncode, stdout=stdout, stderr=stderr)
+                result = ExecutionResult(
+                    returncode=process.returncode, stdout=stdout, stderr=stderr
+                )
 
-            return ExecutionResult(returncode=result.returncode, stdout=result.stdout, stderr=result.stderr)
+            return ExecutionResult(
+                returncode=result.returncode, stdout=result.stdout, stderr=result.stderr
+            )
         except subprocess.TimeoutExpired as exc:
             self.logger.error(f"Command timed out: {command}")
             raise CommandTimeoutError(f"Command timed out after {timeout}s") from exc

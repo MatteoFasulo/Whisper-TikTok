@@ -8,4 +8,3 @@ class IVideoDownloader(ABC):
     @abstractmethod
     def download(self, url: str, output_dir: Path) -> Path:
         """Download video from URL to output directory."""
-        pass

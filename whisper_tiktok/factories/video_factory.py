@@ -33,13 +33,23 @@ class VideoCreatorFactory:
     def _build_strategies(self, config: dict) -> list[ProcessingStrategy]:
         """Build processing pipeline based on config."""
         strategies = [
-            DownloadBackgroundStrategy(self.container.video_downloader(), self.container.logger()),
-            TTSGenerationStrategy(self.container.tts_service(), self.container.logger()),
-            TranscriptionStrategy(self.container.transcription_service(), self.container.logger()),
-            VideoCompositionStrategy(self.container.ffmpeg_service(), self.container.logger()),
+            DownloadBackgroundStrategy(
+                self.container.video_downloader(), self.container.logger()
+            ),
+            TTSGenerationStrategy(
+                self.container.tts_service(), self.container.logger()
+            ),
+            TranscriptionStrategy(
+                self.container.transcription_service(), self.container.logger()
+            ),
+            VideoCompositionStrategy(
+                self.container.ffmpeg_service(), self.container.logger()
+            ),
         ]
 
         if config.get("upload_tiktok"):
-            strategies.append(TikTokUploadStrategy(self.container.uploader(), self.container.logger()))
+            strategies.append(
+                TikTokUploadStrategy(self.container.uploader(), self.container.logger())
+            )
 
         return strategies

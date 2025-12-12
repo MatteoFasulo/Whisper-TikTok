@@ -50,10 +50,7 @@ class CommandExecutor:
                 result = ExecutionResult(
                     returncode=process.returncode, stdout=stdout, stderr=stderr
                 )
-
-            return ExecutionResult(
-                returncode=result.returncode, stdout=result.stdout, stderr=result.stderr
-            )
+            return result
         except subprocess.TimeoutExpired as exc:
             self.logger.error(f"Command timed out: {command}")
             raise CommandTimeoutError(f"Command timed out after {timeout}s") from exc

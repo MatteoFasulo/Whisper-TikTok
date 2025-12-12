@@ -23,7 +23,7 @@ class TTSService(ITTSService):
 
         Args:
             text (str): The text to be converted to speech.
-            output_path (Path): The path to save the synthesized audio file.
+            output_file (Path): The path to save the synthesized audio file.
             voice (str): The voice to be used for synthesis.
         """
         self.logger.debug(f"Synthesizing speech to {output_file} using voice {voice}")

@@ -1,11 +1,12 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-RUN apt-get update && apt-get install -y \
-    build-essential curl ca-certificates software-properties-common \
-    git ffmpeg && rm -rf /var/lib/apt/lists/*
-
-RUN groupadd --system --gid 999 nonroot \
- && useradd --system --gid 999 --uid 999 --create-home nonroot
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        ffmpeg \
+        curl \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -25,8 +26,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked
 
 RUN uv pip install -U streamlit
-
-USER nonroot
 
 EXPOSE 8501
 

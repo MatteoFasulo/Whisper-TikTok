@@ -10,12 +10,13 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "dependency-injector>=4.0,<5.0",
-    "edge-tts>=7.2.3",
+    "edge-tts==7.2.6",
     "numpy>=2.3.5",
     "openai-whisper>=20250625",
     "pre-commit>=4.5.0",
     "rich>=14.2.0",
     "stable-ts>=2.19.1",
+    "streamlit>=1.52.1",
     "tiktok-uploader>=1.1.5",
     "torch>=2.6.0,<2.8.0",
     "tqdm>=4.67.1",

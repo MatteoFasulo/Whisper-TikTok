@@ -22,6 +22,7 @@ dependencies = [
     "tqdm>=4.67.1",
     "typer>=0.20.0",
     "yt-dlp>=2025.11.12",
+    "mkdocstrings[python]>=0.18"
 ]
 
 [project.optional-dependencies]

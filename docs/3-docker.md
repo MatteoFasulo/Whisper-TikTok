@@ -1,4 +1,4 @@
-# Docker Image for Whisper-TikTok
+# Docker
 
 In this guide, we'll walk you through the process of using the dockerized version of the Whisper-TikTok model. Docker is a platform that allows you to package applications and their dependencies into containers, making it easy to run them on any system without worrying about compatibility issues.
 

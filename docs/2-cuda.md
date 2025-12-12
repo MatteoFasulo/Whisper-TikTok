@@ -1,4 +1,4 @@
-# Installing CUDA Driver for GPU Acceleration
+# Installing CUDA Driver
 
 To harness the power of GPU acceleration for the OpenAI Whisper model with PyTorch, you'll need to install the CUDA driver on your system. CUDA is a parallel computing platform and API developed by NVIDIA that allows GPUs to perform complex computations much faster than traditional CPUs. This guide will walk you through the process of installing the CUDA driver step by step.
 

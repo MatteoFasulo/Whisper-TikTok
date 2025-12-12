@@ -26,6 +26,19 @@ theme:
       primary: teal
       accent: lime
 
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            members_order: alphabetical
+            group_by_category: true
+            show_submodules: true
+            summary: true
+            show_labels: true
+
+
 extra:
   social:
     - icon: fontawesome/brands/github-alt

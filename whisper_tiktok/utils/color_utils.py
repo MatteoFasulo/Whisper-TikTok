@@ -8,7 +8,14 @@ def validate_hex_color(color: str) -> bool:
 
 
 def rgb_to_bgr(rgb: str) -> str:
-    """Convert RGB hex to BGR hex."""
+    """Convert RGB hex to BGR hex.
+
+    Args:
+        rgb: RGB hex string (e.g., "#RRGGBB" or "RRGGBB")
+
+    Returns:
+        BGR hex string (e.g., "BBGGRR")
+    """
     # Validate input length
     if len(rgb) != 6 and len(rgb) != 7:
         raise ValueError("RGB hex must be 6 or 7 characters long (including #).")

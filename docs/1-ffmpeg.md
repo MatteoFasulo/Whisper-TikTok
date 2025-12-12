@@ -1,4 +1,4 @@
-# Installing FFmpeg
+# FFmpeg
 
 FFmpeg is a powerful multimedia framework that provides command-line tools to record, convert, and stream audio and video. It's an essential tool for anyone working with multimedia files. In this guide, we'll walk you through the installation process for FFmpeg on various operating systems.
 

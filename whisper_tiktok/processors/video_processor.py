@@ -39,7 +39,9 @@ class VideoProcessor:
 
         # Initialize context
         media_path = Path(self.config.get("workspace_path", ".")) / "media" / self.uuid
-        output_path = Path(self.config.get("workspace_path", ".")) / "output" / self.uuid
+        output_path = (
+            Path(self.config.get("workspace_path", ".")) / "output" / self.uuid
+        )
 
         media_path.mkdir(parents=True, exist_ok=True)
         output_path.mkdir(parents=True, exist_ok=True)

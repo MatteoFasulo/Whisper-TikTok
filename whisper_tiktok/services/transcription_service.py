@@ -7,6 +7,8 @@ from whisper_tiktok.interfaces.transcription_service import ITranscriptionServic
 
 
 class TranscriptionService(ITranscriptionService):
+    """Service for transcribing audio using Whisper."""
+
     def __init__(self, logger):
         self.logger = logger
 
@@ -18,7 +20,9 @@ class TranscriptionService(ITranscriptionService):
         model: str,
         options: dict,
     ) -> tuple[Path, Path]:
-        self.logger.debug(f"Transcribing {audio_file} with model {model} and options {options}")
+        self.logger.debug(
+            f"Transcribing {audio_file} with model {model} and options {options}"
+        )
 
         whisper_model = stable_whisper.load_model(
             model, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")

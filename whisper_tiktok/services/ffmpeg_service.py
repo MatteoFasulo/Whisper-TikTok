@@ -10,8 +10,6 @@ from whisper_tiktok.execution.command_executor import CommandExecutor, Execution
 class FFmpegError(Exception):
     """Custom exception for FFmpeg errors."""
 
-    pass
-
 
 class MediaInfo(NamedTuple):
     """Represents the result of running FFprobe.
@@ -28,7 +26,10 @@ class MediaInfo(NamedTuple):
 
     @staticmethod
     def from_json(result: ExecutionResult) -> "MediaInfo":
-        return MediaInfo(return_code=result.returncode, json=result.stdout, error=result.stderr)
+        """Creates a MediaInfo instance from FFprobe execution result."""
+        return MediaInfo(
+            return_code=result.returncode, json=result.stdout, error=result.stderr
+        )
 
     @staticmethod
     def convert_time(time_in_seconds: float) -> str:
@@ -49,6 +50,7 @@ class MediaInfo(NamedTuple):
 
     @property
     def duration(self) -> float:
+        """Extracts the duration of the audio stream from the FFprobe JSON output."""
         d = json.loads(self.json)
 
         streams = d.get("streams", [])
@@ -99,7 +101,9 @@ class FFmpegService:
         # Build filter complex
         filters = self._build_video_filters(subtitles)
 
-        command = self._build_ffmpeg_command(background, audio, output, start_time, duration, filters)
+        command = self._build_ffmpeg_command(
+            background, audio, output, start_time, duration, filters
+        )
         result = self.executor.execute(command)
 
         if result.returncode != 0:

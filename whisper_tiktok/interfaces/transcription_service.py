@@ -15,4 +15,3 @@ class ITranscriptionService(ABC):
         options: dict,
     ) -> tuple[Path, Path]:
         """Transcribe audio and generate SRT/ASS files."""
-        pass

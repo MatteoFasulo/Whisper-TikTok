@@ -8,8 +8,6 @@ from whisper_tiktok.interfaces.video_downloader import IVideoDownloader
 class VideoDownloadError(Exception):
     """Custom exception for video download errors."""
 
-    pass
-
 
 class VideoDownloaderService(IVideoDownloader):
     """YouTube video downloader using yt-dlp."""

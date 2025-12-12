@@ -4,6 +4,8 @@ import edge_tts
 
 
 class VoicesManager:
+    """Wrapper for edge_tts VoicesManager."""
+
     @staticmethod
     async def create():
         """Create and return voices manager object."""

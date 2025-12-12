@@ -37,18 +37,8 @@ def version_callback(value: bool):
 
 
 @app.callback()
-def main(
-    version: Optional[bool] = typer.Option(
-        None,
-        "--version",
-        "-V",
-        callback=version_callback,
-        is_eager=True,
-        help="Show version and exit.",
-    ),
-):
+def main():
     """Whisper TikTok - Create TikTok videos with AI-generated subtitles."""
-    pass
 
 
 @app.command()
@@ -199,7 +189,7 @@ def create(
         # Validate model choice
         valid_models = ["tiny", "base", "small", "medium", "large", "turbo"]
         if model not in valid_models:
-            logger.error(f"Invalid model. Choose from: {', '.join(valid_models)}")
+            logger.error("Invalid model. Choose from: %s", ", ".join(valid_models))
             raise typer.Exit(code=1)
 
         # Handle random voice selection
@@ -213,10 +203,9 @@ def create(
                 voices_obj = await voices_manager.create()
                 voice_result = voices_manager.find(voices_obj, gender, language)
                 tts_voice = voice_result.get("Name") or voice_result.get("ShortName")
-                logger.info(f"Selected random voice: {tts_voice}")
-
+                logger.info("Selected random voice: %s", tts_voice)
             except Exception as e:
-                logger.error(f"Failed to select random voice: {e}")
+                logger.error("Failed to select random voice: %s", e)
                 raise typer.Exit(code=1) from e
         else:
             # Validate specified voice
@@ -227,14 +216,16 @@ def create(
                 voice_result = voices_obj.find(Locale=extracted_language)
 
                 if not voice_result:
-                    logger.error("Voice not found. Run 'whisper-tiktok list-voices' to see available voices")
+                    logger.error(
+                        "Voice not found. Run 'whisper-tiktok list-voices' to see available voices"
+                    )
                     raise typer.Exit(code=1)
 
                 language = extracted_language
-                logger.info(f"Using voice: {tts_voice}")
+                logger.info("Using voice: %s", tts_voice)
 
             except Exception as e:
-                logger.error(f"Voice validation failed: {e}")
+                logger.error("Voice validation failed: %s", e)
                 raise typer.Exit(code=1) from e
 
         # Process font color
@@ -251,12 +242,11 @@ def create(
 
             if media_path.exists():
                 shutil.rmtree(media_path)
-                logger.info(f"Removed {media_path}")
+                logger.info("Removed %s", media_path)
 
             if output_path.exists():
                 shutil.rmtree(output_path)
-                logger.info(f"Removed {output_path}")
-
+                logger.info("Removed %s", output_path)
         # Display startup info
         console.print("\n[bold green]🎬 Starting video creation pipeline…[/bold green]")
         console.print(f"  [cyan]Model:[/cyan] {model}")
@@ -288,7 +278,9 @@ def create(
 
         try:
             await app_instance.run()
-            console.print("\n[bold green]✅ Pipeline completed successfully![/bold green]")
+            console.print(
+                "\n[bold green]✅ Pipeline completed successfully![/bold green]"
+            )
         except Exception as e:
             logger.exception("Pipeline failed")
             console.print(f"\n[bold red]❌ Pipeline failed: {e}[/bold red]")
@@ -334,7 +326,9 @@ class Application:
 
         # Process each video
         for idx, video in enumerate(video_data, 1):
-            self.logger.info(f"Processing video {idx}/{len(video_data)}: {video.get('series', 'Unknown')}")
+            self.logger.info(
+                f"Processing video {idx}/{len(video_data)}: {video.get('series', 'Unknown')}"
+            )
             await self._process_video(video, config)
 
     async def _process_video(self, video: dict, config: dict):
@@ -346,7 +340,9 @@ class Application:
             result = await processor.process()
             self.logger.info(f"✓ Video created: {result.output_path}")
         except Exception:
-            self.logger.exception(f"✗ Failed to process video: {video.get('series', 'Unknown')}")
+            self.logger.exception(
+                f"✗ Failed to process video: {video.get('series', 'Unknown')}"
+            )
             raise
 
 

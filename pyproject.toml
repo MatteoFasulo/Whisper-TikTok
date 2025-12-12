@@ -23,7 +23,7 @@ dependencies = [
     "yt-dlp>=2025.11.12",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "pytest",
     "pytest-cov",
@@ -36,7 +36,6 @@ dev = [
     "mypy",
     "bandit",
     "mkdocs-material",
-    "pycodestyle",
 ]
 
 [tool.setuptools.packages]
@@ -45,10 +44,10 @@ find = {}
 [tool.isort]
 py_version = 311
 profile = "black"
-line_length = 120
+line_length = 88
 
 [tool.black]
-line-length = 120
+line-length = 88
 target-version = ['py311', 'py312']
 
 [tool.mypy]
@@ -71,7 +70,7 @@ python_files = ["test_*.py"]
 addopts = "-v --strict-markers"
 
 [tool.ruff]
-line-length = 120
+line-length = 88
 target-version = "py311"
 lint.select = [
     "E",    # pycodestyle errors
@@ -86,6 +85,9 @@ lint.ignore = ["E501"]  # line too long (handled by black)
 [tool.ruff.lint.mccabe]
 # Flag errors (`C901`) whenever the complexity level exceeds 5.
 max-complexity = 20
+
+[tool.pylint.main]
+extension-pkg-allow-list = ["dependency_injector.containers"]
 
 [tool.uv.sources]
 torch = [

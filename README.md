@@ -87,7 +87,7 @@ To run the program from the command-line, execute the following command within y
 python -m whisper_tiktok.main --help
 ```
 
-whcih will provide you with a list of available commands.
+which will provide you with a list of available commands.
 
 ### CLI Options
 

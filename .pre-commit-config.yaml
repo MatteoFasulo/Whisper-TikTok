@@ -48,3 +48,9 @@ repos:
       - id: bandit
         name: bandit (security check)
         args: [-ll]
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.17
+    hooks:
+      - id: uv-lock
+      - id: uv-export

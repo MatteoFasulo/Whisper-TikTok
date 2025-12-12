@@ -7,8 +7,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     git \
     ffmpeg \
-    && rm -rf /var/lib/apt/lists/* \
-    && git clone https://github.com/MatteoFasulo/Whisper-TikTok.git .
+    && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system --gid 999 nonroot \
  && useradd --system --gid 999 --uid 999 --create-home nonroot
@@ -26,9 +25,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project
 
+COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked
-
 RUN uv pip install -U streamlit
 
 ENV PATH="/app/.venv/bin:$PATH"

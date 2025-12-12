@@ -26,7 +26,7 @@ Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowes
 
 ## Installation 🛠️
 
-Whisper-TikTok has been tested in Windows 10, Windows 11 and Ubuntu 23.04 systems equipped with **Python versions 3.9, 3.10, and 3.11**.
+Whisper-TikTok has been tested in Windows 10, Windows 11 and Ubuntu 24.04 systems equipped with **Python versions 3.11, and 3.12**.
 
 If you want to run Whisper-TikTok locally, you can clone the repository using the following command:
 
@@ -40,7 +40,7 @@ Install the required dependencies using pip:
 pip install -r requirements.txt
 ```
 
-However, we encourage the adoption of astra `uv` to install the required dependencies. If you are using `uv`, you can install the dependencies with the following command:
+However, we encourage the adoption of astral [`uv`](https://docs.astral.sh/uv/) to install the required dependencies. If you are using `uv`, you can install the dependencies with the following command:
 
 ```bash
 uv sync
@@ -58,99 +58,82 @@ or
 uv pip install -e .
 ```
 
-It also requires the command-line tool [**FFMPEG**](https://ffmpeg.org/) to be installed on your system, which is available from most package managers:
+Binaries for [**FFMPEG**](https://ffmpeg.org/) are not included in the repository and must be installed separately. Make sure to have FFMPEG installed and accessible in your system's PATH. For convenience, here are the installation instructions for various package managers:
 
 ```bash
 # on Ubuntu or Debian
-
 sudo apt update && sudo apt install ffmpeg
 
 # on Arch Linux
-
 sudo pacman -S ffmpeg
 
 # on MacOS using Homebrew (<https://brew.sh/>)
-
 brew install ffmpeg
 
 # on Windows using Chocolatey (<https://chocolatey.org/>)
-
 choco install ffmpeg
 
 # on Windows using Scoop (<https://scoop.sh/>)
-
 scoop install ffmpeg
 ```
 
-Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for speech recognition. However, the program will work without a GPU, but it will run more slowly due to CPU limitations.
+Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for Automatic Speech Recognition (ASR). However, the program will work without a GPU, but it will run more slowly due to CPU limitations.
 
 ## Command-Line
 
 To run the program from the command-line, execute the following command within your terminal:
 
 ```bash
-python -m Whisper_TikTok.main
+python -m whisper_tiktok.main --help
 ```
+
+whcih will provide you with a list of available commands.
 
 ### CLI Options
 
-Whisper-TikTok supports the following command-line options:
+Whisper-TikTok supports many command-line options to customize the generated TikTok video. Just to name a few, you can choose the Whisper model to use, the TTS voice, subtitle format, subtitle position, font size, font color, and many more.
 
-```text
-python -m Whisper_TikTok.main [OPTIONS]
+To browse all available options, run the following command:
 
-Options:
-  --model TEXT              Model to use [tiny|base|small|medium|large] (Default: small)
-  --url TEXT                YouTube URL to download as background video. (Default: <https://www.youtube.com/watch?v=intRX7BRA90>)
-  --tts TEXT                Voice to use for TTS (Default: en-US-ChristopherNeural)
-  --list-voices             Use `edge-tts --list-voices` to list all voices.
---random_voice              Random voice for TTS (Flag)
-  --gender TEXT             Gender of the random TTS voice [Male|Female].
-  --language TEXT           Language of the random TTS voice(e.g., en-US)
-  --sub_format TEXT         Subtitle format to use [u|i|b] (Default: b) | b (Bold), u (Underline), i (Italic)
-  --sub_position INT        Subtitle position to use [1-9] (Default: 5)
-  --font TEXT               Font to use for subtitles (Default: Lexend Bold)
-  --font_color TEXT         Font color to use for subtitles in HEX format (Default: #FFF000).
-  --font_size INT           Font size to use for subtitles (Default: 21)
-  --max_characters INT      Maximum number of characters per line (Default: 38)
-  --max_words INT           Maximum number of words per segment (Default: 2)
-  --upload_tiktok           Upload the video to TikTok (Flag)
-  -v, --verbose             Verbose (Flag)
+```bash
+python -m whisper_tiktok.main create --help
 ```
 
 > If you use the --random_voice option, please specify both --gender and --language arguments. Whisper model will auto-detect the language of the audio file and use the corresponding model.
 
 ## Usage Examples
 
-- Generate a TikTok video using a specific TTS model and voice:
+- Generate a TikTok video using a specific TTS voice:
 
 ```bash
-python -m Whisper_TikTok.main --model medium --tts en-US-EricNeural
+python -m whisper_tiktok.main create --tts en-US-EricNeural
 ```
 
 - Use a custom YouTube video as the background video:
 
 ```bash
-python -m Whisper_TikTok.main --url https://www.youtube.com/watch?v=dQw4w9WgXcQ --tts en-US-JennyNeural
+python -m whisper_tiktok.main create --background-url https://www.youtube.com/watch?v=dQw4w9WgXcQ
 ```
 
 - Modify the font color of the subtitles:
 
 ```bash
-python -m Whisper_TikTok.main --sub_format b --font_color #FFF000 --tts en-US-JennyNeural
+python -m whisper_tiktok.main create --font_color FFF000
 ```
 
 - Generate a TikTok video with a random TTS voice:
 
 ```bash
-python -m Whisper_TikTok.main --random_voice --gender Male --language en-US
+python -m whisper_tiktok.main create --random_voice --gender Male --language en-US
 ```
 
 - List all available voices:
 
 ```bash
-edge-tts --list-voices
+python -m whisper_tiktok.main list-voices
 ```
+
+you will find a list of available voices together with some information about each voice, such as the tone, style, and suitable scenarios.
 
 ## Additional Resources
 

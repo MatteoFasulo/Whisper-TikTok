@@ -4,16 +4,16 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.0.x   | :white_check_mark: |
+| 2.x.x   | :white_check_mark: |
 | < 1.0   | :x:                |
 
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability in this project, please follow these steps to report it:
 
-1. **Ensure Your Findings Are Valid**: Before reporting a vulnerability, please ensure it is a genuine security issue. Avoid making it public until it has been resolved.
+1. **Ensure Your Findings Are Valid**: Before reporting a vulnerability, please ensure it is a genuine security issue.
 
-2. **Contact Us Privately**: Send an email to [info@matteofasulo.com](mailto:info@matteofasulo.com) with details about the vulnerability. Include the following information:
+2. **Send a Private Report**: Please send an email to the project maintainer with the following information:
    - A brief description of the vulnerability.
    - Steps to reproduce or a proof-of-concept.
    - Affected versions (if known).

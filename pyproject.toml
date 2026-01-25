@@ -1,28 +1,39 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+
+requires = [ "setuptools" ]
+
 [project]
 name = "whisper-tiktok"
-version = "2.0.3"
 description = "A TikTok video creation tool using Whisper ASR and EdgeTTS"
+readme.content-type = "text/markdown"
+readme.file = "README.md"
 authors = [
-    { name="Matteo Fasulo", email="info@matteofasulo.com" },
+    { name="Matteo Fasulo", email="74818541+MatteoFasulo@users.noreply.github.com" },
 ]
 license = "Apache-2.0"
-readme = "README.md"
 requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dynamic = [ "version" ]
+urls = { Homepage = "https://github.com/MatteoFasulo/Whisper-TikTok" }
+scripts.whisper = "whisper_tiktok.main:app"
 dependencies = [
     "dependency-injector>=4.0,<5.0",
     "edge-tts==7.2.6",
     "numpy>=2.3.5",
     "openai-whisper>=20250625",
-    "pre-commit>=4.5.0",
     "rich>=14.2.0",
     "stable-ts>=2.19.1",
     "streamlit>=1.52.1",
     "tiktok-uploader>=1.1.5",
-    "torch>=2.6.0,<2.8.0",
+    "torch>=2.6.0",
     "tqdm>=4.67.1",
     "typer>=0.20.0",
     "yt-dlp>=2025.11.12",
-    "mkdocstrings[python]>=0.18"
 ]
 
 [project.optional-dependencies]
@@ -30,77 +41,58 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-asyncio",
+    "pytest-xdist",
     "anyio",
+    "nbmake",
     "black",
     "isort",
-    "ruff",
-    "pylint",
-    "mypy",
-    "bandit",
+    "pre-commit>=4.5.0",
+    "bump-my-version",
+    "generate-changelog",
+]
+docs = [
+    "mkdocs",
     "mkdocs-material",
+    "mkdocstrings[python]",
 ]
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools]
+py-modules = [ "whisper_tiktok" ]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = { attr = "whisper_tiktok.version.__version__" }
+
+[tool.setuptools.packages.find]
+exclude = [ "tests*" ]
+namespaces = false
 
 [tool.isort]
-py_version = 311
 profile = "black"
-line_length = 88
+line_length = 120
+include_trailing_comma = true
+multi_line_output = 3
 
 [tool.black]
-line-length = 88
-target-version = ['py311', 'py312']
-
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-ignore_missing_imports = true
-disallow_untyped_defs = false
-
-[tool.pylint.messages_control]
-disable = [
-    "C0103",  # invalid-name
-    "C0114",  # missing-module-docstring
-    "R0903",  # too-few-public-methods
-]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --strict-markers"
+addopts = "-ra -v --strict -n=auto"
 
-[tool.ruff]
-line-length = 88
-target-version = "py311"
-lint.select = [
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings
-    "F",    # Pyflakes
-    "I",    # isort
-    "C",    # flake8-comprehensions
-    "B",    # flake8-bugbear
-]
-lint.ignore = ["E501"]  # line too long (handled by black)
-
-[tool.ruff.lint.mccabe]
-# Flag errors (`C901`) whenever the complexity level exceeds 5.
-max-complexity = 20
-
-[tool.pylint.main]
-extension-pkg-allow-list = ["dependency_injector.containers"]
-
-[tool.uv.sources]
-torch = [
-  { index = "pytorch-cu126" },
-]
-
-[[tool.uv.index]]
-name = "pytorch-cu126"
-url = "https://download.pytorch.org/whl/cu126"
-explicit = true
-
-[[tool.mypy.overrides]]
-module = ["tiktok_uploader.*", "stable_whisper.*"]
-follow_imports = "skip"
+[tool.bumpversion]
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+tag = true
+sign_tags = true
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+pre_commit_hooks = ["pytest", "uv sync", "git add uv.lock"]
+commit_args = ""

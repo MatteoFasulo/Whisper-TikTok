@@ -34,14 +34,5 @@ jobs:
       - name: Install the project
         run: uv sync --extra dev
 
-      - name: ruff
-        run: uv run ruff check whisper_tiktok
-
-      - name: black
-        run: uv run black --line-length 88 --check whisper_tiktok
-
-      - name: mypy
-        run: uv run mypy whisper_tiktok
-
-      - name: pylint
-        run: uv run pylint --fail-under=9.6 whisper_tiktok
+      - name: pre-commit
+        run: uv run pre-commit run --all-files

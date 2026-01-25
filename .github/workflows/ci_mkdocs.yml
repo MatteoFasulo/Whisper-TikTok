@@ -1,31 +1,33 @@
 name: ci_mkdocs
 on:
-    push:
-        branches:
-            - main
-            - dev*
+  push:
+    branches:
+      - main
+      - dev*
 permissions:
-    contents: write
+  contents: write
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v6
-            - name: Configure Git Credentials
-              run: |
-                git config user.name github-actions[bot]
-                git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-            - uses: actions/setup-python@v6
-              with:
-                  python-version: 3.12
-            - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
-            - uses: actions/cache@v5
-              with:
-                key: mkdocs-material-${{ env.cache_id }}
-                path: ~/.cache
-                restore-keys: |
-                  mkdocs-material-
-            - run: pip install mkdocs-material mkdocstrings-python
-            - run: mkdocs gh-deploy --force
+      - name: Install the project
+        run: uv sync --extra docs
+
+      - name: Build MkDocs site
+        run: mkdocs gh-deploy --force

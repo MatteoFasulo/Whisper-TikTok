@@ -20,7 +20,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 urls = { Homepage = "https://github.com/MatteoFasulo/Whisper-TikTok" }
-scripts.whisper = "whisper_tiktok.main:app"
+scripts.whisper_tiktok = "whisper_tiktok.main:app"
 dependencies = [
     "dependency-injector>=4.0,<5.0",
     "edge-tts==7.2.6",
@@ -76,12 +76,16 @@ multi_line_output = 3
 [tool.black]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = [
+    "tests",
+    "examples/",
+]
 python_files = ["test_*.py"]
-addopts = "-ra -v --strict -n=auto"
+addopts = "-ra --strict --doctest-modules --tb=short --nbmake -n=auto"
 
 [tool.bumpversion]
 parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+current_version = "v2.0.3"
 serialize = ["{major}.{minor}.{patch}"]
 search = "{current_version}"
 replace = "{new_version}"
@@ -94,5 +98,8 @@ tag_message = "Bump version: {current_version} → {new_version}"
 allow_dirty = false
 commit = true
 message = "Bump version: {current_version} → {new_version}"
-pre_commit_hooks = ["pytest", "uv sync", "git add uv.lock"]
+pre_commit_hooks = []
 commit_args = ""
+
+[[tool.bumpversion.files]]
+filename = "whisper_tiktok/version.py"

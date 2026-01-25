@@ -11,7 +11,7 @@ FFmpeg is a powerful multimedia framework that provides command-line tools to re
 
 ---
 
-## Windows Installation <a name="windows-installation"></a>
+## Windows Installation
 
 Installing FFmpeg on Windows can be done using pre-built executables.
 
@@ -35,7 +35,7 @@ Installing FFmpeg on Windows can be done using pre-built executables.
 
 ---
 
-## macOS Installation <a name="macos-installation"></a>
+## macOS Installation
 
 You can install FFmpeg on macOS using package managers like Homebrew or MacPorts. Here's how to do it with Homebrew:
 
@@ -61,7 +61,7 @@ You can install FFmpeg on macOS using package managers like Homebrew or MacPorts
 
 ---
 
-## Linux Installation <a name="linux-installation"></a>
+## Linux Installation
 
 On Linux, you can install FFmpeg using your distribution's package manager. Here are instructions for some popular Linux distributions:
 
@@ -108,7 +108,7 @@ You should see FFmpeg's version information.
 
 ---
 
-## Testing Your FFmpeg Installation <a name="testing-ffmpeg"></a>
+## Testing FFmpeg
 
 To ensure FFmpeg is working correctly, you can run a simple test command. Open your command prompt, terminal, or PowerShell and run:
 

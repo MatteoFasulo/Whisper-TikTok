@@ -60,7 +60,7 @@ group_by:
   - metadata.category
 
 # Only tags matching this regular expression are used for the changelog.
-tag_pattern: ^[0-9]+\.[0-9]+(?:\.[0-9]+)?$
+tag_pattern: ^v?[0-9]+\.[0-9]+(?:\.[0-9]+)?$
 
 # Tells `git-log` whether to include merge commits in the log.
 include_merges: false

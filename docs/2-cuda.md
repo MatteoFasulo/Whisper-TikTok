@@ -1,4 +1,4 @@
-# Installing CUDA Driver
+# Installing CUDA
 
 To harness the power of GPU acceleration for the OpenAI Whisper model with PyTorch, you'll need to install the CUDA driver on your system. CUDA is a parallel computing platform and API developed by NVIDIA that allows GPUs to perform complex computations much faster than traditional CPUs. This guide will walk you through the process of installing the CUDA driver step by step.
 
@@ -10,7 +10,7 @@ To harness the power of GPU acceleration for the OpenAI Whisper model with PyTor
 
 ---
 
-## Prerequisites <a name="prerequisites"></a>
+## Prerequisites
 
 Before you begin, make sure you have the following prerequisites in place:
 
@@ -22,7 +22,7 @@ Before you begin, make sure you have the following prerequisites in place:
 
 ---
 
-## Installing CUDA Driver <a name="installing-cuda-driver"></a>
+## Installing CUDA Driver
 
 Follow these steps to install the CUDA driver on your system:
 
@@ -64,7 +64,7 @@ Follow these steps to install the CUDA driver on your system:
 
 ---
 
-## Verifying CUDA Installation <a name="verifying-cuda-installation"></a>
+## Verifying CUDA Installation
 
 To verify that CUDA is installed correctly, follow these steps:
 

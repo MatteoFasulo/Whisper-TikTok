@@ -7,7 +7,7 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Video (demo)](#demo-video)
+- [Installation](#installation-️)
 - [Command-Line](#command-line)
 - [Usage Examples](#usage-examples)
 - [Additional Resources](#additional-resources)
@@ -20,7 +20,7 @@
 
 Discover Whisper-TikTok, an innovative AI-powered tool that leverages the prowess of **Edge TTS**, **OpenAI-Whisper**, and **FFMPEG** to craft captivating TikTok videos. Harnessing the capabilities of OpenAI's Whisper model, Whisper-TikTok effortlessly generates an accurate **transcription** from provided audio files, laying the foundation for the creation of mesmerizing TikTok videos through the utilization of **FFMPEG**. Additionally, the program seamlessly integrates the **Microsoft Edge Cloud Text-to-Speech (TTS) API** to lend a vibrant **voiceover** to the video. Opting for Microsoft Edge Cloud TTS API's voiceover is a deliberate choice, as it delivers a remarkably **natural and authentic** auditory experience, setting it apart from the often monotonous and artificial voiceovers prevalent in numerous TikTok videos.
 
-## Demo Video
+### Demo Video
 
 <https://github.com/MatteoFasulo/Whisper-TikTok/assets/74818541/68e25504-c305-4144-bd39-c9acc218c3a4>
 
@@ -43,20 +43,12 @@ pip install -r requirements.txt
 However, we encourage the adoption of astral [`uv`](https://docs.astral.sh/uv/) to install the required dependencies. If you are using `uv`, you can install the dependencies with the following command:
 
 ```bash
-uv sync
+uv pip install -e . --torch-backend=auto
 ```
 
-Then, install the repository as a package:
+>Note: The `--torch-backend=auto` allows automatic selection of the appropriate PyTorch backend. More info can be found in the [uv documentation](https://docs.astral.sh/uv/guides/integration/pytorch/#automatic-backend-selection).
 
-```bash
-pip install -e .
-```
-
-or
-
-```bash
-uv pip install -e .
-```
+### FFMPEG Installation
 
 Binaries for [**FFMPEG**](https://ffmpeg.org/) are not included in the repository and must be installed separately. Make sure to have FFMPEG installed and accessible in your system's PATH. For convenience, here are the installation instructions for various package managers:
 
@@ -77,14 +69,12 @@ choco install ffmpeg
 scoop install ffmpeg
 ```
 
-Please note that for optimal performance, it's advisable to have a GPU when using the OpenAI Whisper model for Automatic Speech Recognition (ASR). However, the program will work without a GPU, but it will run more slowly due to CPU limitations.
-
 ## Command-Line
 
 To run the program from the command-line, execute the following command within your terminal:
 
 ```bash
-python -m whisper_tiktok.main --help
+whisper_tiktok --help
 ```
 
 which will provide you with a list of available commands.
@@ -96,7 +86,7 @@ Whisper-TikTok supports many command-line options to customize the generated Tik
 To browse all available options, run the following command:
 
 ```bash
-python -m whisper_tiktok.main create --help
+whisper_tiktok create --help
 ```
 
 > If you use the --random_voice option, please specify both --gender and --language arguments. Whisper model will auto-detect the language of the audio file and use the corresponding model.
@@ -106,31 +96,31 @@ python -m whisper_tiktok.main create --help
 - Generate a TikTok video using a specific TTS voice:
 
 ```bash
-python -m whisper_tiktok.main create --tts en-US-EricNeural
+whisper_tiktok create --tts en-US-EricNeural
 ```
 
 - Use a custom YouTube video as the background video:
 
 ```bash
-python -m whisper_tiktok.main create --background-url https://www.youtube.com/watch?v=dQw4w9WgXcQ
+whisper_tiktok create --background-url https://www.youtube.com/watch?v=dQw4w9WgXcQ
 ```
 
 - Modify the font color of the subtitles:
 
 ```bash
-python -m whisper_tiktok.main create --font_color FFF000
+whisper_tiktok create --font_color FFF000
 ```
 
 - Generate a TikTok video with a random TTS voice:
 
 ```bash
-python -m whisper_tiktok.main create --random_voice --gender Male --language en-US
+whisper_tiktok create --random_voice --gender Male --language en-US
 ```
 
 - List all available voices:
 
 ```bash
-python -m whisper_tiktok.main list-voices
+whisper_tiktok list-voices
 ```
 
 you will find a list of available voices together with some information about each voice, such as the tone, style, and suitable scenarios.
@@ -139,11 +129,11 @@ you will find a list of available voices together with some information about ea
 
 ### Code of Conduct
 
-Please review our [Code of Conduct](./CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
+Please review our [Code of Conduct](https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/CODE_OF_CONDUCT.md) before contributing to Whisper-TikTok.
 
 ### Contributing
 
-We welcome contributions from the community! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for more information.
+We welcome contributions from the community! Please see our [Contributing Guidelines](https://github.com/MatteoFasulo/Whisper-TikTok/blob/main/CONTRIBUTING.md) for more information.
 
 ## Acknowledgments
 

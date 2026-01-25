@@ -1,40 +1,95 @@
-# Contributing to Whisper-TikTok
+# Contributing
 
-Thank you for your interest in contributing to our project! We appreciate your support and look forward to working with you.
+All contributions to are welcome!
 
 ## Getting Started
 
-Before contributing to our project, we recommend that you familiarize yourself with our project's [code of conduct](CODE_OF_CONDUCT.md). We also encourage you to review the [existing issues](https://github.com/MatteoFasulo/Whisper-TikTok/issues) and [pull requests](https://github.com/MatteoFasulo/Whisper-TikTok/pulls) to get an idea of what needs to be done and to avoid duplicating efforts.
+Before contributing to our project, we recommend that you familiarize yourself with our project's [code of conduct](CODE_OF_CONDUCT.md).
 
-## Ways to Contribute
+We also encourage you to review the [existing issues](https://github.com/MatteoFasulo/Whisper-TikTok/issues) and [pull requests](https://github.com/MatteoFasulo/Whisper-TikTok/pulls) to get an idea of what needs to be done and to avoid duplicating efforts.
 
-### Reporting Issues
+## Contributing Code
 
-If you encounter any bugs or issues, please let us know by creating an issue in our project's [issue tracker](https://github.com/MatteoFasulo/Whisper-TikTok/issues). When reporting an issue, please include as much detail as possible, such as a clear and descriptive title, a step-by-step description of the problem, and any relevant screenshots or error messages.
+Before contributing code, please make sure to do the following:
 
-### Suggesting Enhancements
+1. Fork the repository and clone it to your local machine.
+2. Create a virtual environment with `conda`, `venv` or any other tool of your choice.
+3. Install the required dependencies by running:
 
-We welcome suggestions for new features or enhancements to our project! Please create an issue in our project's [issue tracker](https://github.com/MatteoFasulo/Whisper-TikTok/issues) and describe the new feature or enhancement you'd like to see. Be sure to provide as much detail as possible, such as why you think the feature would be useful, any relevant use cases, and any potential challenges or limitations.
+    ```bash
+    uv pip install -e ".[dev, docs]" --torch-backend=auto
+    ```
 
-### Contributing Code
+4. Make sure that all the tests pass by running:
 
-We appreciate contributions of all kinds, including code contributions! Before contributing code, please make sure to do the following:
+    ```bash
+    pytest
+    ```
 
-1. Review the [existing issues](https://github.com/MatteoFasulo/Whisper-TikTok/issues) and [pull requests](https://github.com/MatteoFasulo/Whisper-TikTok/pulls) to make sure your proposed changes haven't already been addressed.
-2. Familiarize yourself with our project's code structure and development practices.
-3. Create a fork of our project and make your changes in a new branch.
-4. Submit a pull request with a clear and descriptive title, a detailed description of the changes you made, and any relevant screenshots or code snippets.
+5. Make sure that formatting and linting checks pass. We use `pre-commit` to manage our hooks. You can run the hooks manually by executing:
 
-Please note that all code contributions are subject to review and may require changes before they can be merged into the main project.
+    ```bash
+    pre-commit install
+    pre-commit run --all-files
+    ```
 
-### Improving Documentation
+6. Commit your changes and push your branch.
+7. Create a merge request describing your changes and linking any relevant issues.
 
-Improving project documentation is also a valuable contribution! If you notice any errors or areas where the documentation could be improved, please create an issue in our project's [issue tracker](https://github.com/MatteoFasulo/Whisper-TikTok/issues) or submit a pull request with your proposed changes.
+## Bug Reports and Feature Requests
 
-## Code of Conduct
+If you encounter any bugs or have feature requests, please open an issue on our [GitHub Issues page](https://github.com/MatteoFasulo/Whisper-TikTok/issues).
 
-Our project has a code of conduct to ensure that all contributors feel welcome and valued. Please review the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) file before contributing to our project.
+When reporting a bug, please include as much detail as possible, including steps to reproduce the issue, expected behavior, and any relevant logs or screenshots.
 
-## Conclusion
+## Releasing a New Version
 
-We appreciate your interest in contributing to our project and look forward to your contributions. If you have any questions or need any help, please don't hesitate to reach out to us through the issue tracker or by email.
+We use semantic versioning for our project. To release a new version, follow these steps:
+
+1. Make sure that all changes intended for the new release are merged into the `main` branch. Unstaged or staged changes should not be present but rather committed or stashed away.
+2. Create a new branch from `main` for the release (e.g., `prepare-release`):
+
+    ```bash
+    git checkout main
+    git pull origin main
+    git checkout -b prepare-release
+    ```
+
+3. Ensure all tests pass and the code is properly formatted. Use `pre-commit` to check formatting and linting.
+
+    ```bash
+    pytest
+    pre-commit install
+    pre-commit run --all-files
+    ```
+
+4. Choose which kind of version bump you want to perform: `major`, `minor`, or `patch`:
+
+    - Major: for incompatible API changes.
+    - Minor: for adding functionality in a backward-compatible manner.
+    - Patch: for backward-compatible bug fixes.
+
+    Then run the following command to bump the version accordingly:
+
+    ```bash
+    bump-my-version bump <major|minor|patch>
+    ```
+
+5. Verify that the version has been updated and a new git tag has been created.
+6. Update the `CHANGELOG.md` file with the changes included in this release. Run the following command to generate the changelog:
+
+    ```bash
+    generate-changelog
+    ```
+
+7. Commit the updated `CHANGELOG.md` file and push the changes along with the new tag to the remote repository:
+
+    ```bash
+    git add CHANGELOG.md
+    git commit -m "chore: update CHANGELOG for new release"
+    git push --tags && git push origin prepare-release
+    ```
+
+8. Create a pull request to merge the `prepare-release` branch into `main`. Once the pull request is approved and merged, the new version will be officially released.
+
+9. Now give yourself a pat on the back for a job well done :)

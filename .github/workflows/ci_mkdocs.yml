@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12"]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
@@ -27,8 +27,8 @@ jobs:
           enable-cache: true
           activate-environment: true
 
-      - name: Install the project
-        run: uv sync --extra docs
+      - name: Install mkdocs-material
+        run: uv pip install mkdocs mkdocs-material mkdocstrings[python]
 
       - name: Build MkDocs site
         run: uv run mkdocs gh-deploy --force

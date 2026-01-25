@@ -25,9 +25,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
+          activate-environment: true
 
       - name: Install the project
         run: uv sync --extra docs
 
       - name: Build MkDocs site
-        run: mkdocs gh-deploy --force
+        run: uv run mkdocs gh-deploy --force

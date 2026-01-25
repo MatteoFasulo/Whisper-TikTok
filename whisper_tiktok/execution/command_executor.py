@@ -27,7 +27,12 @@ class ExecutionResult:
 
 
 class CommandExecutor:
-    """Executes external commands with error handling."""
+    """Executes external commands with error handling.
+
+    Args:
+        logger: Logger instance for logging.
+
+    """
 
     def __init__(self, logger: Logger):
         self.logger = logger
@@ -35,7 +40,16 @@ class CommandExecutor:
     def execute(
         self, command: str, cwd: Path | None = None, timeout: int | None = None
     ) -> ExecutionResult:
-        """Execute command and return result."""
+        """Execute command and return result.
+
+        Args:
+            command: Command to execute.
+            cwd: Working directory for command execution.
+            timeout: Timeout in seconds for command execution.
+
+        Returns:
+            ExecutionResult containing return code, stdout, and stderr.
+        """
 
         self.logger.debug(f"Executing: {command}")
         try:

@@ -282,7 +282,17 @@ def create(
 
 
 class Application:
-    """Main application orchestrator."""
+    """Main application class responsible for orchestrating the video creation pipeline.
+    This class loads video data from a JSON file, builds configuration from a container,
+    and processes each video asynchronously using a factory-created processor.
+
+    Attributes:
+        container (Container): Dependency injection container.
+        logger (logging.Logger): Logger instance for logging operations.
+
+    Methods:
+        run(): Main method to run the video creation pipeline.
+    """
 
     def __init__(self, container: Container, logger: logging.Logger):
         self.container = container
@@ -290,7 +300,10 @@ class Application:
         self.factory = VideoCreatorFactory(container)
 
     def _load_video_data(self) -> list[dict]:
-        """Load video data from JSON file."""
+        """Load video data from video.json file.
+        Returns:
+            List of video data dictionaries.
+        """
         video_json_path = Path.cwd() / "video.json"
 
         try:
@@ -305,11 +318,19 @@ class Application:
             raise
 
     def _build_config(self) -> dict:
-        """Build configuration from container."""
+        """Build configuration from container.
+
+        Returns:
+            Configuration dictionary.
+        """
         return dict(self.container.config())
 
-    async def run(self):
-        """Run the video creation pipeline."""
+    async def run(self) -> None:
+        """Run the video creation pipeline.
+
+        Returns:
+            None
+        """
 
         # Load video data
         video_data = self._load_video_data()
@@ -322,8 +343,16 @@ class Application:
             )
             await self._process_video(video, config)
 
-    async def _process_video(self, video: dict, config: dict):
-        """Process a single video."""
+    async def _process_video(self, video: dict, config: dict) -> None:
+        """Process a single video.
+
+        Args:
+            video (dict): Video data dictionary.
+            config (dict): Configuration dictionary.
+
+        Returns:
+            None
+        """
 
         processor = self.factory.create_processor(video, config)
 
@@ -338,7 +367,11 @@ class Application:
 
 
 def _setup_event_loop():
-    """Setup event loop for Windows if needed."""
+    """Setup event loop for Windows if needed.
+
+    Returns:
+        None
+    """
     if platform.system() == "Windows":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 

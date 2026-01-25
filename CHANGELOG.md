@@ -2,10 +2,10 @@
 
 ## Unreleased (2026-01-25)
 
+## v2.0.4 (2026-01-25)
+
 ### Fixes
 
-- Fix: Update tag pattern in changelog configuration to allow optional 'v' prefix.
-    
 - Fix: Update CI workflows to correct branch specifications and enhance pre-commit hooks.
     
 - Fix: Update Python version in CI workflows to 3.12 and adjust MkDocs installation step.
@@ -79,6 +79,12 @@
     
 ### Other
 
+- Bump version: 2.0.3 → 2.0.4.
+    
+- Chore: remove Docker support and related documentation.
+    
+- Chore: remove changelog CI workflow and update versioning instructions in documentation.
+    
 - Enhance documentation and functionality across multiple files.
     
   - Updated mkdocs.yml to include mkdocstrings plugin for better documentation generation.
@@ -175,6 +181,16 @@
     
 ### Updates
 
+- Refactor contributing guidelines, remove Docker support, and update documentation.
+    
+  - Updated CONTRIBUTING.md to streamline contribution process and added new section for releasing a new version.
+  - Removed Dockerfile and docker-compose.yml as part of the project restructuring.
+  - Enhanced README.md and index.md for clarity and improved installation instructions.
+  - Updated FFMPEG installation documentation across multiple files.
+  - Added example Jupyter notebook for demonstrating usage.
+  - Adjusted pyproject.toml for script naming and testing configurations.
+  - Introduced new test_import.py to verify module import functionality.
+  - Updated versioning in version.py to include a 'v' prefix.
 - Refactor: Simplify CI workflows by removing redundant style checks and improving structure.
     
 - Remove version information and version callback from main.py.

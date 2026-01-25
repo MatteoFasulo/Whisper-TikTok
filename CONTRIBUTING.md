@@ -63,22 +63,33 @@ We use semantic versioning for our project. To release a new version, follow the
     pre-commit run --all-files
     ```
 
-4. Choose which kind of version bump you want to perform: `major`, `minor`, or `patch`.
+4. Choose which kind of version bump you want to perform: `major`, `minor`, or `patch`:
+
     - Major: for incompatible API changes.
     - Minor: for adding functionality in a backward-compatible manner.
     - Patch: for backward-compatible bug fixes.
+
+    Then run the following command to bump the version accordingly:
 
     ```bash
     bump-my-version bump <major|minor|patch>
     ```
 
-5. Verify that the version has been updated, changelog has been modified, and a new git tag has been created.
-6. Push the changes and the new tag to the remote repository:
+5. Verify that the version has been updated and a new git tag has been created.
+6. Update the `CHANGELOG.md` file with the changes included in this release. Run the following command to generate the changelog:
 
     ```bash
+    generate-changelog
+    ```
+
+7. Commit the updated `CHANGELOG.md` file and push the changes along with the new tag to the remote repository:
+
+    ```bash
+    git add CHANGELOG.md
+    git commit -m "chore: update CHANGELOG for new release"
     git push --tags && git push origin prepare-release
     ```
 
-7. Create a pull request to merge the `prepare-release` branch into `main`. Once the pull request is approved and merged, the new version will be officially released.
+8. Create a pull request to merge the `prepare-release` branch into `main`. Once the pull request is approved and merged, the new version will be officially released.
 
-8. Now give yourself a pat on the back for a job well done :)
+9. Now give yourself a pat on the back for a job well done :)

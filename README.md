@@ -2,7 +2,7 @@
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/chart?repos=MatteoFasulo/Whisper-TikTok&type=date&legend=top-left&sealed_token=8k6HK1GqfhdFpQLSI4E7_WPdQaSjaoBX6z4Ab6rkVzVQi1q1cnxj_9Bh_CPrJ6S2FWJzRv1qS30T5phOOfMAcj5oWWAe0lTQ05BgdcJw5cQPpehwDTKQQZA0nUdClg)](https://star-history.com/#MatteoFasulo/Whisper-TikTok&Date)
+[![Star History Chart](https://api.star-history.com/chart?repos=MatteoFasulo/Whisper-TikTok&type=date&legend=top-left&sealed_token=o4lWvyxqoTEZJBguuIr8QGWKBUUc4Jb41oCQehdzXzn5WNMuKezVa3th80ksoaAEq8OM3gT4XGdaalBvkiDFFf7MKN8GUAh4jc6O5doLSL26dy-MpqNsg_YwwwXg8-1EvUR7INCyQtbKMZiSahnNOV1XrezkrWw1dIoGGW-2Rhk2gjwDCnkt7YCop5_J)](https://www.star-history.com/)
 
 ## Table of Contents
 
